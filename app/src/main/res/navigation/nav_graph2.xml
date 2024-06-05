@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph2"
+    app:startDestination="@id/schoolCodeFragment">
+    <fragment
+        android:id="@+id/schoolCodeFragment"
+        android:name="com.hul.curriculam.ui.schoolCode.SchoolCodeFragment"
+        android:label="fragment_school_code"
+        tools:layout="@layout/fragment_school_code" >
+        <action
+            android:id="@+id/action_schoolCodeFragment_to_schoolFormFragment"
+            app:destination="@id/schoolFormFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/schoolFormFragment"
+        android:name="com.hul.curriculam.ui.schoolForm.SchoolFormFragment"
+        android:label="fragment_school_form"
+        tools:layout="@layout/fragment_school_form" />
+</navigation>
