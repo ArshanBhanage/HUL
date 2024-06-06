@@ -39,6 +39,7 @@
     <string name="location_name">Location name</string>
     <string name="my_visits">My Visits</string>
     <string name="my_area">My Area</string>
+    <string name="my_performance">My Performance</string>
     <string name="visit_number">Visits today</string>
     <string name="punch_time">Punch in time </string>
     <string name="my_attendence">My Attendance</string>

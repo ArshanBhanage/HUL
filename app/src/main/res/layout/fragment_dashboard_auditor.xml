@@ -106,24 +106,22 @@
                                 <TextView
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginRight="10dp"
+                                    android:layout_toRightOf="@+id/cal"
                                     android:fontFamily="@font/public_sans"
                                     android:text="@string/my_attendence"
                                     android:textColor="#2F2B3D"
                                     android:textFontWeight="700"
                                     android:textSize="18sp"
-                                    android:layout_toRightOf="@+id/cal"
                                     android:textStyle="bold"
-                                    android:layout_marginRight="10dp"
+                                    app:layout_constraintEnd_toStartOf="@+id/punchInButton"
                                     app:layout_constraintStart_toEndOf="@+id/cal"
-                                    app:layout_constraintTop_toTopOf="parent"
-                                    app:layout_constraintEnd_toStartOf="@+id/punchInButton"/>
+                                    app:layout_constraintTop_toTopOf="parent" />
+
                                 <com.google.android.material.button.MaterialButton
                                     android:id="@+id/punchInButton"
-                                    app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintTop_toTopOf="parent"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textSize="13sp"
                                     android:layout_alignParentRight="true"
                                     android:layout_gravity="right"
                                     android:backgroundTint="#dde0f6"
@@ -131,11 +129,14 @@
                                     android:text="@string/punch_in"
                                     android:textAllCaps="false"
                                     android:textColor="#2C41CA"
-                                    app:icon="@mipmap/plus"
-                                    app:cornerRadius="8dp"
-                                    app:iconTint="#2C41CA"
                                     android:textFontWeight="700"
-                                    android:textStyle="bold" />
+                                    android:textSize="13sp"
+                                    android:textStyle="bold"
+                                    app:cornerRadius="8dp"
+                                    app:icon="@mipmap/plus"
+                                    app:iconTint="#2C41CA"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
                             </androidx.constraintlayout.widget.ConstraintLayout>
 
                             <androidx.constraintlayout.widget.ConstraintLayout
@@ -329,78 +330,192 @@
                                     android:textSize="18sp"
                                     android:textStyle="bold" />
                             </LinearLayout>
-                            <!--                        <com.google.android.material.textfield.TextInputLayout-->
-                            <!--                            android:id="@+id/menu"-->
-                            <!--                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"-->
-                            <!--                            android:layout_width="150dp"-->
-                            <!--                            android:layout_height="wrap_content"-->
-                            <!--                            app:layout_constraintTop_toTopOf="parent"-->
-                            <!--                            app:layout_constraintEnd_toEndOf="parent"-->
-                            <!--                            app:layout_constraintBottom_toBottomOf="parent"-->
-                            <!--                            app:placeholderText="@string/status"-->
-                            <!--                            app:boxStrokeColor="@color/green"-->
-                            <!--                            app:endIconTint="@color/green">-->
-
-                            <!--                            <AutoCompleteTextView-->
-                            <!--                                android:id="@+id/autocomplete"-->
-                            <!--                                android:layout_width="match_parent"-->
-                            <!--                                android:layout_height="wrap_content"-->
-                            <!--                                android:inputType="none"-->
-                            <!--                                android:textColor="@color/green"-->
-                            <!--                                />-->
-
-                            <!--                        </com.google.android.material.textfield.TextInputLayout>-->
                         </androidx.constraintlayout.widget.ConstraintLayout>
+
                         <TextView
                             android:id="@+id/myArea"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="24dp"
                             android:fontFamily="@font/public_sans"
                             android:text="@string/my_area"
                             android:textColor="#2C41CA"
-                            android:layout_marginTop="24dp"
                             android:textFontWeight="700"
                             android:textSize="18sp"
                             android:textStyle="bold" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
-                        <!--                        <com.google.android.material.textfield.TextInputLayout-->
-                        <!--                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"-->
-                        <!--                            android:layout_width="match_parent"-->
-                        <!--                            android:layout_height="wrap_content"-->
-                        <!--                            android:hint="@string/location_name"-->
-                        <!--                            app:endIconDrawable="@mipmap/refresh"-->
-                        <!--                            app:endIconTint="@color/purple_500"-->
-                        <!--                            app:layout_constraintBottom_toBottomOf="parent"-->
-                        <!--                            app:layout_constraintEnd_toEndOf="parent"-->
-                        <!--                            app:layout_constraintTop_toTopOf="parent">-->
 
-                        <!--                            <AutoCompleteTextView-->
-                        <!--                                android:layout_width="match_parent"-->
-                        <!--                                android:layout_height="wrap_content"-->
-                        <!--                                android:textColor="@color/green" />-->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_marginVertical="16dp"
+                    android:background="@color/white"
+                    app:cardCornerRadius="8dp">
 
-                        <!--                        </com.google.android.material.textfield.TextInputLayout>-->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="24dp">
 
-                        <!--                        <TextView-->
-                        <!--                            android:layout_width="match_parent"-->
-                        <!--                            android:layout_height="wrap_content"-->
-                        <!--                            android:layout_marginTop="24dp"-->
-                        <!--                            android:fontFamily="@font/public_sans"-->
-                        <!--                            android:lineHeight="28dp"-->
-                        <!--                            android:text="@string/or_select_location"-->
-                        <!--                            android:textColor="#6d6b77"-->
-                        <!--                            android:textFontWeight="400"-->
-                        <!--                            android:textSize="15sp"-->
-                        <!--                            android:textStyle="bold"-->
-                        <!--                            app:layout_constraintTop_toTopOf="parent" />-->
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
 
-                        <!--                        <androidx.recyclerview.widget.RecyclerView-->
-                        <!--                            android:id="@+id/visitedLocation"-->
-                        <!--                            android:layout_width="match_parent"-->
-                        <!--                            android:layout_height="match_parent"-->
-                        <!--                            android:layout_marginTop="24dp"-->
-                        <!--                            tools:itemCount="5"-->
-                        <!--                            tools:listitem="@layout/location_view_design" />-->
+                            <ImageView
+                                android:id="@+id/my_performance"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@mipmap/ic_performance"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+
+                                />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="12dp"
+                                android:orientation="vertical"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/my_performance"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/public_sans"
+                                    android:text="@string/my_performance"
+                                    android:textColor="#2F2B3D"
+                                    android:textFontWeight="700"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="2"
+                            android:layout_marginTop="10dp">
+
+                            <LinearLayout
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <View
+                                    android:layout_width="15dp"
+                                    android:layout_height="15dp"
+                                    android:background="@drawable/purple_cirlce" />
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="20dp"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Total Visits"
+                                        android:textColor="#6d6b77"
+                                        android:textSize="15sp" />
+
+                                    <TextView
+                                        android:id="@+id/idVisits"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="35"
+                                        android:textColor="#444050"
+                                        android:textSize="18sp"
+                                        android:textStyle="bold" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <View
+                                    android:layout_width="15dp"
+                                    android:layout_height="15dp"
+                                    android:background="@drawable/green_cirlce" />
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="20dp"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Attendance"
+                                        android:textColor="#6d6b77"
+                                        android:textSize="15sp" />
+
+                                    <TextView
+                                        android:id="@+id/idAttendance"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="90%"
+                                        android:textColor="#444050"
+                                        android:textSize="18sp"
+                                        android:textStyle="bold" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="10dp">
+
+                            <View
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:background="@drawable/orange_cirlce" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Audit Approval"
+                                    android:textColor="#6d6b77"
+                                    android:textSize="15sp" />
+
+                                <TextView
+                                    android:id="@+id/idTotalVisits"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="94%"
+                                    android:textColor="#444050"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
