@@ -2,7 +2,6 @@ package com.hul.loginRegistraion.otp
 
 import android.content.Intent
 import android.graphics.BitmapFactory
-import androidx.fragment.app.viewModels
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -13,7 +12,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.Toast
-import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.hul.HULApplication
 import com.hul.R
@@ -23,14 +21,15 @@ import com.hul.api.controller.APIController
 import com.hul.dashboard.Dashboard
 import com.hul.data.RequestModel
 import com.hul.data.ResponseModel
-import com.hul.databinding.FragmentLoginWithPinBinding
 import com.hul.databinding.FragmentOTPBinding
 import com.hul.loginRegistraion.LoginRegisterComponent
 import com.hul.loginRegistraion.LoginRegistrationInterface
-import com.hul.loginRegistraion.loginwithpin.LoginWithPINViewModel
+import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboard
+import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
+import com.hul.utils.UserTypes
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.nonredirectionAlertDialogue
@@ -83,10 +82,14 @@ class OTPFragment : Fragment(), ApiHandler, RetryInterface {
 
         val regex = """^(?:\D*\d){6}""".toRegex()
         otpViewModel.loginId.value = requireArguments().getString("loginId")
-        otpViewModel.encodedLoginId.value = otpViewModel.loginId.value!!.replace(regex) { it.value.replace(Regex("""\d"""), "*") }
-        binding.numberSubInfo.text = requireContext().getString(R.string.otp_sub_info1) + " " +otpViewModel.encodedLoginId.value + " "+ requireContext().getString(R.string.otp_sub_info2)
+        otpViewModel.encodedLoginId.value =
+            otpViewModel.loginId.value!!.replace(regex) { it.value.replace(Regex("""\d"""), "*") }
+        binding.numberSubInfo.text =
+            requireContext().getString(R.string.otp_sub_info1) + " " + otpViewModel.encodedLoginId.value + " " + requireContext().getString(
+                R.string.otp_sub_info2
+            )
 
-        binding.loginButton.setOnClickListener{
+        binding.loginButton.setOnClickListener {
             loginUser()
         }
 
@@ -94,8 +97,7 @@ class OTPFragment : Fragment(), ApiHandler, RetryInterface {
             if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_SEND) {
                 // Handle Done or Send action key press
                 // Do something
-                if(otpViewModel.loginEnabled.value!! && !otpViewModel.termsAccepted.value!!)
-                {
+                if (otpViewModel.loginEnabled.value!! && !otpViewModel.termsAccepted.value!!) {
                     loginUser()
                 }
                 return@OnEditorActionListener true
@@ -151,16 +153,30 @@ class OTPFragment : Fragment(), ApiHandler, RetryInterface {
 
     private fun loginModel(): RequestModel {
         return RequestModel(
-            mobile = "+91"+otpViewModel.loginId.value,
+            mobile = "+91" + otpViewModel.loginId.value,
             otp = otpViewModel.otp.value
         )
     }
 
     private fun redirectToDashboard() {
-        val intent = Intent(activity, Dashboard::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        startActivity(intent)
-        requireActivity().finish()
+        when (userInfo.userType) {
+            UserTypes.MOBILISER -> {
+                val intent = Intent(activity, Dashboard::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                startActivity(intent)
+                requireActivity().finish()
+            }
+            UserTypes.FIELD_AUDITOR -> {
+                val intent = Intent(activity, FieldAuditorDashboard::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                startActivity(intent)
+                requireActivity().finish()
+            }
+
+            else -> {
+                // Handle other cases or default behavior
+            }
+        }
     }
 
     override fun onApiSuccess(o: String?, objectType: Int) {
@@ -173,13 +189,16 @@ class OTPFragment : Fragment(), ApiHandler, RetryInterface {
                 val model: ResponseModel = Gson().fromJson(o, ResponseModel::class.java)
                 if (!model.error) {
 
-                    userInfo.authToken = model.data!!.get("auth_token").toString() // for active session
-                    userInfo.loginId = model.data!!.get("mobile_number").toString().replace("+91","")
+                    userInfo.authToken =
+                        model.data!!.get("auth_token").toString() // for active session
+                    userInfo.loginId =
+                        model.data!!.get("mobile_number").toString().replace("+91", "")
                     userInfo.projectId = model.data!!.get("project_id").toString()
                     userInfo.projectName = model.data!!.get("project_name").toString()
+                    userInfo.userType = model.data?.get("user_type").toString()
+
                     val array = JSONArray(model.data!!.get("areas_mapped").toString())
-                    if(array.length()>0)
-                    {
+                    if (array.length() > 0) {
                         userInfo.myArea = array.getJSONObject(0).getString("area_name")
                     }
                     redirectToDashboard()
@@ -188,23 +207,31 @@ class OTPFragment : Fragment(), ApiHandler, RetryInterface {
                 }
 
             }
+
             ApiExtentions.ApiDef.GET_LOGO -> {
-                val model: ResponseModel = Gson().fromJson(o,ResponseModel::class.java)
+                val model: ResponseModel = Gson().fromJson(o, ResponseModel::class.java)
                 if (!model.error) {
                     getBanner()
-                    val imageBytes = Base64.decode(model.data!!.get("logo").toString(), Base64.DEFAULT)
-                    val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                    val imageBytes =
+                        Base64.decode(model.data!!.get("logo").toString(), Base64.DEFAULT)
+                    val decodedImage =
+                        BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
                     binding.logoimage.setImageBitmap(decodedImage)
                 } else {
                     redirectionAlertDialogue(requireContext(), model.message!!)
                 }
 
             }
+
             ApiExtentions.ApiDef.GET_BANNER -> {
-                val model: ResponseModel = Gson().fromJson(o,ResponseModel::class.java)
+                val model: ResponseModel = Gson().fromJson(o, ResponseModel::class.java)
                 if (!model.error) {
-                    val imageBytes = Base64.decode(model.data!!.get("project_image").toString(), Base64.DEFAULT)
-                    val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                    val imageBytes = Base64.decode(
+                        model.data!!.get("project_image").toString(),
+                        Base64.DEFAULT
+                    )
+                    val decodedImage =
+                        BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
                     binding.preview.setImageBitmap(decodedImage)
                 } else {
                     redirectionAlertDialogue(requireContext(), model.message!!)
@@ -212,7 +239,8 @@ class OTPFragment : Fragment(), ApiHandler, RetryInterface {
 
             }
 
-            else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
+            else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG)
+                .show()
         }
     }
 
@@ -227,7 +255,8 @@ class OTPFragment : Fragment(), ApiHandler, RetryInterface {
             ApiExtentions.ApiDef.LOGIN -> loginUser()
             ApiExtentions.ApiDef.GET_LOGO -> getLogo()
             ApiExtentions.ApiDef.GET_BANNER -> getBanner()
-            else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
+            else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG)
+                .show()
         }
 
     }

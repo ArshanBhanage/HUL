@@ -25,9 +25,11 @@ import com.hul.data.ResponseModel
 import com.hul.databinding.FragmentLoginWithPinBinding
 import com.hul.loginRegistraion.LoginRegisterComponent
 import com.hul.loginRegistraion.LoginRegistrationInterface
+import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboard
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
+import com.hul.utils.UserTypes
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.nonredirectionAlertDialogue
@@ -71,6 +73,9 @@ class LoginWithPIN : Fragment(), ApiHandler, RetryInterface {
                 .create()
         loginRegisterComponent.inject(this)
         binding.viewModel = loginWithPINViewModel
+
+        // Check if user already logged-in
+        checkUserLoginStatus()
 
         binding.loginButton.setOnClickListener {
             loginUser()
@@ -177,6 +182,27 @@ class LoginWithPIN : Fragment(), ApiHandler, RetryInterface {
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
         startActivity(intent)
         requireActivity().finish()
+    }
+
+    private fun checkUserLoginStatus() {
+        if (userInfo.authToken != null) {
+            when (userInfo.userType) {
+                UserTypes.MOBILISER -> {
+                    val intent = Intent(activity, Dashboard::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                }
+                UserTypes.FIELD_AUDITOR -> {
+                    val intent = Intent(activity, FieldAuditorDashboard::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                }
+
+                else -> {
+                    // Handle other cases or default behavior
+                }
+            }
+        }
     }
 
     override fun onApiSuccess(o: String?, objectType: Int) {

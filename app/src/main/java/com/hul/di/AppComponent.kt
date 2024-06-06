@@ -8,6 +8,7 @@ import com.hul.camera.CameraComponent
 import com.hul.curriculam.CurriculamComponent
 import com.hul.dashboard.DashboardComponent
 import com.hul.loginRegistraion.LoginRegisterComponent
+import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -30,5 +31,5 @@ interface AppComponent {
 
     fun curriculamComponent(): CurriculamComponent.Factory
 
-
+    fun fieldAuditorDashboardComponent(): FieldAuditorDashboardComponent.Factory
 }

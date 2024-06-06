@@ -10,6 +10,7 @@ import com.hul.utils.MY_AREA
 import com.hul.utils.PENDING_LEAD_DETAIL
 import com.hul.utils.PROJECT_ID
 import com.hul.utils.PROJECT_Name
+import com.hul.utils.USER_TYPE
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -55,5 +56,7 @@ class UserInfo @Inject constructor(private val storage: Storage) {
         get() = storage.getString(MY_AREA)
         set(value) = storage.setString(MY_AREA, value)
 
-
+    var userType: String
+        get() = storage.getString(USER_TYPE)
+        set(value) = storage.setString(USER_TYPE, value)
 }
