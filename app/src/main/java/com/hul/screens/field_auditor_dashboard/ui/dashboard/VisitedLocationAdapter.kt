@@ -10,6 +10,7 @@ import com.hul.databinding.LocationVisitedDesignBinding
 /**
  * Created by Nitin Chorge on 03-04-2024.
  */
+
 class VisitedLocationAdapter(private val mList: ArrayList<String>, private val dashboardInterface: DashboardFragmentInterface, val mContext : Context) : RecyclerView.Adapter<VisitedLocationAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: LocationVisitedDesignBinding) : RecyclerView.ViewHolder(binding.root)
@@ -29,11 +30,8 @@ class VisitedLocationAdapter(private val mList: ArrayList<String>, private val d
     // to keep it simple we are
     // not setting any image data to view
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        with(holder){
-            with(mList[position]){
-               binding.locationPosition.text = mList[position]
-            }
-        }
+        val item = mList[position]
+        holder.binding.locationPosition.text = item
     }
 
     // return the size of languageList

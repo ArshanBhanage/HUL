@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import com.hul.R
 import com.hul.data.Attendencemodel
+import com.hul.utils.TimeUtils
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -39,7 +40,8 @@ class AttendenceAdapter(private val context: Context, private val dataSource: Li
             view = inflater.inflate(R.layout.attendence_view, parent, false)
             viewHolder = ViewHolder()
             viewHolder.imageView = view.findViewById(R.id.present) as ImageView
-            viewHolder.textView = view.findViewById(R.id.day) as TextView
+            viewHolder.date = view.findViewById(R.id.date) as TextView
+            viewHolder.month = view.findViewById(R.id.month) as TextView
             view.tag = viewHolder
         } else {
             view = convertView
@@ -47,8 +49,15 @@ class AttendenceAdapter(private val context: Context, private val dataSource: Li
         }
 
         val item = getItem(position) as Attendencemodel
-        //viewHolder.imageView.setImageResource(item.imageResId)
-        viewHolder.textView.text = formatDateToDayWithSuffix(stringToDate(item.date!!)!!)
+
+        if(item.date != null) {
+            val timeStamp = TimeUtils.getTimeStampFromDateString(item.date!!)
+            val month = capitalizeWords(TimeUtils.getMonthFromTimestamp(timeStamp))
+
+            viewHolder.date.text = formatDateToDayWithSuffix(stringToDate(item.date!!)!!)
+            viewHolder.month.text = month
+
+        }
 
         if(item.present!!)
         {
@@ -63,7 +72,8 @@ class AttendenceAdapter(private val context: Context, private val dataSource: Li
 
     private class ViewHolder {
         lateinit var imageView: ImageView
-        lateinit var textView: TextView
+        lateinit var date: TextView
+        lateinit var month: TextView
     }
 
     fun stringToDate(dateString: String): Date? {
@@ -94,6 +104,11 @@ class AttendenceAdapter(private val context: Context, private val dataSource: Li
         }
     }
 
+    fun capitalizeWords(text: String): String {
+        return text.split(" ").joinToString(" ") { word ->
+            word.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        }
+    }
 
 }
 

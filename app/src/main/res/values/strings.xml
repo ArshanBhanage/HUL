@@ -11,10 +11,14 @@
 
     <string name="username">Mobile Number</string>
     <string name="school_name">School Name</string>
+    <string name="name_of_school_representative">Name of the school representative whom mobiliser met</string>
+    <string name="mobile_number_of_school_representative">Mobile Number of the school representative whom mobiliser met</string>
+    <string name="u_dise_code">U DISE Code</string>
     <string name="ward">Ward/Block</string>
     <string name="district">District</string>
     <string name="school_Code">School Code</string>
     <string name="enter_school_Code">Enter School Code</string>
+    <string name="enter_school_name">Enter School name</string>
     <string name="remarks">Remark</string>
     <string name="type_code">Type your 6 digit security code</string>
     <string name="username_placeholder">Enter your mobile number</string>
@@ -25,7 +29,10 @@
     <string name="login_info">Please sign-in to your account.</string>
     <string name="rights">Hindustan Unilever Limited\n© Unilever 2024</string>
     <string name="selfie_at_school">Selfie at first school</string>
+    <string name="picture_school_name">Picture of the school name</string>
     <string name="material_info">Full image of mobiliser with curriculum material</string>
+    <string name="selfie_with_school_name">Selfie with the school name or U DISE code</string>
+    <string name="ack_letter_picture">Acknowledgement letter picture</string>
     <string name="or_select_location">Or select from below</string>
     <string name="login_button">Login</string>
     <string name="capture">Capture</string>
@@ -45,8 +52,10 @@
     <string name="my_attendence">My Attendance</string>
     <string name="attendance">Mark Attendance  </string>
     <string name="school_code_heading">School Code </string>
+    <string name="school_activity_heading">School Activity</string>
     <string name="attendance_info">Ensure images are clear or retake them </string>
     <string name="school_code_info">Select your visit for this school</string>
+    <string name="school_activity_sub_title">Fill up the following details</string>
     <string name="time">Time </string>
     <string name="date">Date </string>
     <string name="start_new_project">Start new projects </string>
@@ -119,4 +128,9 @@
     <string name="form3">No. of filled trackers collected</string>
     <string name="form4">School asked to revisit for more tracker collection</string>
     <string name="form5">Yes</string>
+    <string name="till_date">Till Date</string>
+    <string name="view_school_location">View School Location</string>
+    <string name="no_of_books_handed_over">No. of books handed over to school</string>
+    <string name="no_of_books_given">No. of books given to school</string>
+    <string name="submit">Submit</string>
 </resources>

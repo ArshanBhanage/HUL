@@ -97,6 +97,9 @@ class APIController @Inject constructor(private val mContext: Context) :
         call: Call<ResponseBody?>,
         response: Response<ResponseBody?>
     ) {
+
+        Log.i(APIController::class.qualifiedName, "Data : " + response.toString())
+
         if (response.code() == 200 || response.code() == 201) {
             mHandler.onApiSuccess(response.body()!!.string(), apiId)
         } else {
@@ -119,7 +122,7 @@ class APIController @Inject constructor(private val mContext: Context) :
     }
 
     override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
-        Log.d("Errororo", t.localizedMessage)
+        Log.i(APIController::class.qualifiedName, "Error : " + t.localizedMessage)
         if (t.localizedMessage != null) {
             if (t.localizedMessage.contains("13.126.28.53") || t.localizedMessage.contains("ws.mintwalk.com")) {
                 mHandler.onApiError("Can not establish connection.\nCheck your Internet Connectivity.")

@@ -5,7 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
+import android.widget.RadioButton
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -71,21 +74,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                 .create()
         dashboardComponent.inject(this)
         binding.viewModel = dashboardViewModel
-//        val adapter = ArrayAdapter(
-//            requireContext(),
-//            android.R.layout.simple_spinner_item, resources.getStringArray(com.hul.R.array.status)
-//        )
-//        binding.autocomplete.setAdapter(adapter)
 
-        var visitList = arrayListOf("Location 1", "Location 2", "Location 3")
         binding.locationToVisit.layoutManager = LinearLayoutManager(context)
-
-
-//        binding.visitedLocation.layoutManager = LinearLayoutManager(context)
-//        val visitedLocationAdapter = VisitedLocationAdapter(visitList, this, requireContext())
-//
-//        // Setting the Adapter with the recyclerview
-//        binding.visitedLocation.adapter = visitedLocationAdapter
 
         binding.myArea.text = userInfo.myArea
 
@@ -95,6 +85,10 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         }
 
         binding.date.text = formatDate(Date(), "dd MMM yyyy")
+
+        binding.tillDateButton.setOnClickListener{
+            showOptionsDialog()
+        }
 
         return root
     }
@@ -251,5 +245,39 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         val intent = Intent(activity, Curriculam::class.java)
         intent.putExtra("projectInfo", Gson().toJson(projectInfo))
         startActivity(intent)
+    }
+
+    private fun showOptionsDialog() {
+        val inflater = LayoutInflater.from(requireContext())
+        val dialogView: View = inflater.inflate(R.layout.performance_dialog_options, null)
+
+        val checkTillDate: RadioButton = dialogView.findViewById(R.id.check_till_date)
+        val checkToday: RadioButton = dialogView.findViewById(R.id.check_today)
+        val checkYesterday: RadioButton = dialogView.findViewById(R.id.check_yesterday)
+
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setView(dialogView)
+            .setTitle("Select Date Option")
+            .setPositiveButton("OK") { dialog, _ ->
+                if (checkTillDate.isChecked) {
+                    checkToday.isChecked = false
+                    checkYesterday.isChecked = false
+                }
+                if (checkToday.isChecked) {
+                    checkYesterday.isChecked = false
+                    checkTillDate.isChecked = false
+                }
+                if (checkYesterday.isChecked) {
+                    checkToday.isChecked = false
+                    checkTillDate.isChecked = false
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        val dialog = builder.create()
+        dialog.show()
     }
 }

@@ -109,4 +109,8 @@ dependencies {
 
     implementation("com.google.android.material:material:1.5.0")
     implementation("androidx.viewpager2:viewpager2:1.0.0")
+
+    // Responsive dp and sp
+    implementation("com.intuit.sdp:sdp-android:1.1.1")
+    implementation("com.intuit.ssp:ssp-android:1.1.1")
 }
