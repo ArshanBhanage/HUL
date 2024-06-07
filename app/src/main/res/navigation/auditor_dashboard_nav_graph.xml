@@ -11,9 +11,21 @@
         <action
             android:id="@+id/action_dashboardFragment_to_attendenceFragment"
             app:destination="@id/attendenceFragment" />
+        <action
+            android:id="@+id/action_dashboardFragment_to_schoolFragment"
+            app:destination="@id/schoolActivityFragment" />
     </fragment>
     <fragment
         android:id="@+id/attendenceFragment"
         android:name="com.hul.screens.field_auditor_dashboard.ui.attendence.AttendenceFragment"
         android:label="AttendenceFragment" />
+    <fragment
+        android:id="@+id/schoolActivityFragment"
+        android:name="com.hul.screens.field_auditor_dashboard.ui.school_activity.SchoolActivityFragment"
+        android:label="SchoolActivityFragment">
+        <argument
+            android:name="projectInfo"
+            app:argType="string"
+            app:nullable="false" />
+    </fragment>
 </navigation>

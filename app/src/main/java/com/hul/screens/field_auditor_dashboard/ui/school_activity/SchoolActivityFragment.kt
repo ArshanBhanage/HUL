@@ -301,8 +301,6 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
 
     override fun onResume() {
         super.onResume()
-
-
     }
 
     fun markAttendence() {

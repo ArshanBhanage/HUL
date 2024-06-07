@@ -79,9 +79,18 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
         binding.myArea.text = userInfo.myArea
 
-
         binding.punchInButton.setOnClickListener {
             redirectToAttendence(ProjectInfo(location_id = "1"))
+        }
+
+        //Test only, to be removed
+        binding.stats.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putString("projectInfo", Gson().toJson(ProjectInfo(location_id = "1")))
+            findNavController().navigate(
+                R.id.action_dashboardFragment_to_schoolFragment,
+                bundle
+            )
         }
 
         binding.date.text = formatDate(Date(), "dd MMM yyyy")
