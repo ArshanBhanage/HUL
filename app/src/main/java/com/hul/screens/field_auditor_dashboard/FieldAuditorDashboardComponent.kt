@@ -3,6 +3,7 @@ package com.hul.screens.field_auditor_dashboard
 import com.hul.di.ActivityScope
 import com.hul.screens.field_auditor_dashboard.ui.attendence.AttendenceFragment
 import com.hul.screens.field_auditor_dashboard.ui.dashboard.DashboardFragment
+import com.hul.screens.field_auditor_dashboard.ui.school_activity.MobiliserVisitsFragment
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.SchoolActivityFragment
 import dagger.Subcomponent
 
@@ -22,6 +23,6 @@ interface FieldAuditorDashboardComponent {
     fun inject(activity: FieldAuditorDashboard)
     fun inject(dashboard: DashboardFragment)
     fun inject(attendence: AttendenceFragment)
-
-    fun inject(school_activity: SchoolActivityFragment)
+    fun inject(schoolActivity: SchoolActivityFragment)
+    fun inject(mobiliserVisits: MobiliserVisitsFragment)
 }

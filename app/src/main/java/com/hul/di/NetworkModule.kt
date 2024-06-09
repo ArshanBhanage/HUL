@@ -21,44 +21,32 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideRetrofit(userInfo: UserInfo,): Retrofit {
-        val retrofit: Retrofit
-        val mOkHttpClient: OkHttpClient
+    fun provideRetrofit(userInfo: UserInfo): Retrofit {
+        val mOkHttpClient: OkHttpClient.Builder = OkHttpClient.Builder()
+            .connectTimeout(160, TimeUnit.SECONDS)
+            .readTimeout(160L, TimeUnit.SECONDS)
+            .writeTimeout(160L, TimeUnit.SECONDS)
+            .addInterceptor(Interceptor { chain: Interceptor.Chain ->
+                val original = chain.request()
+                val request = original.newBuilder()
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", userInfo.authToken)
+                    .method(original.method, original.body)
+                    .build()
+                chain.proceed(request)
+            })
+
         if (HULApplication.IS_DEBUG) {
             val logging = HttpLoggingInterceptor()
             logging.level = HttpLoggingInterceptor.Level.BODY
-            mOkHttpClient = OkHttpClient.Builder().addInterceptor(logging)
-                .connectTimeout(160, TimeUnit.SECONDS)
-                .readTimeout(160L, TimeUnit.SECONDS)
-                .writeTimeout(160L, TimeUnit.SECONDS)
-                .addInterceptor(Interceptor { chain: Interceptor.Chain ->
-                    val original = chain.request()
-                    val request = original.newBuilder()
-                        .header("Content-Type", "application/json")
-                        .header("Authorization", userInfo.authToken)
-                        .method(original.method, original.body)
-                        .build()
-                    chain.proceed(request)
-                }).build()
-        } else {
-            mOkHttpClient = OkHttpClient.Builder()
-                .connectTimeout(160, TimeUnit.SECONDS)
-                .readTimeout(160L, TimeUnit.SECONDS)
-                .writeTimeout(160L, TimeUnit.SECONDS)
-                .addInterceptor(Interceptor { chain: Interceptor.Chain ->
-                    val original = chain.request()
-                    val request = original.newBuilder()
-                        .header("Content-Type", "application/json")
-                        .header("Authorization", userInfo.authToken)
-                        .method(original.method, original.body)
-                        .build()
-                    chain.proceed(request)
-                }).build()
+            mOkHttpClient.addInterceptor(logging)
         }
-        retrofit = Retrofit.Builder().client(mOkHttpClient)
+
+        val retrofit = Retrofit.Builder().client(mOkHttpClient.build())
             .addConverterFactory(GsonConverterFactory.create()).baseUrl(ApiInterface.BASE_URL)
             .build()
 
         return retrofit
     }
+
 }

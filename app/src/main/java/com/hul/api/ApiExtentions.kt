@@ -15,6 +15,7 @@ class ApiExtentions {
         ATTENDENCE_FORM,
         VISIT_LIST,
         VISIT_LIST_SINGLE,
+        VISIT_LIST_FIELD_AUDITOR,
         SUBMIT_SCHOOL_FORM,
         SCHOOL_CODES,
         GET_ATTENDENCE,
@@ -22,6 +23,8 @@ class ApiExtentions {
         CONFIRM_LEAD,
         UPLOADED_DOCUMENT_LIST,
         UPLOAD_IMAGE,
-        SUBMIT_LEAD
+        SUBMIT_LEAD,
+        GET_USER_DETAILS,
+        GET_PERFORMANCE
     }
 }

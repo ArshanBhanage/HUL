@@ -38,7 +38,7 @@
                     android:textColor="@color/black"
                     android:textSize="@dimen/_20ssp"
                     android:textStyle="bold"
-
+                    android:id="@+id/imgLogo"
                     />
 
                 <ImageView
@@ -272,10 +272,9 @@
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
                         <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/locationToVisit"
+                            android:id="@+id/recyclerViewMobilisers"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_marginTop="@dimen/_24sdp"
                             tools:itemCount="5"
                             tools:listitem="@layout/location_view_design" />
                     </LinearLayout>
@@ -442,7 +441,7 @@
                                         android:textSize="@dimen/_15ssp" />
 
                                     <TextView
-                                        android:id="@+id/idVisits"
+                                        android:id="@+id/txtVisits"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="35"
@@ -479,7 +478,7 @@
                                         android:textSize="@dimen/_15ssp" />
 
                                     <TextView
-                                        android:id="@+id/idAttendance"
+                                        android:id="@+id/txtAttendance"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="90%"
@@ -517,7 +516,7 @@
                                     android:textSize="@dimen/_15ssp" />
 
                                 <TextView
-                                    android:id="@+id/idTotalVisits"
+                                    android:id="@+id/txtTotalVisits"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="94%"

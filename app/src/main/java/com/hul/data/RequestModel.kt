@@ -26,5 +26,7 @@ data class RequestModel(
     var longitude : String? = null,
     var externalId : String? = null,
     var visit_id : String? = null,
-    var visitData: VisitData? = null
+    var visitData: VisitData? = null,
+    val userType: String? = null,
+    val mobiliserId: Int = 0
 )

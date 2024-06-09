@@ -77,6 +77,10 @@ class APIController @Inject constructor(private val mContext: Context) :
                 .getVisitListSingle(requestModel!!.location_id)
                 .enqueue(this)
 
+            ApiExtentions.ApiDef.VISIT_LIST_FIELD_AUDITOR -> retrofit.create(ApiInterface::class.java)
+                .getVisitListSingle(requestModel!!.userType, requestModel.mobiliserId)
+                .enqueue(this)
+
             ApiExtentions.ApiDef.LEAD_DETAILS -> retrofit.create(ApiInterface::class.java)
                 .getLeadDetails(requestModel!!.leadId!!)
                 .enqueue(this)
@@ -89,6 +93,14 @@ class APIController @Inject constructor(private val mContext: Context) :
                 .getUploadedDocument(requestModel!!.leadId!!)
                 .enqueue(this)
 
+            ApiExtentions.ApiDef.GET_USER_DETAILS -> retrofit.create(ApiInterface::class.java)
+                .getUserDetails()
+                .enqueue(this)
+
+            ApiExtentions.ApiDef.GET_PERFORMANCE -> retrofit.create(ApiInterface::class.java)
+                .getPerformance()
+                .enqueue(this)
+
             else -> Toast.makeText(mContext, "API NOT INTEGRATED", Toast.LENGTH_LONG).show()
         }
 
@@ -98,9 +110,6 @@ class APIController @Inject constructor(private val mContext: Context) :
         call: Call<ResponseBody?>,
         response: Response<ResponseBody?>
     ) {
-
-        Log.i(APIController::class.qualifiedName, "Data : " + response.toString())
-
         if (response.code() == 200 || response.code() == 201) {
             mHandler.onApiSuccess(response.body()!!.string(), apiId)
         } else if(response.code() == 401) {

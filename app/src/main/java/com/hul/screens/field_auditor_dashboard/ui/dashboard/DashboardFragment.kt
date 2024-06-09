@@ -1,11 +1,12 @@
 package com.hul.screens.field_auditor_dashboard.ui.dashboard
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import android.widget.RadioButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -21,8 +22,12 @@ import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
 import com.hul.curriculam.Curriculam
 import com.hul.data.Attendencemodel
+import com.hul.data.MappedUser
+import com.hul.data.PerformanceData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
+import com.hul.data.ResponseModel
+import com.hul.data.UserDetails
 import com.hul.databinding.FragmentDashboardAuditorBinding
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
 import com.hul.user.UserInfo
@@ -31,7 +36,6 @@ import com.hul.utils.RetryInterface
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectionAlertDialogue
-import com.hul.utils.setProgressDialog
 import org.json.JSONObject
 import java.lang.reflect.Type
 import java.text.SimpleDateFormat
@@ -59,6 +63,10 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     @Inject
     lateinit var apiController: APIController
 
+    val mobiliserUsers = mutableListOf<MappedUser>()
+
+    lateinit var mobilisersAdapter: MobilisersAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -75,7 +83,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         dashboardComponent.inject(this)
         binding.viewModel = dashboardViewModel
 
-        binding.locationToVisit.layoutManager = LinearLayoutManager(context)
+        binding.recyclerViewMobilisers.layoutManager = LinearLayoutManager(context)
 
         binding.myArea.text = userInfo.myArea
 
@@ -95,7 +103,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
         binding.date.text = formatDate(Date(), "dd MMM yyyy")
 
-        binding.tillDateButton.setOnClickListener{
+        binding.tillDateButton.setOnClickListener {
             showOptionsDialog()
         }
 
@@ -114,37 +122,55 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     override fun onResume() {
         super.onResume()
-
-        loadLocations()
+        mobiliserUsers.clear()
+        getLogo()
     }
 
-    fun loadLocations() {
-
+    private fun getLogo() {
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
-            setProgressDialog(requireContext(), "Loading Leads")
             apiController.getApiResponse(
                 this,
-                loadLocationsModel(),
-                ApiExtentions.ApiDef.VISIT_LIST.ordinal
+                RequestModel(projectId = userInfo.projectId),
+                ApiExtentions.ApiDef.GET_LOGO.ordinal
             )
         } else {
-            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.VISIT_LIST.ordinal, this)
+            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.GET_LOGO.ordinal, this)
         }
-
     }
 
-    private fun loadLocationsModel(): RequestModel {
-        return RequestModel(
-            projectId = userInfo.projectId
+    private fun getMobilisers() {
+        apiController.getApiResponse(
+            this,
+            getUserDetailsModel(),
+            ApiExtentions.ApiDef.GET_USER_DETAILS.ordinal
         )
     }
 
-    fun getAttendence() {
+    private fun getPerformance() {
+        apiController.getApiResponse(
+            this,
+            getPerformanceModel(),
+            ApiExtentions.ApiDef.GET_PERFORMANCE.ordinal
+        )
+    }
+
+    private fun getVisitListModel(userType: String, mobiliserId: Int): RequestModel {
+        return RequestModel(
+            userType = userType,
+            mobiliserId = mobiliserId
+        )
+    }
+
+    private fun getUserDetailsModel(): RequestModel {
+        return RequestModel()
+    }
+
+    private fun getAttendance() {
 
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
             apiController.getApiResponse(
                 this,
-                getAttendenceModel(),
+                getAttendanceModel(),
                 ApiExtentions.ApiDef.GET_ATTENDENCE.ordinal
             )
         } else {
@@ -153,36 +179,56 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     }
 
-    private fun getAttendenceModel(): RequestModel {
+    private fun getAttendanceModel(): RequestModel {
         return RequestModel(
             projectId = userInfo.projectId
+        )
+    }
+
+    private fun getPerformanceModel(): RequestModel {
+        return RequestModel(
+
         )
     }
 
     override fun onApiSuccess(o: String?, objectType: Int) {
 
         cancelProgressDialog()
-        when (ApiExtentions.ApiDef.values()[objectType]) {
+        when (ApiExtentions.ApiDef.entries[objectType]) {
 
-            ApiExtentions.ApiDef.VISIT_LIST -> {
+            ApiExtentions.ApiDef.GET_USER_DETAILS -> {
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
-                    val listType: Type = object : TypeToken<List<ProjectInfo?>?>() {}.type
-                    var projectInfo: ArrayList<ProjectInfo> =
-                        Gson().fromJson(model.getJSONArray("data").toString(), listType);
+                    val userResponse = Gson().fromJson(
+                        model.getJSONObject("data").toString(),
+                        UserDetails::class.java
+                    )
 
-                    val myVisitsAdapter = MyVisitsAdapter(projectInfo, this, requireContext())
+                    mobiliserUsers.addAll(userResponse.users_mapped)
+                    mobilisersAdapter = MobilisersAdapter(ArrayList(mobiliserUsers), this, requireContext())
+                    binding.recyclerViewMobilisers.adapter = mobilisersAdapter
 
-                    // Setting the Adapter with the recyclerview
-                    binding.visitNumbers.text =
-                        projectInfo.size.toString() + " " + requireContext().getString(R.string.visit_number)
-                    binding.locationToVisit.adapter = myVisitsAdapter
-                    getAttendence()
-
+                    getPerformance()
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
+            }
 
+            ApiExtentions.ApiDef.GET_PERFORMANCE -> {
+                val model = JSONObject(o.toString())
+                if (!model.getBoolean("error")) {
+                    val performanceData = Gson().fromJson(
+                        model.getJSONObject("data").toString(),
+                        PerformanceData::class.java
+                    )
+                    binding.txtVisits.text = performanceData.total_visits.toString()
+                    binding.txtAttendance.text = performanceData.attendance.toString() + "%"
+                    binding.txtTotalVisits.text = performanceData.audit_approval.toString() + "%"
+
+                    getAttendance()
+                } else {
+                    redirectionAlertDialogue(requireContext(), model.getString("message"))
+                }
             }
 
             ApiExtentions.ApiDef.GET_ATTENDENCE -> {
@@ -218,12 +264,26 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
             }
 
+            ApiExtentions.ApiDef.GET_LOGO -> {
+                val model: ResponseModel = Gson().fromJson(o, ResponseModel::class.java)
+                if (!model.error) {
+                    val imageBytes = Base64.decode(model.data!!.get("logo").toString(), Base64.DEFAULT)
+                    val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                    binding.imgLogo.setImageBitmap(decodedImage)
+
+                    // Get Mobilisers
+                    getMobilisers()
+                } else {
+                    redirectionAlertDialogue(requireContext(), model.message!!)
+                }
+            }
+
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
         }
     }
 
     override fun onApiError(message: String?) {
-        if(message?.equals(context?.getString(R.string.session_expire))!!) {
+        if (message?.equals(context?.getString(R.string.session_expire))!!) {
             userInfo.authToken = ""
         }
         redirectionAlertDialogue(requireContext(), message!!)
@@ -232,8 +292,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     override fun retry(type: Int) {
 
         when (ApiExtentions.ApiDef.values()[type]) {
-            ApiExtentions.ApiDef.VISIT_LIST -> loadLocations()
-            ApiExtentions.ApiDef.GET_ATTENDENCE -> getAttendence()
+            ApiExtentions.ApiDef.GET_USER_DETAILS -> getMobilisers()
+            ApiExtentions.ApiDef.GET_ATTENDENCE -> getAttendance()
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
         }
 
@@ -244,7 +304,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         if (dashboardViewModel.attendenceToday.value!!.present!!) {
             redirectToCurriculam(projectInfo)
         } else {
-            var bundle = Bundle()
+            val bundle = Bundle()
             bundle.putString("projectInfo", Gson().toJson(projectInfo))
             findNavController().navigate(
                 R.id.action_dashboardFragment_to_attendenceFragment,
@@ -291,5 +351,9 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
         val dialog = builder.create()
         dialog.show()
+    }
+
+    override fun redirectToVisits(mappedUser: MappedUser) {
+
     }
 }
