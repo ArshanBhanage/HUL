@@ -133,4 +133,5 @@
     <string name="no_of_books_handed_over">No. of books handed over to school</string>
     <string name="no_of_books_given">No. of books given to school</string>
     <string name="submit">Submit</string>
+    <string name="session_expire">Session Expired, Login Again</string>
 </resources>

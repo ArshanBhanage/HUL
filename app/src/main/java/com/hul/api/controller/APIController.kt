@@ -3,6 +3,7 @@ package com.hul.api.controller
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import com.hul.R
 import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler
 import com.hul.api.ApiInterface
@@ -102,6 +103,10 @@ class APIController @Inject constructor(private val mContext: Context) :
 
         if (response.code() == 200 || response.code() == 201) {
             mHandler.onApiSuccess(response.body()!!.string(), apiId)
+        } else if(response.code() == 401) {
+            if(ApiExtentions.ApiDef.values()[apiId]!=ApiExtentions.ApiDef.GET_LOGO && ApiExtentions.ApiDef.values()[apiId]!=ApiExtentions.ApiDef.GET_BANNER) {
+                mHandler.onApiError(mContext.getString(R.string.session_expire))
+            }
         } else {
 
             var response = JSONObject(response.errorBody()!!.string())

@@ -17,6 +17,8 @@ data class RequestModel(
     var photo_url1_description : String? = null,
     var photo_url2 : String? = null,
     var photo_url2_description : String? = null,
+    var photo_url3 : String? = null,
+    var photo_url3_description : String? = null,
     var remarks : String? = null,
     var project : String? = null,
     var location_id : String? = null,

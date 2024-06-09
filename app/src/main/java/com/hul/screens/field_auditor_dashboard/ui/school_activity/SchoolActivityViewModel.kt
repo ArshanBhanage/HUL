@@ -16,11 +16,13 @@ class SchoolActivityViewModel @Inject constructor(
 
     var imageUrl1 = MutableLiveData<String>("")
     var imageUrl2 = MutableLiveData<String>("")
+    var imageUrl3 = MutableLiveData<String>("")
 
     var position = MutableLiveData<Int>(0)
 
     var imageUrl1API = MutableLiveData<String>("")
     var imageUrl2API = MutableLiveData<String>("")
+    var imageUrl3API = MutableLiveData<String>("")
 
     var longitude = MutableLiveData<String>()
     var lattitude = MutableLiveData<String>()

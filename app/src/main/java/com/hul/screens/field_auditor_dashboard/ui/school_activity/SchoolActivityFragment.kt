@@ -326,8 +326,10 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
             longitude = schoolActivityViewModel.longitude.value,
             photo_url1 = schoolActivityViewModel.imageUrl1API.value,
             photo_url2 = schoolActivityViewModel.imageUrl2API.value,
+            photo_url3 = schoolActivityViewModel.imageUrl3API.value,
             photo_url1_description = binding.image1Description.text.toString(),
-            photo_url2_description = binding.image2Description.text.toString()
+            photo_url2_description = binding.image2Description.text.toString(),
+            photo_url3_description = binding.image3Description.text.toString()
         )
     }
 
@@ -354,6 +356,7 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
 
     fun uploadImage() {
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+            
             setProgressDialog(requireContext(), "Uploading")
             uploadFileController.getApiResponse(
                 this,

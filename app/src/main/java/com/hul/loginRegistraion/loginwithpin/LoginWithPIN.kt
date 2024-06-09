@@ -185,7 +185,7 @@ class LoginWithPIN : Fragment(), ApiHandler, RetryInterface {
     }
 
     private fun checkUserLoginStatus() {
-        if (userInfo.authToken != null) {
+        if (!userInfo.authToken.isEmpty()) {
             when (userInfo.userType) {
                 UserTypes.MOBILISER -> {
                     val intent = Intent(activity, Dashboard::class.java)

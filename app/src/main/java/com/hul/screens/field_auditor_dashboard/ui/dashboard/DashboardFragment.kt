@@ -223,6 +223,9 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     }
 
     override fun onApiError(message: String?) {
+        if(message?.equals(context?.getString(R.string.session_expire))!!) {
+            userInfo.authToken = ""
+        }
         redirectionAlertDialogue(requireContext(), message!!)
     }
 
