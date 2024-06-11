@@ -13,6 +13,9 @@ data class VisitData(
     var picture_of_teachers_seeing_the_video: String? = null,
     var school_closed: String? = null,
     var school_name: String? = null,
+    var school_representative_who_collected_the_books: String? = null,
+    var principal_contact_details: String? = null,
+    var principal: String? = null,
     var u_dice_code: String? = null,
     var visit_id: String? = null,
 )

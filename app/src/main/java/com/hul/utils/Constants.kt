@@ -49,8 +49,6 @@ const val AUTH_TOKEN = "authToken"
 const val PENDING_LEAD_DETAIL = "pendingLeadSetails"
 const val PROJECT_ID = "projectId"
 const val PROJECT_Name = "projectName"
-const val MY_AREA = "myArea"
-const val USER_TYPE = "userType"
 const val LEAD_DETAIL_LIST = "leadListDetails"
 const val REFERRAL_SCHEME_CODE = "referralSchemeCode"
 const val COMPANY = "company"
@@ -111,13 +109,11 @@ var deviceFootPrintHeader = "deviceFPmsgHeader"
 var messageHeader = "msgHeader"
 var dataTag = "data"
 
-
-
-
 //language list
 val languages = arrayListOf("English", "हिंदी", "ಕನ್ನಡ", "தமிழ்")
 
-
+const val USER_TYPE = "userType"
+const val MY_AREA = "myArea"
 
 
 
@@ -369,7 +365,6 @@ fun pinValidation(number: String): Boolean {
 fun otpValidation(number: String): Boolean {
     return number.length == 6
 }
-
 object UserTypes {
     const val MOBILISER = "MOBILISER"
     const val FIELD_AUDITOR = "FIELD_AUDITOR"

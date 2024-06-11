@@ -1,5 +1,4 @@
 package com.hul.api
-
 import com.hul.data.*
 import com.hul.data.RequestModel
 import okhttp3.MultipartBody
@@ -120,6 +119,9 @@ interface ApiInterface {
         @Query("uploadFor") uploadFor: String?,
         @Query("filename") filename: String?,
     ): Call<ResponseBody?>
+
+    @POST("app/visits/v1/addVisitData/")
+    fun visitData(@Body requestModel: RequestModel): Call<ResponseBody?>
 
     companion object {
         const val BASE_URL = "http://3.7.149.234:8000/"

@@ -92,7 +92,6 @@ class APIController @Inject constructor(private val mContext: Context) :
             ApiExtentions.ApiDef.UPLOADED_DOCUMENT_LIST -> retrofit.create(ApiInterface::class.java)
                 .getUploadedDocument(requestModel!!.leadId!!)
                 .enqueue(this)
-
             ApiExtentions.ApiDef.GET_USER_DETAILS -> retrofit.create(ApiInterface::class.java)
                 .getUserDetails()
                 .enqueue(this)
@@ -104,6 +103,10 @@ class APIController @Inject constructor(private val mContext: Context) :
             ApiExtentions.ApiDef.GET_VISIT_DATA -> retrofit.create(ApiInterface::class.java)
                 .getVisitData(requestModel!!.visitId, requestModel.project, requestModel.loadImages)
                 .enqueue(this)
+            ApiExtentions.ApiDef.VISIT_DATA -> retrofit.create(ApiInterface::class.java)
+                .visitData(requestModel!!)
+                .enqueue(this)
+
 
             else -> Toast.makeText(mContext, "API NOT INTEGRATED", Toast.LENGTH_LONG).show()
         }
@@ -141,6 +144,7 @@ class APIController @Inject constructor(private val mContext: Context) :
 
     override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
         Log.i(APIController::class.qualifiedName, "Error : " + t.localizedMessage)
+        Log.d("Errororo", t.localizedMessage)
         if (t.localizedMessage != null) {
             if (t.localizedMessage.contains("13.126.28.53") || t.localizedMessage.contains("ws.mintwalk.com")) {
                 mHandler.onApiError("Can not establish connection.\nCheck your Internet Connectivity.")

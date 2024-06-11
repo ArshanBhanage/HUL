@@ -13,7 +13,6 @@ import com.hul.utils.FileUtils.getFile
 import com.hul.data.RequestModel
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -52,7 +51,6 @@ class UploadFileController @Inject constructor(private val mContext: Context) :
         // MultipartBody.Part is used to send also the actual file name
         val body: MultipartBody.Part =
             MultipartBody.Part.createFormData("file", file.name, requestFile)
-
         this.mHandler = handler!!
         if (requestModel != null) {
             retrofit.create(ApiInterface::class.java)

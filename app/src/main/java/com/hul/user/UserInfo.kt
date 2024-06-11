@@ -55,7 +55,6 @@ class UserInfo @Inject constructor(private val storage: Storage) {
     var myArea: String
         get() = storage.getString(MY_AREA)
         set(value) = storage.setString(MY_AREA, value)
-
     var userType: String
         get() = storage.getString(USER_TYPE)
         set(value) = storage.setString(USER_TYPE, value)

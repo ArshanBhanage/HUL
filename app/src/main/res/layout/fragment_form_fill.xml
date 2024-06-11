@@ -72,7 +72,7 @@
                             android:textSize="16sp"
                             android:enabled="false"/>
 
-                        
+
                     </com.google.android.material.textfield.TextInputLayout>
                     <TextView
                         android:layout_width="match_parent"
@@ -110,7 +110,7 @@
                             android:textSize="16sp"
                             android:enabled="false"/>
 
-                        
+
                     </com.google.android.material.textfield.TextInputLayout>
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
@@ -463,9 +463,9 @@
                             android:textColor="@color/black"
                             android:textFontWeight="400"
                             android:textSize="16sp"
-                            android:enabled="false"/>
+                            android:enabled="true"/>
 
-                        
+
                     </com.google.android.material.textfield.TextInputLayout>
                     <TextView
                         android:layout_width="match_parent"
@@ -502,9 +502,9 @@
                             android:textColor="@color/black"
                             android:textFontWeight="400"
                             android:textSize="16sp"
-                            android:enabled="false"/>
+                            android:enabled="true"/>
 
-                        
+
                     </com.google.android.material.textfield.TextInputLayout>
                     <TextView
                         android:layout_width="match_parent"
@@ -541,9 +541,9 @@
                             android:textColor="@color/black"
                             android:textFontWeight="400"
                             android:textSize="16sp"
-                            android:enabled="false"/>
+                            android:enabled="true"/>
 
-                        
+
                     </com.google.android.material.textfield.TextInputLayout>
                     <TextView
                         android:layout_width="match_parent"
@@ -559,15 +559,15 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/form4"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="@={viewModel.form4}"
-                        android:layout_marginTop="10dp"
-                        android:theme="@style/SCBSwitch"
-                        android:layout_marginRight="10dp"
-                        />
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/form4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="@={viewModel.form4}"
+                            android:layout_marginTop="10dp"
+                            android:theme="@style/SCBSwitch"
+                            android:layout_marginRight="10dp"
+                            />
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -615,9 +615,9 @@
                             android:textColor="@color/black"
                             android:textFontWeight="400"
                             android:textSize="16sp"
-                            android:enabled="false"/>
+                            android:enabled="true"/>
 
-                        
+
                     </com.google.android.material.textfield.TextInputLayout>
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/proceed"

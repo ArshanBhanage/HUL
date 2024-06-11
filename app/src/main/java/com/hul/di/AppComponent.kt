@@ -32,4 +32,5 @@ interface AppComponent {
     fun curriculamComponent(): CurriculamComponent.Factory
 
     fun fieldAuditorDashboardComponent(): FieldAuditorDashboardComponent.Factory
+
 }

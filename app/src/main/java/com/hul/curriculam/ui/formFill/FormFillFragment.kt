@@ -18,12 +18,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.hul.HULApplication
@@ -31,6 +33,7 @@ import com.hul.R
 import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
+import com.hul.api.controller.UploadFileController as uploadFileController
 import com.hul.camera.CameraActivity
 import com.hul.curriculam.CurriculamComponent
 import com.hul.curriculam.ui.formDetails.FormDetailsFragment
@@ -47,6 +50,7 @@ import com.hul.utils.RetryInterface
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectionAlertDialogue
+import com.hul.utils.setProgressDialog
 import org.json.JSONObject
 import java.lang.reflect.Type
 import javax.inject.Inject
@@ -54,12 +58,13 @@ import javax.inject.Inject
 class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
 
     private var _binding: FragmentFormFillBinding? = null
-
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
 
     private lateinit var curriculamComponent: CurriculamComponent
+
+//    private lateinit var disceCodeEditText: String
 
     @Inject
     lateinit var formFillViewModel: FormFillViewModel
@@ -114,7 +119,7 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
         binding.proceed.setOnClickListener {
-
+            submitForm()
         }
 
         if (allPermissionsGranted()) {
@@ -135,29 +140,25 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
 
     }
 
-    var startImageCapture =
+    val startImageCapture =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 // There are no request codes
                 val data: Intent? = result.data
-                when (data!!.getIntExtra("position", 0)) {
-                    0 ->
-                        formFillViewModel.imageUrl1.value = result.data!!.getStringExtra("imageUrl")
+                val position = data!!.getIntExtra("position", 0)
+                val imageUrl = result.data!!.getStringExtra("imageUrl")
 
-                    1 ->
-                        formFillViewModel.imageUrl2.value = result.data!!.getStringExtra("imageUrl")
-
-                    2 ->
-                        formFillViewModel.imageUrl3.value = result.data!!.getStringExtra("imageUrl")
-
-                    3 ->
-                        formFillViewModel.imageUrl4.value = result.data!!.getStringExtra("imageUrl")
-
-                    4 ->
-                        formFillViewModel.imageUrl5.value = result.data!!.getStringExtra("imageUrl")
+                // Update the view model's imageUrl at the corresponding position
+                when (position) {
+                    0 -> formFillViewModel.imageUrl1.value = imageUrl
+                    1 -> formFillViewModel.imageUrl2.value = imageUrl
+                    2 -> formFillViewModel.imageUrl3.value = imageUrl
+                    3 -> formFillViewModel.imageUrl4.value = imageUrl
+                    4 -> formFillViewModel.imageUrl5.value = imageUrl
                 }
             }
         }
+
 
     companion object {
         private const val ARG_CONTENT1 = "content1"
@@ -342,10 +343,10 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
             apiController.getApiResponse(
                 this,
                 submitModel(),
-                ApiExtentions.ApiDef.SUBMIT_SCHOOL_FORM.ordinal
+                ApiExtentions.ApiDef.VISIT_DATA.ordinal
             )
         } else {
-            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.SUBMIT_SCHOOL_FORM.ordinal, this)
+            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.VISIT_DATA.ordinal, this)
         }
 
     }
@@ -356,19 +357,22 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
             visit_id = formFillViewModel.projectInfo.value!!.location_id,
             visitData = VisitData(
                 no_of_teachers_trained= formFillViewModel.form1.value,
-            number_of_books_distributed= 25.toString(),
-        number_of_students_as_per_record= 25.toString(),
-        picture_of_acknowledgement_letter= null,
-        picture_of_school_with_name_visible= null,
-        picture_of_school_with_unique_code= null,
-        picture_of_students_with_book_distribution= null,
-        picture_of_students_with_book_distribution2= null,
-        picture_of_students_with_book_distribution3= null,
-        picture_of_teachers_seeing_the_video= null,
-        school_closed= 0.toString(),
-        school_name= "Maharashtra Vidyalaya",
-        u_dice_code= "XYZ012/123/111",
-        visit_id= 2.toString()
+                number_of_books_distributed= 25.toString(),
+                number_of_students_as_per_record= 25.toString(),
+                picture_of_acknowledgement_letter= formFillViewModel.imageUrl1.value,
+                picture_of_school_with_name_visible= formFillViewModel.imageUrl2.value,
+                picture_of_school_with_unique_code= formFillViewModel.imageUrl3.value,
+                picture_of_students_with_book_distribution= formFillViewModel.imageUrl4.value,
+                picture_of_students_with_book_distribution2= formFillViewModel.imageUrl5.value,
+                picture_of_students_with_book_distribution3= null,
+                picture_of_teachers_seeing_the_video= null,
+                school_closed= "false",
+                school_name= binding.schoolName.text.toString(),
+                school_representative_who_collected_the_books = binding.form1.text.toString(),
+                principal_contact_details = binding.form2.text.toString(),
+                principal = "Arman Singh",
+                u_dice_code = binding.disceCode.text.toString(),
+                visit_id= 2.toString()
             )
         )
     }
@@ -381,21 +385,49 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
             ApiExtentions.ApiDef.SUBMIT_SCHOOL_FORM -> {
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
-
-
                     // Set the adapter to the AutoCompleteTextView
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
-
             }
 
+            ApiExtentions.ApiDef.VISIT_DATA -> {
+                val model = JSONObject(o.toString())
+                if (!model.getBoolean("error")) {
+                    Toast.makeText(requireContext(), "Visit data submitted successfully", Toast.LENGTH_LONG).show()
+                } else {
+                    redirectionAlertDialogue(requireContext(), model.getString("message"))
+                }
+            }
 
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
         }
     }
 
+//    override fun onApiSuccess(o: String?, objectType: Int) {
+//
+//        cancelProgressDialog()
+//        when (ApiExtentions.ApiDef.values()[objectType]) {
+//
+//            ApiExtentions.ApiDef.SUBMIT_SCHOOL_FORM -> {
+//                val model = JSONObject(o.toString())
+//                if (!model.getBoolean("error")) {
+//
+//
+//                    // Set the adapter to the AutoCompleteTextView
+//                } else {
+//                    redirectionAlertDialogue(requireContext(), model.getString("message"))
+//                }
+//
+//            }
+//
+//
+//            else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
+//        }
+//    }
+
     override fun onApiError(message: String?) {
+        println(message)
         redirectionAlertDialogue(requireContext(), message!!)
     }
 

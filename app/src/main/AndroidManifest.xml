@@ -56,11 +56,13 @@
             android:exported="true"
             android:screenOrientation="portrait" >
         </activity>
+
         <activity
             android:name=".screens.field_auditor_dashboard.FieldAuditorDashboard"
             android:exported="true"
             android:screenOrientation="portrait" >
         </activity>
+
     </application>
 
 </manifest>
