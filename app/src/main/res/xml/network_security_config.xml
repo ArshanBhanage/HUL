@@ -1,0 +1,5 @@
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">3.7.149.234</domain>
+    </domain-config>
+</network-security-config>
