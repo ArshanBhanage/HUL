@@ -42,6 +42,7 @@ import com.hul.data.RequestModel
 import com.hul.data.SchoolActivityRequestModel
 import com.hul.data.SchoolVisitData
 import com.hul.data.UploadImageData
+import com.hul.data.VisitDetails
 import com.hul.databinding.FragmentSchoolActivityBinding
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
 import com.hul.screens.field_auditor_dashboard.ui.mobiliser_visits.MobiliserVisitsViewModel
@@ -330,7 +331,13 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
             visit_id = schoolActivityViewModel.projectInfo.value?.visit_id ?: 0,
             collected_by = userInfo.loginId,
             visitData = SchoolVisitData(
-                no_of_teachers_trained =
+                no_of_teachers_trained = {
+                    VisitDetails(
+                        value = schoolActivityViewModel.visitData.value.visit_1.no_of_teachers_trained.value,
+                        is_approved = schoolActivityViewModel.visitData.value.visit_1.no_of_teachers_trained.is_approved,
+                        rejection_reason = schoolActivityViewModel.visitData.value.visit_1.no_of_teachers_trained.rejection_reason
+                    )
+                }
             )
         )
     }*/
