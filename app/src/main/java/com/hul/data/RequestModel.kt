@@ -28,5 +28,10 @@ data class RequestModel(
     var visit_id : String? = null,
     var visitData: VisitData? = null,
     val userType: String? = null,
-    val mobiliserId: Int = 0
+    val mobiliserId: Int = 0,
+    val visitId: Int = 0,
+    val loadImages: Boolean = false,
+    val projectName: String? = null,
+    val uploadFor: String = "",
+    val filename: String = ""
 )

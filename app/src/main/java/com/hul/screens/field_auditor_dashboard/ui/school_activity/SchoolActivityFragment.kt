@@ -8,12 +8,15 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -33,10 +36,15 @@ import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
 import com.hul.camera.CameraActivity
 import com.hul.curriculam.Curriculam
+import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
+import com.hul.data.SchoolActivityRequestModel
+import com.hul.data.SchoolVisitData
+import com.hul.data.UploadImageData
 import com.hul.databinding.FragmentSchoolActivityBinding
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
+import com.hul.screens.field_auditor_dashboard.ui.mobiliser_visits.MobiliserVisitsViewModel
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
@@ -86,6 +94,8 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
 // last location to create a Notification if the user navigates away from the app.
     private var currentLocation: Location? = null
 
+    var imageIndex: Int = 0
+
     private val requestPermission =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val granted = permissions.entries.all {
@@ -118,11 +128,11 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         }
     }
 
-    fun requestPermission() {
+    private fun requestPermission() {
         requestPermission.launch(REQUIRED_PERMISSIONS)
     }
 
-    fun requestLocation() {
+    private fun requestLocation() {
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         requestLocation.launch(intent)
     }
@@ -179,44 +189,6 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
             locationCallback,
             Looper.getMainLooper()
         )
-
-//        locationCallback = object : LocationCallback() {
-//            //This callback is where we get "streaming" location updates. We can check things like accuracy to determine whether
-//            //this latest update should replace our previous estimate.
-//            override fun onLocationResult(locationResult: LocationResult) {
-//
-//                if (locationResult == null) {
-//                    Log.d(TAG, "locationResult null")
-//                    return
-//                }
-//                Log.d(TAG, "received " + locationResult.locations.size + " locations")
-//                for (loc in locationResult.locations) {
-//                    cameraPreviewViewModel.longitude.value = loc.longitude.toString()
-//                    cameraPreviewViewModel.lattitude.value = loc.latitude.toString()
-//                    if (cameraPreviewViewModel.uri.value != null) {
-//                        cancelProgressDialog()
-//                        redurectToImagePreview(cameraPreviewViewModel.uri.value!!)
-//                    }
-//                }
-//            }
-//
-//            override fun onLocationAvailability(locationAvailability: LocationAvailability) {
-//                Log.d(TAG, "locationAvailability is " + locationAvailability.isLocationAvailable)
-//                super.onLocationAvailability(locationAvailability)
-//            }
-//        }
-
-//        val locationRequest = LocationRequest.create().apply {
-//            interval = 100 // Update interval in milliseconds
-//            fastestInterval = 500 // Fastest update interval in milliseconds
-//            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-//        }
-//
-//        fusedLocationClient.requestLocationUpdates(
-//            locationRequest,
-//            locationCallback,
-//            null /* Looper */
-//        )
     }
 
     override fun onCreateView(
@@ -234,6 +206,8 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
                 .create()
         dashboardComponent.inject(this)
         binding.viewModel = schoolActivityViewModel
+
+        binding.llMain.setOnClickListener { hideKeyboard() }
 
         binding.pictureOfSchoolNameCapture.setOnClickListener {
             redirectToCamera(
@@ -253,7 +227,7 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
 
         binding.curriculumCapture.setOnClickListener {
             redirectToCamera(
-                1,
+                2,
                 schoolActivityViewModel.imageType3.value!!,
                 resources.getString(R.string.ack_letter_picture)
             )
@@ -263,17 +237,12 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
             requireActivity().onBackPressed()
         }
 
-//        binding.retake1.setOnClickListener {
-//            redirectToCamera(0,attendenceViewModel.imageType1.value!!)
-//        }
-//
-//        binding.retake2.setOnClickListener {
-//            redirectToCamera(1,attendenceViewModel.imageType2.value!!)
-//        }
-
         binding.btnSubmit.setOnClickListener {
-            schoolActivityViewModel.position.value = 1
-            uploadImage()
+            if (validateFields()) {
+                if (imageIndex == 0) {
+                    uploadImage(schoolActivityViewModel.imageUrl1.value?.toUri()!!)
+                }
+            }
         }
 
         if (allPermissionsGranted()) {
@@ -285,9 +254,23 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         schoolActivityViewModel.projectInfo.value =
             Gson().fromJson(requireArguments().getString("projectInfo"), ProjectInfo::class.java)
 
-        getAttendenceForm()
-
         return root
+    }
+
+    private fun validateFields(): Boolean {
+        return if (schoolActivityViewModel.imageUrl1.value?.isEmpty() == true
+            || schoolActivityViewModel.imageUrl2.value?.isEmpty() == true
+            || schoolActivityViewModel.imageUrl3.value?.isEmpty() == true
+        ) {
+            Toast.makeText(requireContext(), "Please add all images", Toast.LENGTH_LONG).show()
+            false
+        } else if (schoolActivityViewModel.noOfBooksGivenToSchool.value?.isEmpty() == true) {
+            Toast.makeText(requireContext(), "Please add No of books given", Toast.LENGTH_LONG)
+                .show()
+            false
+        }else{
+            true
+        }
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
@@ -301,24 +284,23 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
 
     override fun onResume() {
         super.onResume()
+        getVisitData();
     }
 
-    fun markAttendence() {
-
+    private fun getVisitData() {
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
-            setProgressDialog(requireContext(), "Loading Leads")
+            setProgressDialog(requireContext(), "Loading Visit data")
             apiController.getApiResponse(
                 this,
-                markAttendenceModel(),
-                ApiExtentions.ApiDef.MARK_ATTENDENCE.ordinal
+                visitsDataModel(),
+                ApiExtentions.ApiDef.GET_VISIT_DATA.ordinal
             )
         } else {
-            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.MARK_ATTENDENCE.ordinal, this)
+            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.GET_VISIT_DATA.ordinal, this)
         }
-
     }
 
-    private fun markAttendenceModel(): RequestModel {
+    private fun markAttendanceModel(): RequestModel {
         return RequestModel(
             project = userInfo.projectName,
             location_id = schoolActivityViewModel.projectInfo.value!!.location_id,
@@ -333,95 +315,80 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         )
     }
 
-    fun getAttendenceForm() {
-
-        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
-            setProgressDialog(requireContext(), "Loading Leads")
-            apiController.getApiResponse(
-                this,
-                getAttendenceFormModel(),
-                ApiExtentions.ApiDef.ATTENDENCE_FORM.ordinal
+    private fun visitsDataModel(): RequestModel {
+        return schoolActivityViewModel.projectInfo.value?.visit_id?.let {
+            RequestModel(
+                project = userInfo.projectName,
+                visitId = it,
+                loadImages = false
             )
-        } else {
-            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.ATTENDENCE_FORM.ordinal, this)
-        }
-
+        }!!
     }
 
-    private fun getAttendenceFormModel(): RequestModel {
-        return RequestModel(
-            projectId = userInfo.projectId,
+    /*private fun getSaveSchoolDataModel(): SchoolActivityRequestModel {
+        return SchoolActivityRequestModel(
+            visit_id = schoolActivityViewModel.projectInfo.value?.visit_id ?: 0,
+            collected_by = userInfo.loginId,
+            visitData = SchoolVisitData(
+                no_of_teachers_trained =
+            )
         )
-    }
+    }*/
 
-    fun uploadImage() {
+    private fun uploadImage(imageUri: Uri) {
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
-            
             setProgressDialog(requireContext(), "Uploading")
             uploadFileController.getApiResponse(
                 this,
-                if (schoolActivityViewModel.position.value == 1) schoolActivityViewModel.imageUrl1.value!!.toUri() else schoolActivityViewModel.imageUrl2.value!!.toUri(),
+                imageUri,
                 uploadImageModel(),
                 ApiExtentions.ApiDef.UPLOAD_IMAGE.ordinal
             )
         } else {
             noInternetDialogue(requireContext(), ApiExtentions.ApiDef.UPLOAD_IMAGE.ordinal, this)
         }
-
     }
 
     private fun uploadImageModel(): RequestModel {
         return RequestModel(
-            project = userInfo.projectName
+            project = schoolActivityViewModel.projectInfo.value?.project_name ?: "",
+            uploadFor = "field_audit",
+            filename = (schoolActivityViewModel.projectInfo.value?.project_name + "-" + imageIndex)
+                ?: ""
         )
     }
 
     override fun onApiSuccess(o: String?, objectType: Int) {
 
         cancelProgressDialog()
-        when (ApiExtentions.ApiDef.values()[objectType]) {
-
-            ApiExtentions.ApiDef.ATTENDENCE_FORM -> {
-                val model = JSONObject(o.toString())
-                binding.image1Description.text =
-                    model.getJSONObject("data").getJSONArray("form_fields").getJSONObject(0)
-                        .getString("form_field_title")
-                binding.image2Description.text =
-                    model.getJSONObject("data").getJSONArray("form_fields").getJSONObject(1)
-                        .getString("form_field_title")
-
-                schoolActivityViewModel.imageType1.value =
-                    model.getJSONObject("data").getJSONArray("form_fields").getJSONObject(0)
-                        .getString("input_type")
-                schoolActivityViewModel.imageType2.value =
-                    model.getJSONObject("data").getJSONArray("form_fields").getJSONObject(1)
-                        .getString("input_type")
-
-            }
-
-            ApiExtentions.ApiDef.MARK_ATTENDENCE -> {
-                val model = JSONObject(o.toString())
-                if (schoolActivityViewModel.projectInfo.value!!.project_name != null) {
-                    redirectToCurriculam(schoolActivityViewModel.projectInfo.value!!)
-                } else {
-                    requireActivity().onBackPressed()
-                }
-            }
-
+        when (ApiExtentions.ApiDef.entries[objectType]) {
             ApiExtentions.ApiDef.UPLOAD_IMAGE -> {
                 val model = JSONObject(o.toString())
+                val uploadImageData = Gson().fromJson(
+                    model.getJSONObject("data").toString(),
+                    UploadImageData::class.java
+                )
+                if (uploadImageData != null && imageIndex == 0) {
+                    imageIndex += 1;
+                    schoolActivityViewModel.imageUrl1API.value = uploadImageData.url
+                    uploadImage(schoolActivityViewModel.imageUrl2.value?.toUri()!!)
+                } else if (uploadImageData != null && imageIndex == 1) {
+                    imageIndex += 1;
+                    schoolActivityViewModel.imageUrl2API.value = uploadImageData.url
+                    uploadImage(schoolActivityViewModel.imageUrl2.value?.toUri()!!)
+                } else if (imageIndex == 2) {
+                    schoolActivityViewModel.imageUrl3API.value = uploadImageData.url
+                    // All images uploaded, Need to call Submit Data Api
 
-                if (schoolActivityViewModel.position.value == 1) {
-                    schoolActivityViewModel.imageUrl1API.value =
-                        model.getJSONObject("data").getString("url")
-                    schoolActivityViewModel.position.value = 2
-                    uploadImage()
-                } else {
-                    schoolActivityViewModel.imageUrl2API.value =
-                        model.getJSONObject("data").getString("url")
-                    markAttendence()
                 }
+            }
 
+            ApiExtentions.ApiDef.GET_VISIT_DATA -> {
+                val model = JSONObject(o.toString())
+                schoolActivityViewModel.visitData.value = Gson().fromJson(
+                    model.getJSONObject("data").toString(),
+                    GetVisitDataResponseData::class.java
+                )
             }
 
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
@@ -433,14 +400,10 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     override fun retry(type: Int) {
-
-        when (ApiExtentions.ApiDef.values()[type]) {
-            ApiExtentions.ApiDef.MARK_ATTENDENCE -> markAttendence()
-            ApiExtentions.ApiDef.UPLOAD_IMAGE -> uploadImage()
-            ApiExtentions.ApiDef.ATTENDENCE_FORM -> getAttendenceForm()
+        when (ApiExtentions.ApiDef.entries[type]) {
+//            ApiExtentions.ApiDef.UPLOAD_IMAGE -> uploadImage()
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
         }
-
     }
 
     private fun redirectToCamera(position: Int, imageType: String, heading: String) {
@@ -449,18 +412,9 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         intent.putExtra("imageType", imageType)
         intent.putExtra("heading", heading)
         startImageCapture.launch(intent)
-
     }
 
-    private fun redirectToCurriculam(projectInfo: ProjectInfo) {
-        val intent = Intent(activity, Curriculam::class.java)
-        intent.putExtra("projectInfo", Gson().toJson(projectInfo))
-        startActivity(intent)
-    }
-
-    //private val startImageCapture = registerForActivityResult(CameraActivity::class.java)
-
-    var startImageCapture =
+    private var startImageCapture =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 // There are no request codes
@@ -468,8 +422,11 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
                 if (data!!.getIntExtra("position", 0) == 0) {
                     schoolActivityViewModel.imageUrl1.value =
                         result.data!!.getStringExtra("imageUrl")
-                } else {
+                } else if (data.getIntExtra("position", 0) == 1) {
                     schoolActivityViewModel.imageUrl2.value =
+                        result.data!!.getStringExtra("imageUrl")
+                } else if (data.getIntExtra("position", 0) == 2) {
+                    schoolActivityViewModel.imageUrl3.value =
                         result.data!!.getStringExtra("imageUrl")
                 }
             }
@@ -484,6 +441,15 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
+    }
+
+    private fun hideKeyboard() {
+        val imm =
+            requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val view = requireActivity().currentFocus
+        view?.let {
+            imm.hideSoftInputFromWindow(it.windowToken, 0)
+        }
     }
 
 }

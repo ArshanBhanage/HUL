@@ -53,11 +53,10 @@ class UploadFileController @Inject constructor(private val mContext: Context) :
         val body: MultipartBody.Part =
             MultipartBody.Part.createFormData("file", file.name, requestFile)
 
-
         this.mHandler = handler!!
         if (requestModel != null) {
             retrofit.create(ApiInterface::class.java)
-                .upload(body,requestModel.project)
+                .upload(body,requestModel.project, requestModel.uploadFor, requestModel.filename)
                 .enqueue(this)
         }
 

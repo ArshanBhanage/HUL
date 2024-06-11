@@ -101,6 +101,10 @@ class APIController @Inject constructor(private val mContext: Context) :
                 .getPerformance()
                 .enqueue(this)
 
+            ApiExtentions.ApiDef.GET_VISIT_DATA -> retrofit.create(ApiInterface::class.java)
+                .getVisitData(requestModel!!.visitId, requestModel.project, requestModel.loadImages)
+                .enqueue(this)
+
             else -> Toast.makeText(mContext, "API NOT INTEGRATED", Toast.LENGTH_LONG).show()
         }
 

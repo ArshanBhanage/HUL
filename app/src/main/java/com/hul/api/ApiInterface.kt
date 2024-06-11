@@ -80,6 +80,13 @@ interface ApiInterface {
     @GET("app/users/v1/performance")
     fun getPerformance(): Call<ResponseBody?>
 
+    @GET("app/visits/v1/visitData")
+    fun getVisitData(
+        @Query("visitId") visitId: Int,
+        @Query("project") project: String?,
+        @Query("loadImages") loadImages: Boolean
+    ): Call<ResponseBody?>
+
     @POST("app/users/v1/verify_otp")
     fun loginUser(@Body param: RequestModel?): Call<ResponseBody?>
 
@@ -110,6 +117,8 @@ interface ApiInterface {
     fun upload(
         @Part file: MultipartBody.Part?,
         @Query("projectName") projectName: String?,
+        @Query("uploadFor") uploadFor: String?,
+        @Query("filename") filename: String?,
     ): Call<ResponseBody?>
 
     companion object {

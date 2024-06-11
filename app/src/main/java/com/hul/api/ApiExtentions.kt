@@ -25,6 +25,8 @@ class ApiExtentions {
         UPLOAD_IMAGE,
         SUBMIT_LEAD,
         GET_USER_DETAILS,
-        GET_PERFORMANCE
+        GET_PERFORMANCE,
+        GET_VISIT_DATA,
+        SAVE_SCHOOL_ACTIVITY_DATA
     }
 }

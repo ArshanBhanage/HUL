@@ -12,8 +12,8 @@
             android:id="@+id/action_dashboardFragment_to_attendenceFragment"
             app:destination="@id/attendenceFragment" />
         <action
-            android:id="@+id/action_dashboardFragment_to_schoolFragment"
-            app:destination="@id/schoolActivityFragment" />
+            android:id="@+id/action_dashboard_to_visits"
+            app:destination="@id/mobiliserVisitsFragment" />
     </fragment>
     <fragment
         android:id="@+id/attendenceFragment"
@@ -28,4 +28,18 @@
             app:argType="string"
             app:nullable="false" />
     </fragment>
+
+    <fragment
+        android:id="@+id/mobiliserVisitsFragment"
+        android:name="com.hul.screens.field_auditor_dashboard.ui.mobiliser_visits.MobiliserVisitsFragment"
+        android:label="MobiliserVisitsFragment">
+        <argument
+            android:name="mobiliserData"
+            app:argType="string"
+            app:nullable="false" />
+        <action
+            android:id="@+id/action_visits_school_activity"
+            app:destination="@id/schoolActivityFragment" />
+    </fragment>
+
 </navigation>

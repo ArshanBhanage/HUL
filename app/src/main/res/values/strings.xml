@@ -32,6 +32,7 @@
     <string name="picture_school_name">Picture of the school name</string>
     <string name="material_info">Full image of mobiliser with curriculum material</string>
     <string name="selfie_with_school_name">Selfie with the school name or U DISE code</string>
+
     <string name="ack_letter_picture">Acknowledgement letter picture</string>
     <string name="or_select_location">Or select from below</string>
     <string name="login_button">Login</string>
@@ -134,4 +135,5 @@
     <string name="no_of_books_given">No. of books given to school</string>
     <string name="submit">Submit</string>
     <string name="session_expire">Session Expired, Login Again</string>
+    <string name="mobiliser">Mobiliser</string>
 </resources>

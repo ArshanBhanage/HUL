@@ -16,7 +16,6 @@
         android:background="#f8f9fa">
 
         <LinearLayout
-            android:id="@+id/llMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -68,6 +67,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.cardview.widget.CardView
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="4dp"
@@ -76,6 +76,7 @@
             app:cardCornerRadius="8dp">
 
         <LinearLayout
+            android:id="@+id/llMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -106,14 +107,16 @@
                 app:prefixTextColor="@color/black">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/txtUDiseCode"
+                    android:id="@+id/edtDiseCode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="number"
                     android:lineHeight="18dp"
                     android:textColor="@color/black"
                     android:textFontWeight="400"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    android:enabled="false"
+                    android:text='@{viewModel.visitData != null ? viewModel.visitData.visit_1.u_dice_code.value : ""}'/>/>
 
                 <requestFocus />
             </com.google.android.material.textfield.TextInputLayout>
@@ -144,14 +147,16 @@
                 app:prefixTextColor="@color/black">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/ward"
+                    android:id="@+id/edtSchoolName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
+                    android:inputType="text"
                     android:lineHeight="18dp"
                     android:textColor="@color/black"
                     android:textFontWeight="400"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    android:enabled="false"
+                    android:text='@{viewModel.visitData != null ? viewModel.visitData.visit_1.school_name.value : ""}'/>
 
                 <requestFocus />
             </com.google.android.material.textfield.TextInputLayout>
@@ -199,18 +204,18 @@
                     app:errorIconTint="@color/red"
                     app:errorTextColor="@color/red"
                     app:layout_constraintTop_toBottomOf="@+id/loginHeader"
-                    app:placeholderText="@string/enter_school_name"
+                    app:placeholderText="@string/enter_here"
                     app:prefixTextColor="@color/black">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/txtNoOfBooksHandedOver"
+                        android:id="@+id/edtNoOfBooksHandedOver"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="number"
-                        android:lineHeight="18dp"
                         android:textColor="@color/black"
-                        android:textFontWeight="400"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp"
+                        android:enabled="false"
+                        android:text='@{viewModel.visitData != null ? viewModel.visitData.visit_1.number_of_books_distributed.value : ""}'/>
 
                     <requestFocus />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -218,18 +223,20 @@
                 <LinearLayout
                     android:id="@+id/llButtons"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginBottom="@dimen/_7sdp">
 
                     <ImageView
                         android:layout_width="@dimen/_40sdp"
-                        android:layout_height="@dimen/_20sdp"
+                        android:layout_height="@dimen/_40sdp"
                         android:src="@drawable/ic_negative"
                         android:layout_gravity="center_vertical"/>
 
                     <ImageView
                         android:layout_width="@dimen/_40sdp"
-                        android:layout_height="@dimen/_20sdp"
+                        android:layout_height="@dimen/_40sdp"
                         android:src="@drawable/ic_positive"
                         android:layout_gravity="center_vertical"/>
 
@@ -263,6 +270,7 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/edtNoOfBooksGiven"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_weight="1"
@@ -273,7 +281,7 @@
                     app:errorIconTint="@color/red"
                     app:errorTextColor="@color/red"
                     app:layout_constraintTop_toBottomOf="@+id/loginHeader"
-                    app:placeholderText="@string/enter_school_name"
+                    app:placeholderText="@string/enter_here"
                     app:prefixTextColor="@color/black">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -284,7 +292,8 @@
                         android:lineHeight="18dp"
                         android:textColor="@color/black"
                         android:textFontWeight="400"
-                        android:textSize="16sp"/>
+                        android:textSize="16sp"
+                        android:text='@{viewModel.noOfBooksGivenToSchool}'/>
 
                     <requestFocus />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -314,7 +323,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:visibility="@{viewModel.captured2Visibility}"
+                    android:visibility="@{viewModel.captured1Visibility}"
                     android:layout_gravity="center_vertical">
 
                     <ImageView
@@ -426,7 +435,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:visibility="@{viewModel.captured2Visibility}"
+                    android:visibility="@{viewModel.captured3Visibility}"
                     android:layout_gravity="center_vertical">
 
                     <ImageView
@@ -456,7 +465,7 @@
                     android:textFontWeight="700"
                     android:textSize="13sp"
                     android:textStyle="bold"
-                    android:visibility="@{viewModel.capture2Visibility}"/>
+                    android:visibility="@{viewModel.capture3Visibility}"/>
 
             </LinearLayout>
 
@@ -482,7 +491,7 @@
                 app:errorIconTint="@color/red"
                 app:errorTextColor="@color/red"
                 app:layout_constraintTop_toBottomOf="@+id/loginHeader"
-                app:placeholderText="@string/enter_school_name"
+                app:placeholderText="@string/enter_here"
                 app:prefixTextColor="@color/black">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -493,7 +502,9 @@
                     android:lineHeight="18dp"
                     android:textColor="@color/black"
                     android:textFontWeight="400"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    android:enabled="false"
+                    android:text='@{viewModel.visitData != null ? viewModel.visitData.visit_1.school_representative_who_collected_the_books.value : ""}'/>/>
 
                 <requestFocus />
             </com.google.android.material.textfield.TextInputLayout>
@@ -520,18 +531,20 @@
                 app:errorIconTint="@color/red"
                 app:errorTextColor="@color/red"
                 app:layout_constraintTop_toBottomOf="@+id/loginHeader"
-                app:placeholderText="@string/enter_school_name"
+                app:placeholderText="@string/enter_here"
                 app:prefixTextColor="@color/black">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edtTextSchoolRepresentativeNumber"
+                    android:id="@+id/edtSchoolRepresentativeNumber"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="number"
                     android:lineHeight="18dp"
                     android:textColor="@color/black"
                     android:textFontWeight="400"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    android:enabled="false"
+                    android:text='@{viewModel.visitData != null ? viewModel.visitData.visit_1.school_representative_who_collected_the_books.value : ""}'/>
 
                 <requestFocus />
             </com.google.android.material.textfield.TextInputLayout>
@@ -562,14 +575,13 @@
                 app:prefixTextColor="@color/black">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edtTextRemarks"
+                    android:id="@+id/edtRemarks"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:lineHeight="18dp"
+                    android:inputType="text"
                     android:textColor="@color/black"
-                    android:textFontWeight="400"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    android:text='@{viewModel.remark}'/>
 
                 <requestFocus />
             </com.google.android.material.textfield.TextInputLayout>

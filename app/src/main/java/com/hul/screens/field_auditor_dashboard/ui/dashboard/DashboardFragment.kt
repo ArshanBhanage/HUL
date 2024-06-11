@@ -91,16 +91,6 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             redirectToAttendence(ProjectInfo(location_id = "1"))
         }
 
-        //Test only, to be removed
-        binding.stats.setOnClickListener {
-            val bundle = Bundle()
-            bundle.putString("projectInfo", Gson().toJson(ProjectInfo(location_id = "1")))
-            findNavController().navigate(
-                R.id.action_dashboardFragment_to_schoolFragment,
-                bundle
-            )
-        }
-
         binding.date.text = formatDate(Date(), "dd MMM yyyy")
 
         binding.tillDateButton.setOnClickListener {
@@ -154,12 +144,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         )
     }
 
-    private fun getVisitListModel(userType: String, mobiliserId: Int): RequestModel {
-        return RequestModel(
-            userType = userType,
-            mobiliserId = mobiliserId
-        )
-    }
+
 
     private fun getUserDetailsModel(): RequestModel {
         return RequestModel()
@@ -353,7 +338,12 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         dialog.show()
     }
 
-    override fun redirectToVisits(mappedUser: MappedUser) {
-
+    override fun redirectToVisits(mobiliserData: MappedUser) {
+        val bundle = Bundle()
+        bundle.putString("mobiliserData", Gson().toJson(mobiliserData))
+        findNavController().navigate(
+            R.id.action_dashboard_to_visits,
+            bundle
+        )
     }
 }

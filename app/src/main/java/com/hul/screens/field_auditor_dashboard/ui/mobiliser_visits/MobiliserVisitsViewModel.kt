@@ -1,4 +1,4 @@
-package com.hul.screens.field_auditor_dashboard.ui.school_activity
+package com.hul.screens.field_auditor_dashboard.ui.mobiliser_visits
 
 import android.view.View
 import androidx.lifecycle.LiveData
@@ -6,6 +6,8 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import com.hul.data.GetVisitDataResponseData
+import com.hul.data.MappedUser
 import com.hul.data.ProjectInfo
 import com.hul.user.UserInfo
 import javax.inject.Inject
@@ -32,7 +34,7 @@ class MobiliserVisitsViewModel @Inject constructor(
     var imageType3 = MutableLiveData<String>()
 
     var projectInfo = MutableLiveData<ProjectInfo>()
-
+    var mobiliserUser = MutableLiveData<MappedUser>()
 
     var remark = MutableLiveData<String>("")
 
