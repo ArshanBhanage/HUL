@@ -41,14 +41,24 @@
                     android:id="@+id/imgLogo"
                     />
 
-                <ImageView
-                    android:layout_width="@dimen/_80sdp"
-                    android:layout_height="@dimen/_40sdp"
+                <RelativeLayout
+                    android:id="@+id/rlWeekDay"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
                     android:layout_alignParentEnd="true"
-                    android:src="@mipmap/avtar"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_20ssp"
-                    android:textStyle="bold" />
+                    android:layout_margin="3dp"
+                    android:background="@drawable/circle_shape">
+
+                    <TextView
+                        android:id="@+id/txtLatter"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="E"
+                        android:textStyle="bold"
+                        android:textColor="@color/teal_200"
+                        android:textSize="20sp" />
+                </RelativeLayout>
             </RelativeLayout>
 
             <LinearLayout

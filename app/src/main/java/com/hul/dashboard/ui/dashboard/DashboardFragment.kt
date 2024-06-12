@@ -99,6 +99,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         }
 
         binding.date.text = formatDate(Date(), "dd MMM yyyy")
+        binding.txtLatter.text = userInfo.projectName.trim().split("")[1].uppercase()
 
         return root
     }

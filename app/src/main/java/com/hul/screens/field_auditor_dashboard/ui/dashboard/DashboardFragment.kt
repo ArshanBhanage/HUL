@@ -99,6 +99,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             showOptionsDialog()
         }
 
+        binding.txtLatter.text = userInfo.projectName.trim().split("")[1].uppercase()
+
         return root
     }
 

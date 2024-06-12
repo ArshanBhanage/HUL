@@ -95,11 +95,9 @@ class ImagePreviewFragment : Fragment(), ApiHandler, RetryInterface {
 
         if (requireArguments().getString("visitData") != null) {
             imagePreviewViewModel.visitData.value = Gson().fromJson(
-                requireArguments().getString("heading"),
+                requireArguments().getString("visitData"),
                 GetVisitDataResponseData::class.java
             )
-
-
         }
 
 
