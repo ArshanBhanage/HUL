@@ -28,10 +28,13 @@ data class RequestModel(
     var visit_id : String? = null,
     var visitData: VisitData? = null,
     val userType: String? = null,
-    val mobiliserId: Int = 0,
+    val mobiliserId: Int? = null,
     val visitId: Int = 0,
-    val loadImages: Boolean = false,
+    val loadImages: Boolean? = null,
     val projectName: String? = null,
-    val uploadFor: String = "",
-    val filename: String = ""
+    val uploadFor: String? = null,
+    val filename: String? = null,
+
+    val collected_by: String? = null,
+    val schoolVisitData: SchoolVisitData? = null
 )

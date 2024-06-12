@@ -68,7 +68,7 @@
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!--<LinearLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
@@ -77,18 +77,63 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:id="@+id/llPending">
 
                     <TextView
+                        android:id="@+id/txtPending"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Pending"
-                        android:fontFamily="@font/public_sans_regular" />
+                        android:text="@string/pending"
+                        android:textAlignment="center"
+                        android:paddingVertical="@dimen/_10sdp"
+                        android:fontFamily="@font/public_sans_bold" />
 
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_2sdp"
+                        android:background="#2C41CA"
+                        android:id="@+id/viewBluePending"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_1sdp"
+                        android:background="#2F2B3DE5"
+                        android:id="@+id/viewGrayPending"/>
 
                 </LinearLayout>
 
-            </LinearLayout>-->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:id="@+id/llCompleted">
+
+                    <TextView
+                        android:id="@+id/txtCompleted"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/completed"
+                        android:textAlignment="center"
+                        android:paddingVertical="@dimen/_10sdp"
+                        android:fontFamily="@font/public_sans_bold" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_2sdp"
+                        android:background="#2C41CA"
+                        android:id="@+id/viewBlueCompleted"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_1sdp"
+                        android:background="#2F2B3DE5"
+                        android:id="@+id/viewGrayCompleted"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"

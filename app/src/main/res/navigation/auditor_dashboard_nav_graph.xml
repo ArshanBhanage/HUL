@@ -27,6 +27,9 @@
             android:name="projectInfo"
             app:argType="string"
             app:nullable="false" />
+        <action
+            android:id="@+id/action_reset_to_dashboard"
+            app:destination="@id/dashboardFragment" />
     </fragment>
 
     <fragment

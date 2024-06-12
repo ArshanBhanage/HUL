@@ -338,7 +338,7 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
 
     fun submitForm() {
 
-        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+        /*if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
             //setProgressDialog(requireContext(), "Loading Leads")
             apiController.getApiResponse(
                 this,
@@ -347,11 +347,11 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
             )
         } else {
             noInternetDialogue(requireContext(), ApiExtentions.ApiDef.VISIT_DATA.ordinal, this)
-        }
+        }*/
 
     }
 
-    private fun submitModel(): RequestModel {
+    /*private fun submitModel(): RequestModel {
         return RequestModel(
             project = userInfo.projectName,
             visit_id = formFillViewModel.projectInfo.value!!.location_id,
@@ -375,7 +375,7 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
                 visit_id= 2.toString()
             )
         )
-    }
+    }*/
 
     override fun onApiSuccess(o: String?, objectType: Int) {
 

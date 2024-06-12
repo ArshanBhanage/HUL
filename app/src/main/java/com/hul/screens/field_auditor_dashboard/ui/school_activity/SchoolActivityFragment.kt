@@ -22,6 +22,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -35,17 +37,16 @@ import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
 import com.hul.camera.CameraActivity
-import com.hul.curriculam.Curriculam
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.data.SchoolActivityRequestModel
 import com.hul.data.SchoolVisitData
 import com.hul.data.UploadImageData
+import com.hul.data.VisitData
 import com.hul.data.VisitDetails
 import com.hul.databinding.FragmentSchoolActivityBinding
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
-import com.hul.screens.field_auditor_dashboard.ui.mobiliser_visits.MobiliserVisitsViewModel
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
@@ -255,6 +256,17 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         schoolActivityViewModel.projectInfo.value =
             Gson().fromJson(requireArguments().getString("projectInfo"), ProjectInfo::class.java)
 
+        binding.btnPositive.setOnClickListener {
+            binding.btnPositive.visibility = View.GONE
+            binding.btnNegative.visibility = View.GONE
+            binding.trueIconBooks.visibility = View.VISIBLE
+        }
+
+        binding.btnNegative.setOnClickListener {
+            binding.btnPositive.visibility = View.GONE
+            binding.btnNegative.visibility = View.GONE
+        }
+
         return root
     }
 
@@ -265,11 +277,11 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         ) {
             Toast.makeText(requireContext(), "Please add all images", Toast.LENGTH_LONG).show()
             false
-        } else if (schoolActivityViewModel.noOfBooksGivenToSchool.value?.isEmpty() == true) {
+        }/* else if (schoolActivityViewModel.noOfBooksGivenToSchool.value?.isEmpty() == true) {
             Toast.makeText(requireContext(), "Please add No of books given", Toast.LENGTH_LONG)
                 .show()
             false
-        }else{
+        }*/ else {
             true
         }
     }
@@ -301,19 +313,17 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         }
     }
 
-    private fun markAttendanceModel(): RequestModel {
-        return RequestModel(
-            project = userInfo.projectName,
-            location_id = schoolActivityViewModel.projectInfo.value!!.location_id,
-            lattitude = schoolActivityViewModel.lattitude.value,
-            longitude = schoolActivityViewModel.longitude.value,
-            photo_url1 = schoolActivityViewModel.imageUrl1API.value,
-            photo_url2 = schoolActivityViewModel.imageUrl2API.value,
-            photo_url3 = schoolActivityViewModel.imageUrl3API.value,
-            photo_url1_description = binding.image1Description.text.toString(),
-            photo_url2_description = binding.image2Description.text.toString(),
-            photo_url3_description = binding.image3Description.text.toString()
-        )
+    private fun saveSchoolActivityData() {
+        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+            setProgressDialog(requireContext(), "Loading Visit data")
+            apiController.getApiResponse(
+                this,
+                getSaveSchoolDataModel(),
+                ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA.ordinal
+            )
+        } else {
+            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA.ordinal, this)
+        }
     }
 
     private fun visitsDataModel(): RequestModel {
@@ -326,21 +336,47 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         }!!
     }
 
-    /*private fun getSaveSchoolDataModel(): SchoolActivityRequestModel {
-        return SchoolActivityRequestModel(
-            visit_id = schoolActivityViewModel.projectInfo.value?.visit_id ?: 0,
-            collected_by = userInfo.loginId,
-            visitData = SchoolVisitData(
-                no_of_teachers_trained = {
-                    VisitDetails(
-                        value = schoolActivityViewModel.visitData.value.visit_1.no_of_teachers_trained.value,
-                        is_approved = schoolActivityViewModel.visitData.value.visit_1.no_of_teachers_trained.is_approved,
-                        rejection_reason = schoolActivityViewModel.visitData.value.visit_1.no_of_teachers_trained.rejection_reason
-                    )
-                }
+    private fun getSaveSchoolDataModel(): RequestModel {
+        return RequestModel(
+            visit_id = schoolActivityViewModel.projectInfo.value?.visit_id.toString() ?: "",
+            collected_by = userInfo.userType,
+            visitData = VisitData(
+                no_of_teachers_trained = VisitDetails(
+                    value = schoolActivityViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.value,
+                    is_approved = schoolActivityViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.is_approved,
+                    rejection_reason = schoolActivityViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.rejection_reason
+                ),
+                picture_of_school_name = VisitDetails(
+                    value = schoolActivityViewModel.imageUrl1API.value
+                ),
+                selfie_with_school_name_or_u_dice_code = VisitDetails(
+                    value = schoolActivityViewModel.imageUrl2API.value
+                ),
+                picture_of_acknowledgement_letter = VisitDetails(
+                    value = schoolActivityViewModel.imageUrl3API.value
+                ),
+                number_of_students_as_per_record = VisitDetails(
+                    value = schoolActivityViewModel.visitData.value?.visit_1?.number_of_students_as_per_record?.value
+                ),
+                number_of_books_distributed = VisitDetails(
+                    value = schoolActivityViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value
+                ),
+                school_closed = VisitDetails(
+                    value = schoolActivityViewModel.visitData.value?.visit_1?.school_closed?.value
+                ),
+                school_representative_who_collected_the_books = VisitDetails(
+                    value = schoolActivityViewModel.visitData.value?.visit_1?.school_representative_who_collected_the_books?.value
+                ),
+                principal_contact_details = VisitDetails(
+                    value = schoolActivityViewModel.visitData.value?.visit_1?.principal_contact_details?.value
+                ),
+                principal = VisitDetails(
+                    value = schoolActivityViewModel.visitData.value?.visit_1?.principal?.value
+                )
             )
         )
-    }*/
+    }
+
 
     private fun uploadImage(imageUri: Uri) {
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
@@ -366,7 +402,6 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     override fun onApiSuccess(o: String?, objectType: Int) {
-
         cancelProgressDialog()
         when (ApiExtentions.ApiDef.entries[objectType]) {
             ApiExtentions.ApiDef.UPLOAD_IMAGE -> {
@@ -386,7 +421,7 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
                 } else if (imageIndex == 2) {
                     schoolActivityViewModel.imageUrl3API.value = uploadImageData.url
                     // All images uploaded, Need to call Submit Data Api
-
+                    saveSchoolActivityData()
                 }
             }
 
@@ -396,6 +431,14 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
                     model.getJSONObject("data").toString(),
                     GetVisitDataResponseData::class.java
                 )
+            }
+
+            ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA -> {
+                val navOptions = NavOptions.Builder()
+                    .setPopUpTo(R.id.action_reset_to_dashboard, true) // Adjust to your actual dashboard fragment ID
+                    .build()
+
+                findNavController().navigate(R.id.action_reset_to_dashboard, null, navOptions)
             }
 
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()

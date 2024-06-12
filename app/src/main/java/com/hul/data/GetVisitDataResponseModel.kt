@@ -25,7 +25,7 @@ data class Visit1(
 
 data class FieldData(
     val value: String,
-    val is_approved: Boolean?,
+    val is_approved: Int?,
     val rejection_reason: String?,
     val is_image: Boolean
 )

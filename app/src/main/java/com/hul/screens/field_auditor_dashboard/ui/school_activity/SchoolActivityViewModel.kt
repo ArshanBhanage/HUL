@@ -27,7 +27,7 @@ class SchoolActivityViewModel @Inject constructor(
     var lattitude = MutableLiveData<String>()
 
     var imageType1 = MutableLiveData("Back")
-    var imageType2 = MutableLiveData("Back")
+    var imageType2 = MutableLiveData("Image Capture Front")
     var imageType3 = MutableLiveData("Back")
 
     var projectInfo = MutableLiveData<ProjectInfo>()

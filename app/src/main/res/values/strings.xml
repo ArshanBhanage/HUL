@@ -136,4 +136,8 @@
     <string name="submit">Submit</string>
     <string name="session_expire">Session Expired, Login Again</string>
     <string name="mobiliser">Mobiliser</string>
+    <string name="have_the_books_distribution_to_students_done">Have the books distribution to students done?</string>
+    <string name="was_video_shared_with_teacher">Was video shared with Teacher?</string>
+    <string name="pending">Pending</string>
+    <string name="completed">Completed</string>
 </resources>

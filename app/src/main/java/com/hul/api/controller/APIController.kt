@@ -77,9 +77,13 @@ class APIController @Inject constructor(private val mContext: Context) :
                 .getVisitListSingle(requestModel!!.location_id)
                 .enqueue(this)
 
-            ApiExtentions.ApiDef.VISIT_LIST_FIELD_AUDITOR -> retrofit.create(ApiInterface::class.java)
-                .getVisitListSingle(requestModel!!.userType, requestModel.mobiliserId)
-                .enqueue(this)
+            ApiExtentions.ApiDef.VISIT_LIST_FIELD_AUDITOR -> if (requestModel != null) {
+                requestModel.mobiliserId?.let {
+                    retrofit.create(ApiInterface::class.java)
+                        .getVisitListSingle(requestModel.userType, it)
+                        .enqueue(this)
+                }
+            }
 
             ApiExtentions.ApiDef.LEAD_DETAILS -> retrofit.create(ApiInterface::class.java)
                 .getLeadDetails(requestModel!!.leadId!!)
@@ -100,10 +104,18 @@ class APIController @Inject constructor(private val mContext: Context) :
                 .getPerformance()
                 .enqueue(this)
 
-            ApiExtentions.ApiDef.GET_VISIT_DATA -> retrofit.create(ApiInterface::class.java)
-                .getVisitData(requestModel!!.visitId, requestModel.project, requestModel.loadImages)
-                .enqueue(this)
+            ApiExtentions.ApiDef.GET_VISIT_DATA -> if (requestModel != null) {
+                requestModel.loadImages?.let {
+                    retrofit.create(ApiInterface::class.java)
+                        .getVisitData(requestModel.visitId, requestModel.project, it)
+                        .enqueue(this)
+                }
+            }
             ApiExtentions.ApiDef.VISIT_DATA -> retrofit.create(ApiInterface::class.java)
+                .visitData(requestModel!!)
+                .enqueue(this)
+
+            ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA -> retrofit.create(ApiInterface::class.java)
                 .visitData(requestModel!!)
                 .enqueue(this)
 

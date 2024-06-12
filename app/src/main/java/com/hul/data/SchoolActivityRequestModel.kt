@@ -1,9 +1,9 @@
 package com.hul.data
 
 data class SchoolActivityRequestModel(
-    val visit_id: Int,
-    val collected_by: String,
-    val visitData: SchoolVisitData
+    val visit_id: Int?,
+    val collected_by: String?,
+    val visitData: SchoolVisitData?
 )
 
 data class SchoolVisitData(
@@ -24,3 +24,5 @@ data class VisitDetails(
     val is_approved: Int? = null,
     val rejection_reason: String? = null
 )
+
+

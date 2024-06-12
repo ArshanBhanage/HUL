@@ -118,7 +118,6 @@
                     android:enabled="false"
                     android:text='@{viewModel.visitData != null ? viewModel.visitData.visit_1.u_dice_code.value : ""}'/>/>
 
-                <requestFocus />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
@@ -158,7 +157,6 @@
                     android:enabled="false"
                     android:text='@{viewModel.visitData != null ? viewModel.visitData.visit_1.school_name.value : ""}'/>
 
-                <requestFocus />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
@@ -217,8 +215,16 @@
                         android:enabled="false"
                         android:text='@{viewModel.visitData != null ? viewModel.visitData.visit_1.number_of_books_distributed.value : ""}'/>
 
-                    <requestFocus />
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <ImageView
+                    android:id="@+id/trueIconBooks"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@mipmap/circlecheck"
+                    android:layout_gravity="center_vertical"
+                    android:visibility="gone"
+                    android:layout_marginHorizontal="@dimen/_5sdp"/>
 
                 <LinearLayout
                     android:id="@+id/llButtons"
@@ -229,12 +235,14 @@
                     android:layout_marginBottom="@dimen/_7sdp">
 
                     <ImageView
+                        android:id="@+id/btnNegative"
                         android:layout_width="@dimen/_40sdp"
                         android:layout_height="@dimen/_40sdp"
                         android:src="@drawable/ic_negative"
                         android:layout_gravity="center_vertical"/>
 
                     <ImageView
+                        android:id="@+id/btnPositive"
                         android:layout_width="@dimen/_40sdp"
                         android:layout_height="@dimen/_40sdp"
                         android:src="@drawable/ic_positive"
@@ -295,7 +303,6 @@
                         android:textSize="16sp"
                         android:text='@{viewModel.noOfBooksGivenToSchool}'/>
 
-                    <requestFocus />
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
@@ -506,7 +513,6 @@
                     android:enabled="false"
                     android:text='@{viewModel.visitData != null ? viewModel.visitData.visit_1.school_representative_who_collected_the_books.value : ""}'/>/>
 
-                <requestFocus />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
@@ -546,8 +552,64 @@
                     android:enabled="false"
                     android:text='@{viewModel.visitData != null ? viewModel.visitData.visit_1.school_representative_who_collected_the_books.value : ""}'/>
 
-                <requestFocus />
             </com.google.android.material.textfield.TextInputLayout>
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Switch
+                    android:id="@+id/switchBookDistribution"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/public_sans"
+                    android:text="@string/have_the_books_distribution_to_students_done"
+                    android:textColor="#6d6b77"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/_10sdp"
+                    />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Switch
+                    android:id="@+id/switchVideoShare"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/public_sans"
+                    android:text="@string/was_video_shared_with_teacher"
+                    android:textColor="#6d6b77"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/_10sdp"
+                    />
+            </LinearLayout>
+
+
 
             <TextView
                 android:layout_width="match_parent"
@@ -571,7 +633,7 @@
                 app:errorIconTint="@color/red"
                 app:errorTextColor="@color/red"
                 app:layout_constraintTop_toBottomOf="@+id/loginHeader"
-                app:placeholderText="@string/enter_school_name"
+                app:placeholderText="@string/enter_here"
                 app:prefixTextColor="@color/black">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -583,7 +645,6 @@
                     android:textSize="16sp"
                     android:text='@{viewModel.remark}'/>
 
-                <requestFocus />
             </com.google.android.material.textfield.TextInputLayout>
 
             <androidx.appcompat.widget.AppCompatButton
