@@ -114,29 +114,54 @@
                                     android:textFontWeight="700"
                                     android:textSize="@dimen/_14ssp"
                                     android:textStyle="bold"
-                                    app:layout_constraintEnd_toStartOf="@+id/punchInButton"
+                                    app:layout_constraintEnd_toStartOf="@+id/llButtons"
                                     app:layout_constraintStart_toEndOf="@+id/cal"
                                     app:layout_constraintTop_toTopOf="parent" />
 
-                                <com.google.android.material.button.MaterialButton
-                                    android:id="@+id/punchInButton"
+                                <LinearLayout
+                                    android:id="@id/llButtons"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_alignParentRight="true"
-                                    android:layout_gravity="right"
-                                    android:backgroundTint="#dde0f6"
-                                    android:fontFamily="@font/public_sans_semi_bold"
-                                    android:text="@string/punch_in"
-                                    android:textAllCaps="false"
-                                    android:textColor="#2C41CA"
-                                    android:textFontWeight="700"
-                                    android:textSize="@dimen/_10ssp"
-                                    android:textStyle="bold"
-                                    app:cornerRadius="@dimen/_3sdp"
-                                    app:icon="@mipmap/plus"
-                                    app:iconTint="#2C41CA"
                                     app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintTop_toTopOf="parent" />
+                                    app:layout_constraintTop_toTopOf="parent">
+
+                                    <com.google.android.material.button.MaterialButton
+                                        android:id="@+id/punchInButton"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="right"
+                                        android:backgroundTint="#dde0f6"
+                                        android:fontFamily="@font/publicsans"
+                                        android:text="@string/punch_in"
+                                        android:textAllCaps="false"
+                                        android:textColor="#2C41CA"
+                                        android:textFontWeight="700"
+                                        android:textSize="13sp"
+                                        android:textStyle="bold"
+                                        app:cornerRadius="8dp"
+                                        app:icon="@mipmap/plus"
+                                        app:iconTint="#2C41CA" />
+
+                                    <com.google.android.material.button.MaterialButton
+                                        android:id="@+id/punchInButtonDisabled"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="right"
+                                        android:backgroundTint="@color/light_gray"
+                                        android:fontFamily="@font/publicsans"
+                                        android:visibility="gone"
+                                        android:text="@string/punch_in"
+                                        android:textAllCaps="false"
+                                        android:textColor="@color/dark_gray"
+                                        android:textFontWeight="700"
+                                        android:textSize="13sp"
+                                        android:textStyle="bold"
+                                        app:cornerRadius="8dp"
+                                        app:icon="@mipmap/plus"
+                                        app:iconTint="@color/dark_gray" />
+                                </LinearLayout>
+
                             </androidx.constraintlayout.widget.ConstraintLayout>
 
                             <androidx.constraintlayout.widget.ConstraintLayout

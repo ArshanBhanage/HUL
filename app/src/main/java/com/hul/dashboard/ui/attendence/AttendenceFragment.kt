@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
@@ -39,6 +40,7 @@ import com.hul.dashboard.DashboardComponent
 import com.hul.dashboard.ui.dashboard.DashboardFragmentInterface
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
+import com.hul.data.UploadImageData
 import com.hul.databinding.FragmentAttendenceBinding
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
@@ -89,6 +91,8 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
 // last location to create a Notification if the user navigates away from the app.
     private var currentLocation: Location? = null
 
+    var imageIndex: Int = 0
+
     private val requestPermission =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val granted = permissions.entries.all {
@@ -107,7 +111,8 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
     private fun checkLocationSettings() {
-        val locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationManager =
+            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         if (!isGpsEnabled) {
             //Toast.makeText(this, "GPS is not enabled", Toast.LENGTH_SHORT).show()
@@ -133,7 +138,8 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
     private fun requestLocationUpdates() {
 
         // Initialize FusedLocationProviderClient
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        fusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(requireActivity())
 
 
         locationRequest = LocationRequest.create().apply {
@@ -175,7 +181,11 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
             }
         }
 
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+        fusedLocationProviderClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
 
 //        locationCallback = object : LocationCallback() {
 //            //This callback is where we get "streaming" location updates. We can check things like accuracy to determine whether
@@ -233,11 +243,11 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
         binding.viewModel = attendenceViewModel
 
         binding.selfieCapture.setOnClickListener {
-            redirectToCamera(0, attendenceViewModel.imageType1.value!!,"Selfie at first school")
+            redirectToCamera(0, attendenceViewModel.imageType1.value!!, "Selfie at first school")
         }
 
         binding.curriculumCapture.setOnClickListener {
-            redirectToCamera(1,attendenceViewModel.imageType2.value!!,"Selfie with curriculum")
+            redirectToCamera(1, attendenceViewModel.imageType2.value!!, "Selfie with curriculum")
         }
 
         binding.stats.setOnClickListener {
@@ -254,7 +264,10 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
 
         binding.markAttendence.setOnClickListener {
             attendenceViewModel.position.value = 1
-            uploadImage()
+            if (imageIndex == 0) {
+                setProgressDialog(requireContext(), "Uploading")
+                uploadImage(attendenceViewModel.imageUrl1.value?.toUri()!!)
+            }
         }
 
         if (allPermissionsGranted()) {
@@ -263,7 +276,8 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
             requestPermission()
         }
 
-        attendenceViewModel.projectInfo.value = Gson().fromJson(requireArguments().getString("projectInfo"), ProjectInfo::class.java)
+        attendenceViewModel.projectInfo.value =
+            Gson().fromJson(requireArguments().getString("projectInfo"), ProjectInfo::class.java)
 
         getAttendenceForm()
 
@@ -286,7 +300,6 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     fun markAttendence() {
-
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
             setProgressDialog(requireContext(), "Loading Leads")
             apiController.getApiResponse(
@@ -334,41 +347,57 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
         )
     }
 
-    fun uploadImage() {
+    private fun uploadImage(imageUri: Uri) {
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
-            setProgressDialog(requireContext(), "Uploading")
             uploadFileController.getApiResponse(
                 this,
-                if(attendenceViewModel.position.value == 1) attendenceViewModel.imageUrl1.value!!.toUri() else attendenceViewModel.imageUrl2.value!!.toUri(),
+                imageUri,
                 uploadImageModel(),
                 ApiExtentions.ApiDef.UPLOAD_IMAGE.ordinal
             )
         } else {
             noInternetDialogue(requireContext(), ApiExtentions.ApiDef.UPLOAD_IMAGE.ordinal, this)
         }
-
     }
 
     private fun uploadImageModel(): RequestModel {
+        var fileName: String = ""
+        val visitPrefix = "project_" + userInfo.projectName;
+        if (imageIndex == 0) {
+            fileName = visitPrefix + "_selfie_at_first_school.jpeg";
+        }else if (imageIndex == 1) {
+            fileName = visitPrefix + "_full_image_fo_mobiliser_with_curriculam_material.jpeg";
+        }
         return RequestModel(
-            project = userInfo.projectName
+            project = userInfo.projectName,
+            uploadFor = "field_audit",
+            filename = fileName
         )
     }
 
     override fun onApiSuccess(o: String?, objectType: Int) {
 
         cancelProgressDialog()
-        when (ApiExtentions.ApiDef.values()[objectType]) {
+        when (ApiExtentions.ApiDef.entries[objectType]) {
 
             ApiExtentions.ApiDef.ATTENDENCE_FORM -> {
                 val model = JSONObject(o.toString())
-                binding.image1Description.text = model.getJSONObject("data").getJSONArray("form_fields").getJSONObject(0).getString("form_field_title")
-                binding.image2Description.text = model.getJSONObject("data").getJSONArray("form_fields").getJSONObject(1).getString("form_field_title")
+                binding.image1Description.text =
+                    model.getJSONObject("data").getJSONArray("form_fields").getJSONObject(0)
+                        .getString("form_field_title")
+                binding.image2Description.text =
+                    model.getJSONObject("data").getJSONArray("form_fields").getJSONObject(1)
+                        .getString("form_field_title")
 
-                attendenceViewModel.imageType1.value = model.getJSONObject("data").getJSONArray("form_fields").getJSONObject(0).getString("input_type")
-                attendenceViewModel.imageType2.value = model.getJSONObject("data").getJSONArray("form_fields").getJSONObject(1).getString("input_type")
+                attendenceViewModel.imageType1.value =
+                    model.getJSONObject("data").getJSONArray("form_fields").getJSONObject(0)
+                        .getString("input_type")
+                attendenceViewModel.imageType2.value =
+                    model.getJSONObject("data").getJSONArray("form_fields").getJSONObject(1)
+                        .getString("input_type")
 
             }
+
             ApiExtentions.ApiDef.MARK_ATTENDENCE -> {
                 val model = JSONObject(o.toString())
                 if (attendenceViewModel.projectInfo.value!!.project_name != null) {
@@ -377,18 +406,22 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
                     requireActivity().onBackPressed()
                 }
             }
+
             ApiExtentions.ApiDef.UPLOAD_IMAGE -> {
                 val model = JSONObject(o.toString())
-
-                if (attendenceViewModel.position.value == 1) {
-                    attendenceViewModel.imageUrl1API.value = model.getJSONObject("data").getString("url")
-                    attendenceViewModel.position.value = 2
-                    uploadImage()
-                } else {
-                    attendenceViewModel.imageUrl2API.value = model.getJSONObject("data").getString("url")
+                val uploadImageData = Gson().fromJson(
+                    model.getJSONObject("data").toString(),
+                    UploadImageData::class.java
+                )
+                if (uploadImageData != null && imageIndex == 0) {
+                    imageIndex += 1;
+                    attendenceViewModel.imageUrl1API.value = uploadImageData.url
+                    uploadImage(attendenceViewModel.imageUrl2.value?.toUri()!!)
+                } else if (uploadImageData != null && imageIndex == 1) {
+                    imageIndex += 1;
+                    attendenceViewModel.imageUrl2API.value = uploadImageData.url
                     markAttendence()
                 }
-
             }
 
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
@@ -401,16 +434,15 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
 
     override fun retry(type: Int) {
 
-        when (ApiExtentions.ApiDef.values()[type]) {
+        when (ApiExtentions.ApiDef.entries[type]) {
             ApiExtentions.ApiDef.MARK_ATTENDENCE -> markAttendence()
-            ApiExtentions.ApiDef.UPLOAD_IMAGE -> uploadImage()
             ApiExtentions.ApiDef.ATTENDENCE_FORM -> getAttendenceForm()
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
         }
 
     }
 
-    private fun redirectToCamera(position: Int, imageType : String,heading : String) {
+    private fun redirectToCamera(position: Int, imageType: String, heading: String) {
         val intent = Intent(activity, CameraActivity::class.java)
         intent.putExtra("position", position)
         intent.putExtra("imageType", imageType)
@@ -421,7 +453,7 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
 
     private fun redirectToCurriculam(projectInfo: ProjectInfo) {
         val intent = Intent(activity, Curriculam::class.java)
-        intent.putExtra("projectInfo",Gson().toJson(projectInfo))
+        intent.putExtra("projectInfo", Gson().toJson(projectInfo))
         startActivity(intent)
     }
 

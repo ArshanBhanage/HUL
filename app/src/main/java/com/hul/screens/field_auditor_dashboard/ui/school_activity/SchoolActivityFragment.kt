@@ -40,8 +40,6 @@ import com.hul.camera.CameraActivity
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
-import com.hul.data.SchoolActivityRequestModel
-import com.hul.data.SchoolVisitData
 import com.hul.data.UploadImageData
 import com.hul.data.VisitData
 import com.hul.data.VisitDetails
@@ -242,6 +240,7 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         binding.btnSubmit.setOnClickListener {
             if (validateFields()) {
                 if (imageIndex == 0) {
+                    setProgressDialog(requireContext(), "Uploading")
                     uploadImage(schoolActivityViewModel.imageUrl1.value?.toUri()!!)
                 }
             }
@@ -260,6 +259,7 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
             binding.btnPositive.visibility = View.GONE
             binding.btnNegative.visibility = View.GONE
             binding.trueIconBooks.visibility = View.VISIBLE
+            schoolActivityViewModel.isBookDistributionApproved.value = 1;
         }
 
         binding.btnNegative.setOnClickListener {
@@ -315,7 +315,6 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
 
     private fun saveSchoolActivityData() {
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
-            setProgressDialog(requireContext(), "Loading Visit data")
             apiController.getApiResponse(
                 this,
                 getSaveSchoolDataModel(),
@@ -342,7 +341,7 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
             collected_by = userInfo.userType,
             visitData = VisitData(
                 no_of_teachers_trained = VisitDetails(
-                    value = schoolActivityViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.value,
+                    value = schoolActivityViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.value?.toInt(),
                     is_approved = schoolActivityViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.is_approved,
                     rejection_reason = schoolActivityViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.rejection_reason
                 ),
@@ -356,13 +355,14 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
                     value = schoolActivityViewModel.imageUrl3API.value
                 ),
                 number_of_students_as_per_record = VisitDetails(
-                    value = schoolActivityViewModel.visitData.value?.visit_1?.number_of_students_as_per_record?.value
+                    value = schoolActivityViewModel.visitData.value?.visit_1?.number_of_students_as_per_record?.value?.toInt()
                 ),
                 number_of_books_distributed = VisitDetails(
-                    value = schoolActivityViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value
+                    value = schoolActivityViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value?.toInt(),
+                    is_approved = schoolActivityViewModel.isBookDistributionApproved.value
                 ),
                 school_closed = VisitDetails(
-                    value = schoolActivityViewModel.visitData.value?.visit_1?.school_closed?.value
+                    value = schoolActivityViewModel.visitData.value?.visit_1?.school_closed?.value?.toBoolean()
                 ),
                 school_representative_who_collected_the_books = VisitDetails(
                     value = schoolActivityViewModel.visitData.value?.visit_1?.school_representative_who_collected_the_books?.value
@@ -380,7 +380,6 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
 
     private fun uploadImage(imageUri: Uri) {
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
-            setProgressDialog(requireContext(), "Uploading")
             uploadFileController.getApiResponse(
                 this,
                 imageUri,
@@ -393,16 +392,23 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     private fun uploadImageModel(): RequestModel {
+        var fileName: String = ""
+        val visitPrefix = "visit_id" + (schoolActivityViewModel.projectInfo.value?.visit_id.toString() ?: "");
+        if (imageIndex == 0) {
+            fileName = visitPrefix + "_picture_of_the_school_name.jpeg";
+        }else if (imageIndex == 1) {
+            fileName = visitPrefix + "_selfie_with_the_school_name.jpeg";
+        }else{
+            fileName = visitPrefix + "_acknowledgement_letter.jpeg";
+        }
         return RequestModel(
             project = schoolActivityViewModel.projectInfo.value?.project_name ?: "",
             uploadFor = "field_audit",
-            filename = (schoolActivityViewModel.projectInfo.value?.project_name + "-" + imageIndex)
-                ?: ""
+            filename = fileName
         )
     }
 
     override fun onApiSuccess(o: String?, objectType: Int) {
-        cancelProgressDialog()
         when (ApiExtentions.ApiDef.entries[objectType]) {
             ApiExtentions.ApiDef.UPLOAD_IMAGE -> {
                 val model = JSONObject(o.toString())
@@ -426,6 +432,7 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
             }
 
             ApiExtentions.ApiDef.GET_VISIT_DATA -> {
+                cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 schoolActivityViewModel.visitData.value = Gson().fromJson(
                     model.getJSONObject("data").toString(),
@@ -434,6 +441,7 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
             }
 
             ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA -> {
+                cancelProgressDialog()
                 val navOptions = NavOptions.Builder()
                     .setPopUpTo(R.id.action_reset_to_dashboard, true) // Adjust to your actual dashboard fragment ID
                     .build()
@@ -451,7 +459,6 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
 
     override fun retry(type: Int) {
         when (ApiExtentions.ApiDef.entries[type]) {
-//            ApiExtentions.ApiDef.UPLOAD_IMAGE -> uploadImage()
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
         }
     }
@@ -461,6 +468,7 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         intent.putExtra("position", position)
         intent.putExtra("imageType", imageType)
         intent.putExtra("heading", heading)
+        intent.putExtra("visitData", Gson().toJson(schoolActivityViewModel.visitData.value))
         startImageCapture.launch(intent)
     }
 

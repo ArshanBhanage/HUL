@@ -40,6 +40,7 @@ class SchoolActivityViewModel @Inject constructor(
 
     val noOfBooksGivenToSchool = MutableLiveData<String>("")
 
+    val isBookDistributionApproved = MutableLiveData<Int>(0)
 
     val capture1Visibility: LiveData<Int> = imageUrl1.map {
         if (it.isNotEmpty()) {

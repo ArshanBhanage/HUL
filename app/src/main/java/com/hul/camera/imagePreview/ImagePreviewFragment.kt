@@ -22,12 +22,14 @@ import android.widget.Toast
 import androidx.camera.core.ImageCapture
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import com.google.gson.Gson
 import com.hul.HULApplication
 import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
 import com.hul.camera.CameraComponent
+import com.hul.data.GetVisitDataResponseData
 import com.hul.data.RequestModel
 import com.hul.databinding.FragmentImagePreviewBinding
 import com.hul.user.UserInfo
@@ -90,6 +92,17 @@ class ImagePreviewFragment : Fragment(), ApiHandler, RetryInterface {
         cameraComponent.inject(this)
         binding.viewModel = imagePreviewViewModel
         binding.heading.text = requireArguments().getString("heading")
+
+        if (requireArguments().getString("visitData") != null) {
+            imagePreviewViewModel.visitData.value = Gson().fromJson(
+                requireArguments().getString("heading"),
+                GetVisitDataResponseData::class.java
+            )
+
+
+        }
+
+
         return binding.root
 
     }

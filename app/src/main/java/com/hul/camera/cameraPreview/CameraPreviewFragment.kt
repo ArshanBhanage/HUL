@@ -352,6 +352,9 @@ class CameraPreviewFragment : Fragment() {
         bundle.putString("imageUri", uri.toString())
         bundle.putInt("position", requireArguments().getInt("position", 0))
         bundle.putString("heading", requireArguments().getString("heading"))
+        if(requireArguments().getString("visitData") != null) {
+            bundle.putString("visitData",requireArguments().getString("visitData"))
+        }
         findNavController().navigate(
             R.id.action_cameraPreviewFragment_to_imagePreviewFragment,
             bundle

@@ -23,6 +23,9 @@ class CameraActivity : AppCompatActivity() {
         bundle.putInt("position",intent.getIntExtra("position", 0))
         bundle.putString("imageType",intent.getStringExtra("imageType"))
         bundle.putString("heading",intent.getStringExtra("heading"))
+        if(intent.getStringExtra("visitData") != null) {
+            bundle.putString("visitData",intent.getStringExtra("visitData"))
+        }
         findNavController(R.id.nav_host_fragment_camera).setGraph(R.navigation.camera_nav_graph)
         findNavController(R.id.nav_host_fragment_camera).navigate(R.id.cameraPreviewFragment, bundle)
 
