@@ -243,11 +243,11 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
         binding.viewModel = attendenceViewModel
 
         binding.selfieCapture.setOnClickListener {
-            redirectToCamera(0, attendenceViewModel.imageType1.value!!, "Selfie at first school")
+            redirectToCamera(0, attendenceViewModel.imageCaptureType1.value!!, "Selfie at first school")
         }
 
         binding.curriculumCapture.setOnClickListener {
-            redirectToCamera(1, attendenceViewModel.imageType2.value!!, "Selfie with curriculum")
+            redirectToCamera(1, attendenceViewModel.imageCaptureType2.value!!, "Selfie with curriculum")
         }
 
         binding.stats.setOnClickListener {
@@ -448,7 +448,6 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
         intent.putExtra("imageType", imageType)
         intent.putExtra("heading", heading)
         startImageCapture.launch(intent)
-
     }
 
     private fun redirectToCurriculam(projectInfo: ProjectInfo) {

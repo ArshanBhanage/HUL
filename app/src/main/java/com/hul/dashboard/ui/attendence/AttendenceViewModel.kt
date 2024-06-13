@@ -32,8 +32,11 @@ class AttendenceViewModel @Inject constructor(
     var longitude = MutableLiveData<String>()
     var lattitude = MutableLiveData<String>()
 
-    var imageType1 = MutableLiveData("Image Capture Front")
-    var imageType2 = MutableLiveData("Back")
+    var imageType1 = MutableLiveData("")
+    var imageType2 = MutableLiveData("")
+
+    var imageCaptureType1 = MutableLiveData("Image Capture Front")
+    var imageCaptureType2 = MutableLiveData("Back")
 
     var projectInfo = MutableLiveData<ProjectInfo>()
 

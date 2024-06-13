@@ -12,7 +12,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,6 +44,7 @@ import com.hul.data.VisitData
 import com.hul.data.VisitDetails
 import com.hul.databinding.FragmentSchoolActivityBinding
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
+import com.hul.storage.SharedPreferencesStorage
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
@@ -77,6 +77,9 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
 
     @Inject
     lateinit var apiController: APIController
+
+    @Inject
+    lateinit var prefs: SharedPreferencesStorage
 
     // TODO: Step 1.1, Review variables (no changes).
 // FusedLocationProviderClient - Main class for receiving location updates.
@@ -210,6 +213,9 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         binding.llMain.setOnClickListener { hideKeyboard() }
 
         binding.pictureOfSchoolNameCapture.setOnClickListener {
+            schoolActivityViewModel.visitData.value
+                ?.visit_1?.picture_of_school_with_name_visible
+                ?.let { it1 -> prefs.setString("previewImage", it1.value) }
             redirectToCamera(
                 0,
                 schoolActivityViewModel.imageType1.value!!,
@@ -218,6 +224,7 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
         binding.selfieWithSchoolName.setOnClickListener {
+            prefs.setString("previewImage", "")
             redirectToCamera(
                 1,
                 schoolActivityViewModel.imageType2.value!!,
@@ -226,6 +233,7 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
         binding.curriculumCapture.setOnClickListener {
+            prefs.setString("previewImage", "")
             redirectToCamera(
                 2,
                 schoolActivityViewModel.imageType3.value!!,
@@ -267,6 +275,8 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
             binding.btnNegative.visibility = View.GONE
         }
 
+        getVisitData();
+
         return root
     }
 
@@ -297,7 +307,6 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
 
     override fun onResume() {
         super.onResume()
-        getVisitData();
     }
 
     private fun getVisitData() {
@@ -321,7 +330,11 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
                 ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA.ordinal
             )
         } else {
-            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA.ordinal, this)
+            noInternetDialogue(
+                requireContext(),
+                ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA.ordinal,
+                this
+            )
         }
     }
 
@@ -330,7 +343,7 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
             RequestModel(
                 project = userInfo.projectName,
                 visitId = it,
-                loadImages = false
+                loadImages = true
             )
         }!!
     }
@@ -393,12 +406,13 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
 
     private fun uploadImageModel(): RequestModel {
         var fileName: String = ""
-        val visitPrefix = "visit_id" + (schoolActivityViewModel.projectInfo.value?.visit_id.toString() ?: "");
+        val visitPrefix =
+            "visit_id" + (schoolActivityViewModel.projectInfo.value?.visit_id.toString() ?: "");
         if (imageIndex == 0) {
             fileName = visitPrefix + "_picture_of_the_school_name.jpeg";
-        }else if (imageIndex == 1) {
+        } else if (imageIndex == 1) {
             fileName = visitPrefix + "_selfie_with_the_school_name.jpeg";
-        }else{
+        } else {
             fileName = visitPrefix + "_acknowledgement_letter.jpeg";
         }
         return RequestModel(
@@ -443,7 +457,10 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
             ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA -> {
                 cancelProgressDialog()
                 val navOptions = NavOptions.Builder()
-                    .setPopUpTo(R.id.action_reset_to_dashboard, true) // Adjust to your actual dashboard fragment ID
+                    .setPopUpTo(
+                        R.id.action_reset_to_dashboard,
+                        true
+                    ) // Adjust to your actual dashboard fragment ID
                     .build()
 
                 findNavController().navigate(R.id.action_reset_to_dashboard, null, navOptions)
@@ -465,10 +482,11 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
 
     private fun redirectToCamera(position: Int, imageType: String, heading: String) {
         val intent = Intent(activity, CameraActivity::class.java)
-        intent.putExtra("position", position)
-        intent.putExtra("imageType", imageType)
-        intent.putExtra("heading", heading)
-        intent.putExtra("visitData", Gson().toJson(schoolActivityViewModel.visitData.value))
+        val bundle = Bundle()
+        bundle.putInt("position", position)
+        bundle.putString("imageType", imageType)
+        bundle.putString("heading", heading)
+        intent.putExtras(bundle)
         startImageCapture.launch(intent)
     }
 

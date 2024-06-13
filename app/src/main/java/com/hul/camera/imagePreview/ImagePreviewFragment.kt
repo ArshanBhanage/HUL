@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Matrix
@@ -14,6 +15,7 @@ import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -29,9 +31,9 @@ import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
 import com.hul.camera.CameraComponent
-import com.hul.data.GetVisitDataResponseData
 import com.hul.data.RequestModel
 import com.hul.databinding.FragmentImagePreviewBinding
+import com.hul.storage.SharedPreferencesStorage
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
@@ -71,6 +73,9 @@ class ImagePreviewFragment : Fragment(), ApiHandler, RetryInterface {
     @Inject
     lateinit var uploadFileController: UploadFileController
 
+    @Inject
+    lateinit var prefs: SharedPreferencesStorage
+
     private var imageCapture: ImageCapture? = null
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
@@ -93,13 +98,12 @@ class ImagePreviewFragment : Fragment(), ApiHandler, RetryInterface {
         binding.viewModel = imagePreviewViewModel
         binding.heading.text = requireArguments().getString("heading")
 
-        if (requireArguments().getString("visitData") != null) {
-            imagePreviewViewModel.visitData.value = Gson().fromJson(
-                requireArguments().getString("visitData"),
-                GetVisitDataResponseData::class.java
-            )
+        if (prefs.getString("previewImage").isNotEmpty()) {
+            val decodedString = Base64.decode(prefs.getString("previewImage"), Base64.DEFAULT)
+            val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+            binding.ivMobiliser.setImageBitmap(decodedByte)
+            binding.llPreview.visibility = View.VISIBLE
         }
-
 
         return binding.root
 

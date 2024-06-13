@@ -8,13 +8,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hul.R
 import com.hul.data.ProjectInfo
 import com.hul.databinding.ItemMobiliserVisitBinding
-import com.hul.databinding.LocationViewDesignBinding
-import com.hul.screens.field_auditor_dashboard.ui.dashboard.DashboardFragmentInterface
 
 /**
  * Created by Nitin Chorge on 03-04-2024.
  */
-class MobiliserVisitsAdapter(private val mList: ArrayList<ProjectInfo>, private val callback: MobiliserVisitsFragmentInterface, val mContext : Context) : RecyclerView.Adapter<MobiliserVisitsAdapter.ViewHolder>() {
+class MobiliserVisitsAdapter(private var mList: List<ProjectInfo>, private val callback: MobiliserVisitsFragmentInterface, val mContext: Context) : RecyclerView.Adapter<MobiliserVisitsAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ItemMobiliserVisitBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -24,6 +22,11 @@ class MobiliserVisitsAdapter(private val mList: ArrayList<ProjectInfo>, private 
         val binding = ItemMobiliserVisitBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
         return ViewHolder(binding)
+    }
+
+    fun updateVisits(newVisits: List<ProjectInfo>) {
+        this.mList = newVisits as ArrayList<ProjectInfo>
+        notifyDataSetChanged()
     }
 
     // bind the items with each item

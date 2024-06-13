@@ -35,6 +35,12 @@ class FormFillViewModel @Inject constructor(
     var imageUrl4 = MutableLiveData<String>("")
     var imageUrl5 = MutableLiveData<String>("")
 
+    var imageApiUrl1 = MutableLiveData<String>("")
+    var imageApiUrl2 = MutableLiveData<String>("")
+    var imageApiUrl3 = MutableLiveData<String>("")
+    var imageApiUrl4 = MutableLiveData<String>("")
+    var imageApiUrl5 = MutableLiveData<String>("")
+
     val loginEnabled = MediatorLiveData<Boolean>(true)
 
     var form1 = MutableLiveData<String>("")

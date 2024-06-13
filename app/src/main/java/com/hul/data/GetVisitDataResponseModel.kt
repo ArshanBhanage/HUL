@@ -20,7 +20,12 @@ data class Visit1(
     val school_name: FieldData,
     val school_representative_who_collected_the_books: FieldData,
     val u_dice_code: FieldData,
-    val nullField: FieldData?
+    val nullField: FieldData?,
+    val picture_of_school_with_name_visible: FieldData,
+    val picture_of_school_with_unique_code: FieldData,
+    val picture_of_teachers_seeing_the_video: FieldData,
+    val picture_of_students_with_book_distribution: FieldData,
+    val picture_of_acknowledgement_letter: FieldData
 )
 
 data class FieldData(

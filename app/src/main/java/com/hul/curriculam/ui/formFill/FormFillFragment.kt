@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
@@ -33,7 +34,7 @@ import com.hul.R
 import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
-import com.hul.api.controller.UploadFileController as uploadFileController
+import com.hul.api.controller.UploadFileController
 import com.hul.camera.CameraActivity
 import com.hul.curriculam.CurriculamComponent
 import com.hul.curriculam.ui.formDetails.FormDetailsFragment
@@ -42,7 +43,9 @@ import com.hul.dashboard.ui.attendence.AttendenceFragment
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.data.SchoolCode
+import com.hul.data.UploadImageData
 import com.hul.data.VisitData
+import com.hul.data.VisitDetails
 import com.hul.databinding.FragmentFormFillBinding
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
@@ -74,6 +77,11 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
 
     @Inject
     lateinit var apiController: APIController
+
+    @Inject
+    lateinit var uploadFileController: UploadFileController
+
+    var imageIndex: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -119,7 +127,10 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
         binding.proceed.setOnClickListener {
-            submitForm()
+            if (imageIndex == 0) {
+                setProgressDialog(requireContext(), "Uploading")
+                uploadImage(formFillViewModel.imageUrl1.value?.toUri()!!)
+            }
         }
 
         if (allPermissionsGranted()) {
@@ -137,7 +148,47 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
         intent.putExtra("imageType", imageType)
         intent.putExtra("heading", heading)
         startImageCapture.launch(intent)
+    }
 
+    private fun uploadImageModel(): RequestModel {
+        var fileName: String = ""
+        val visitPrefix = "project_" + userInfo.projectName;
+        when (imageIndex) {
+            0 -> {
+                fileName = visitPrefix + "_picture_of_school_name.jpeg";
+            }
+            1 -> {
+                fileName = visitPrefix + "_selfie_with_school_name.jpeg";
+            }
+            2 -> {
+                fileName = visitPrefix + "_students_showing_filled_tracker.jpeg";
+            }
+            3 -> {
+                fileName = visitPrefix + "_teacher_handling_trackers.jpeg";
+            }
+            4 -> {
+                fileName = visitPrefix + "_acknowledgement_letter.jpeg";
+            }
+        }
+
+        return RequestModel(
+            project = userInfo.projectName,
+            uploadFor = "field_audit",
+            filename = fileName
+        )
+    }
+
+    private fun uploadImage(imageUri: Uri) {
+        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+            uploadFileController.getApiResponse(
+                this,
+                imageUri,
+                uploadImageModel(),
+                ApiExtentions.ApiDef.UPLOAD_IMAGE.ordinal
+            )
+        } else {
+            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.UPLOAD_IMAGE.ordinal, this)
+        }
     }
 
     val startImageCapture =
@@ -338,7 +389,7 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
 
     fun submitForm() {
 
-        /*if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
             //setProgressDialog(requireContext(), "Loading Leads")
             apiController.getApiResponse(
                 this,
@@ -347,42 +398,42 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
             )
         } else {
             noInternetDialogue(requireContext(), ApiExtentions.ApiDef.VISIT_DATA.ordinal, this)
-        }*/
+        }
 
     }
 
-    /*private fun submitModel(): RequestModel {
+    private fun submitModel(): RequestModel {
+
         return RequestModel(
             project = userInfo.projectName,
             visit_id = formFillViewModel.projectInfo.value!!.location_id,
             visitData = VisitData(
-                no_of_teachers_trained= formFillViewModel.form1.value,
-                number_of_books_distributed= 25.toString(),
-                number_of_students_as_per_record= 25.toString(),
-                picture_of_acknowledgement_letter= formFillViewModel.imageUrl1.value,
-                picture_of_school_with_name_visible= formFillViewModel.imageUrl2.value,
-                picture_of_school_with_unique_code= formFillViewModel.imageUrl3.value,
-                picture_of_students_with_book_distribution= formFillViewModel.imageUrl4.value,
-                picture_of_students_with_book_distribution2= formFillViewModel.imageUrl5.value,
+                no_of_teachers_trained= VisitDetails(value = formFillViewModel.form1.value),
+                number_of_books_distributed= VisitDetails(value = 25.toString()),
+                number_of_students_as_per_record= VisitDetails(value = 25.toString()),
+                picture_of_acknowledgement_letter= VisitDetails(value = formFillViewModel.imageApiUrl1.value),
+                picture_of_school_with_name_visible= formFillViewModel.imageApiUrl2.value,
+                picture_of_school_with_unique_code= formFillViewModel.imageApiUrl3.value,
+                picture_of_students_with_book_distribution= formFillViewModel.imageApiUrl4.value,
+                picture_of_students_with_book_distribution2= formFillViewModel.imageApiUrl5.value,
                 picture_of_students_with_book_distribution3= null,
                 picture_of_teachers_seeing_the_video= null,
-                school_closed= "false",
+                school_closed= VisitDetails(value = false),
                 school_name= binding.schoolName.text.toString(),
-                school_representative_who_collected_the_books = binding.form1.text.toString(),
-                principal_contact_details = binding.form2.text.toString(),
-                principal = "Arman Singh",
+                school_representative_who_collected_the_books = VisitDetails(value = binding.form1.text.toString()),
+                principal_contact_details = VisitDetails(value = binding.form2.text.toString()),
+                principal = VisitDetails(value = "Arman Singh"),
                 u_dice_code = binding.disceCode.text.toString(),
                 visit_id= 2.toString()
             )
         )
-    }*/
+    }
 
     override fun onApiSuccess(o: String?, objectType: Int) {
-
-        cancelProgressDialog()
-        when (ApiExtentions.ApiDef.values()[objectType]) {
+        when (ApiExtentions.ApiDef.entries[objectType]) {
 
             ApiExtentions.ApiDef.SUBMIT_SCHOOL_FORM -> {
+                cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     // Set the adapter to the AutoCompleteTextView
@@ -392,11 +443,41 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
             }
 
             ApiExtentions.ApiDef.VISIT_DATA -> {
+                cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     Toast.makeText(requireContext(), "Visit data submitted successfully", Toast.LENGTH_LONG).show()
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
+                }
+            }
+
+            ApiExtentions.ApiDef.UPLOAD_IMAGE -> {
+                val model = JSONObject(o.toString())
+                val uploadImageData = Gson().fromJson(
+                    model.getJSONObject("data").toString(),
+                    UploadImageData::class.java
+                )
+                if (uploadImageData != null && imageIndex == 0) {
+                    imageIndex += 1;
+                    formFillViewModel.imageApiUrl1.value = uploadImageData.url
+                    uploadImage(formFillViewModel.imageUrl2.value?.toUri()!!)
+                } else if (uploadImageData != null && imageIndex == 1) {
+                    imageIndex += 1;
+                    formFillViewModel.imageApiUrl2.value = uploadImageData.url
+                    uploadImage(formFillViewModel.imageUrl3.value?.toUri()!!)
+                } else if (uploadImageData != null && imageIndex == 2) {
+                    imageIndex += 1;
+                    formFillViewModel.imageApiUrl3.value = uploadImageData.url
+                    uploadImage(formFillViewModel.imageUrl4.value?.toUri()!!)
+                } else if (uploadImageData != null && imageIndex == 3) {
+                    imageIndex += 1;
+                    formFillViewModel.imageApiUrl4.value = uploadImageData.url
+                    uploadImage(formFillViewModel.imageUrl5.value?.toUri()!!)
+                } else if (uploadImageData != null && imageIndex == 4) {
+                    imageIndex += 1;
+                    formFillViewModel.imageApiUrl5.value = uploadImageData.url
+                    submitForm()
                 }
             }
 

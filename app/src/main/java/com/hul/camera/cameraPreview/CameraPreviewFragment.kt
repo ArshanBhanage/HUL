@@ -7,6 +7,9 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
@@ -60,6 +63,7 @@ import com.hul.user.UserInfo
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.setProgressDialog
 import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
@@ -330,7 +334,7 @@ class CameraPreviewFragment : Fragment() {
                     cameraPreviewViewModel.uri.value = Uri.fromFile(photoFile)
                     //startFetchingLastLocation()
                     setProgressDialog(requireContext(), "Processing Image")
-
+                    ensureLandscapeOrientation(photoFile)
                     // set the saved uri to the image view
 //                    binding.ivCapture.visibility = View.VISIBLE
 //                    binding.ivCapture.setImageURI(savedUri)
@@ -343,6 +347,24 @@ class CameraPreviewFragment : Fragment() {
             })
     }
 
+    private fun ensureLandscapeOrientation(photoFile: File) {
+        val bitmap = BitmapFactory.decodeFile(photoFile.path)
+        val rotatedBitmap = if (bitmap.width < bitmap.height) {
+            // Rotate the image to landscape if it is in portrait
+            val matrix = Matrix()
+            matrix.postRotate(90f)
+            Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        } else {
+            // Image is already in landscape
+            bitmap
+        }
+
+        // Save the rotated bitmap back to the file
+        FileOutputStream(photoFile).use { out ->
+            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+        }
+    }
+
 
     fun redurectToImagePreview(uri: Uri) {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
@@ -352,8 +374,8 @@ class CameraPreviewFragment : Fragment() {
         bundle.putString("imageUri", uri.toString())
         bundle.putInt("position", requireArguments().getInt("position", 0))
         bundle.putString("heading", requireArguments().getString("heading"))
-        if(requireArguments().getString("visitData") != null) {
-            bundle.putString("visitData",requireArguments().getString("visitData"))
+        if(bundle.getString("visitData") != null) {
+            bundle.putString("visitData",bundle.getString("visitData"))
         }
         findNavController().navigate(
             R.id.action_cameraPreviewFragment_to_imagePreviewFragment,

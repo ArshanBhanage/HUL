@@ -20,14 +20,16 @@ class CameraActivity : AppCompatActivity() {
         binding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(binding.root)
         val bundle = Bundle()
-        bundle.putInt("position",intent.getIntExtra("position", 0))
-        bundle.putString("imageType",intent.getStringExtra("imageType"))
-        bundle.putString("heading",intent.getStringExtra("heading"))
-        if(intent.getStringExtra("visitData") != null) {
-            bundle.putString("visitData",intent.getStringExtra("visitData"))
-        }
+
+        bundle.putInt("position", intent.getIntExtra("position", 0))
+        bundle.putString("imageType", intent.getStringExtra("imageType"))
+        bundle.putString("heading", intent.getStringExtra("heading"))
+
         findNavController(R.id.nav_host_fragment_camera).setGraph(R.navigation.camera_nav_graph)
-        findNavController(R.id.nav_host_fragment_camera).navigate(R.id.cameraPreviewFragment, bundle)
+        findNavController(R.id.nav_host_fragment_camera).navigate(
+            R.id.cameraPreviewFragment,
+            bundle
+        )
 
 //        val navController = findNavController(R.id.nav_host_fragment_content_main)
 //        appBarConfiguration = AppBarConfiguration(navController.graph)
@@ -58,10 +60,7 @@ class CameraActivity : AppCompatActivity() {
 //    }
 
 
-
 }
-
-
 
 
 //

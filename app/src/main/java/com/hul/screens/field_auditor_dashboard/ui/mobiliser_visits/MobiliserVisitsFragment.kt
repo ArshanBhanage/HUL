@@ -92,9 +92,9 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
 
         binding.llPending.setOnClickListener {
             mobiliserVisitsViewModel.pendingSelected.value = true
-            /*visits =
-                visits.filter { projectInfo -> projectInfo.visit_status != "SUBMITTED" }
-                        as ArrayList<ProjectInfo>*/
+
+            val pendingVisits = visits.filter { projectInfo -> projectInfo.visit_status != "SUBMITTED" }
+            myVisitsAdapter.updateVisits(pendingVisits)
 
             binding.viewBluePending.visibility = View.VISIBLE
             binding.viewBlueCompleted.visibility = View.GONE
@@ -103,18 +103,12 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
 
             binding.txtPending.setTextColor(Color.parseColor("#2C41CA"))
             binding.txtCompleted.setTextColor(Color.parseColor("#2F2B3DE5"))
-
-
-            myVisitsAdapter.notifyDataSetChanged()
         }
         binding.llCompleted.setOnClickListener {
             mobiliserVisitsViewModel.pendingSelected.value = false
 
-            /*visits.filter { projectInfo -> projectInfo.visit_status == "SUBMITTED" }
-                    as ArrayList<ProjectInfo>*/
-
-
-            myVisitsAdapter.notifyDataSetChanged()
+            val completedVisits = visits.filter { projectInfo -> projectInfo.visit_status == "SUBMITTED" }
+            myVisitsAdapter.updateVisits(completedVisits)
 
             binding.viewBluePending.visibility = View.GONE
             binding.viewBlueCompleted.visibility = View.VISIBLE
@@ -180,8 +174,10 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
                     visits =
                         Gson().fromJson(model.getJSONArray("data").toString(), listType);
 
+                    val pendingVisits = visits.filter { projectInfo -> projectInfo.visit_status != "SUBMITTED" }
+
                     myVisitsAdapter =
-                        MobiliserVisitsAdapter(visits, this, requireContext())
+                        MobiliserVisitsAdapter(pendingVisits, this, requireContext())
                     binding.recyclerViewVisits.adapter = myVisitsAdapter
 
                 } else {
