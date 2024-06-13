@@ -47,6 +47,7 @@ import com.hul.data.UploadImageData
 import com.hul.data.VisitData
 import com.hul.data.VisitDetails
 import com.hul.databinding.FragmentFormFillBinding
+import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDialogFragment
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
@@ -111,19 +112,19 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.schoolName.setText(formFillViewModel.selectedSchoolCode.value!!.location_name)
 
         binding.capture1.setOnClickListener {
-            redirectToCamera(0,"Back",requireContext().getString(R.string.form1))
+            redirectToCamera(0,"Back",requireContext().getString(R.string.school_pic1))
         }
         binding.capture2.setOnClickListener {
-            redirectToCamera(1,"Back",requireContext().getString(R.string.form2))
+            redirectToCamera(1,"Image Capture Front",requireContext().getString(R.string.school_pic2))
         }
         binding.capture3.setOnClickListener {
-            redirectToCamera(2,"Back",requireContext().getString(R.string.form3))
+            redirectToCamera(2,"Back",requireContext().getString(R.string.school_pic3))
         }
         binding.capture4.setOnClickListener {
-            redirectToCamera(3,"Back",requireContext().getString(R.string.form4))
+            redirectToCamera(3,"Back",requireContext().getString(R.string.school_pic4))
         }
         binding.capture5.setOnClickListener {
-            redirectToCamera(4,"Back",requireContext().getString(R.string.form5))
+            redirectToCamera(4,"Back",requireContext().getString(R.string.school_pic5))
         }
 
         binding.proceed.setOnClickListener {
@@ -133,6 +134,33 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
             }
         }
 
+        binding.view1.setOnClickListener { formFillViewModel.imageUrl1.value?.let { it1 ->
+            showImagePreview(
+                it1
+            )
+        } }
+        binding.view2.setOnClickListener { formFillViewModel.imageUrl2.value?.let { it1 ->
+            showImagePreview(
+                it1
+            )
+        } }
+        binding.view3.setOnClickListener { formFillViewModel.imageUrl3.value?.let { it1 ->
+            showImagePreview(
+                it1
+            )
+        } }
+
+        binding.view4.setOnClickListener { formFillViewModel.imageUrl4.value?.let { it1 ->
+            showImagePreview(
+                it1
+            )
+        } }
+        binding.view5.setOnClickListener { formFillViewModel.imageUrl5.value?.let { it1 ->
+            showImagePreview(
+                it1
+            )
+        } }
+
         if (allPermissionsGranted()) {
             checkLocationSettings()
         } else {
@@ -141,6 +169,13 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
 
         return root
     }
+
+    private fun showImagePreview(imagePath: String) {
+        val imageUri = Uri.parse(imagePath)
+        val newFragment = ImagePreviewDialogFragment.newInstance(imageUri)
+        newFragment.show(childFragmentManager, "image_preview")
+    }
+
 
     private fun redirectToCamera(position: Int, imageType: String, heading: String) {
         val intent = Intent(activity, CameraActivity::class.java)

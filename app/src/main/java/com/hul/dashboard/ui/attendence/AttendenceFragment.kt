@@ -42,6 +42,7 @@ import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.data.UploadImageData
 import com.hul.databinding.FragmentAttendenceBinding
+import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDialogFragment
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
@@ -279,9 +280,26 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
         attendenceViewModel.projectInfo.value =
             Gson().fromJson(requireArguments().getString("projectInfo"), ProjectInfo::class.java)
 
+        binding.view1.setOnClickListener { attendenceViewModel.imageUrl1.value?.let { it1 ->
+            showImagePreview(
+                it1
+            )
+        } }
+        binding.view2.setOnClickListener { attendenceViewModel.imageUrl2.value?.let { it1 ->
+            showImagePreview(
+                it1
+            )
+        } }
+
         getAttendenceForm()
 
         return root
+    }
+
+    private fun showImagePreview(imagePath: String) {
+        val imageUri = Uri.parse(imagePath)
+        val newFragment = ImagePreviewDialogFragment.newInstance(imageUri)
+        newFragment.show(childFragmentManager, "image_preview")
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {

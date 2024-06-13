@@ -390,6 +390,7 @@
                     android:layout_gravity="center_vertical">
 
                     <ImageView
+                        android:id="@+id/view2"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_marginRight="10dp"
@@ -446,7 +447,7 @@
                     android:layout_gravity="center_vertical">
 
                     <ImageView
-                        android:id="@+id/view2"
+                        android:id="@+id/view3"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_marginRight="10dp"

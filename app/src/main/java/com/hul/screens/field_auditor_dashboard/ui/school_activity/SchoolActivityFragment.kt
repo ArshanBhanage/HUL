@@ -44,6 +44,7 @@ import com.hul.data.VisitData
 import com.hul.data.VisitDetails
 import com.hul.databinding.FragmentSchoolActivityBinding
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
+import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDialogFragment
 import com.hul.storage.SharedPreferencesStorage
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
@@ -275,6 +276,22 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
             binding.btnNegative.visibility = View.GONE
         }
 
+        binding.view1.setOnClickListener { schoolActivityViewModel.imageUrl1.value?.let { it1 ->
+            showImagePreview(
+                it1
+            )
+        } }
+        binding.view2.setOnClickListener { schoolActivityViewModel.imageUrl2.value?.let { it1 ->
+            showImagePreview(
+                it1
+            )
+        } }
+        binding.view3.setOnClickListener { schoolActivityViewModel.imageUrl3.value?.let { it1 ->
+            showImagePreview(
+                it1
+            )
+        } }
+
         getVisitData();
 
         return root
@@ -298,6 +315,12 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(requireContext(), it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun showImagePreview(imagePath: String) {
+        val imageUri = Uri.parse(imagePath)
+        val newFragment = ImagePreviewDialogFragment.newInstance(imageUri)
+        newFragment.show(childFragmentManager, "image_preview")
     }
 
     override fun onDestroyView() {
