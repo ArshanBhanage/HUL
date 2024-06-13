@@ -1,6 +1,7 @@
 package com.hul.dashboard.ui.dashboard
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -8,7 +9,9 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -73,6 +76,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     var selectedSchoolCode: SchoolCode? = null
 
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -118,6 +122,22 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             showCustomDialog()
         }
 
+        binding.schoolCode.onFocusChangeListener = OnFocusChangeListener { view, hasFocus ->
+            if (hasFocus) {
+                selectedSchoolCode = null
+            }
+            else{
+                hideKeyboard(view)
+            }
+        }
+
+        binding.schoolCode.setOnItemClickListener { parent, view, position, id ->
+            selectedSchoolCode = schoolCodes[position]
+            binding.schoolCode.setText(selectedSchoolCode!!.external_id1)
+            schoolCodes[position].id?.let { getSchoolVisits(it) }
+            binding.schoolCode.clearFocus()
+        }
+
         binding.schoolCode.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 // Code to execute before the text is changed
@@ -125,23 +145,27 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 // Code to execute when the text is changed
-                if(!binding.schoolCode.text.isEmpty()) {
-                    getSchoolCodes(binding.schoolCode.text.toString())
-                }
+
             }
 
             override fun afterTextChanged(s: Editable?) {
                 // Code to execute after the text is changed
+                val obj = schoolCodes.filter { it.external_id1!!.equals(binding.schoolCode.text.toString()) }
+                if(!binding.schoolCode.text.isEmpty() && s.toString().length<10) {
+                    getSchoolCodes(binding.schoolCode.text.toString())
+                }
             }
         })
 
-        binding.schoolCode.setOnItemClickListener { parent, view, position, id ->
-            selectedSchoolCode = schoolCodes[position]
-            binding.schoolCode.setText(selectedSchoolCode!!.external_id1)
-            schoolCodes[position].id?.let { getSchoolVisits(it) }
-        }
+
 
         return root
+    }
+
+    // Function to hide the keyboard
+    private fun hideKeyboard(view: View) {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     fun getSchoolCodes(s: String) {
@@ -185,12 +209,39 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     }
 
+
+
     private fun getSVisitsBySchoolCode(id: Int): RequestModel {
         return RequestModel(
             schoolId = id,
         )
     }
 
+    fun addVisit(id: String, visitNumber : String) {
+
+        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+            //setProgressDialog(requireContext(), "Loading Leads")
+            apiController.getApiResponse(
+                this,
+                addVisitModel(id, visitNumber),
+                ApiExtentions.ApiDef.ADD_VISIT.ordinal
+            )
+        } else {
+            noInternetDialogue(
+                requireContext(),
+                ApiExtentions.ApiDef.ADD_VISIT.ordinal,
+                this
+            )
+        }
+
+    }
+
+    private fun addVisitModel(id: String, visitNumber : String): RequestModel {
+        return RequestModel(
+            location_id = id,
+            visit_number = visitNumber
+        )
+    }
 
     fun formatDate(date: Date, format: String): String {
         val dateFormat = SimpleDateFormat(format, Locale.getDefault())
@@ -298,11 +349,21 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
             }
 
+            ApiExtentions.ApiDef.ADD_VISIT -> {
+                val model = JSONObject(o.toString())
+                if (!model.getBoolean("error")) {
+                    getSchoolVisits(selectedSchoolCode!!.id!!)
+                } else {
+                    redirectionAlertDialogue(requireContext(), model.getString("message"))
+                }
+
+            }
+
             ApiExtentions.ApiDef.VISIT_LIST, ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE -> {
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     val listType: Type = object : TypeToken<List<ProjectInfo?>?>() {}.type
-                    var projectInfo: ArrayList<ProjectInfo> =
+                    val projectInfo: ArrayList<ProjectInfo> =
                         Gson().fromJson(model.getJSONArray("data").toString(), listType);
 
                     val myVisitsAdapter = MyVisitsAdapter(projectInfo, this, requireContext())
@@ -311,6 +372,22 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     binding.visitNumbers.text =
                         projectInfo.size.toString() + " " + requireContext().getString(R.string.visit_number)
                     binding.locationToVisit.adapter = myVisitsAdapter
+
+                    var flag = true
+
+                    for (project in projectInfo) {
+                        if(project.visit_status.equals("ASSIGNED", ignoreCase = true)
+                            || project.visit_status.equals("INITIATED", ignoreCase = true))
+                        {
+                            flag = false
+                        }
+                    }
+
+                    if(flag)
+                    {
+                        addVisit(selectedSchoolCode!!.id.toString(), (projectInfo.size + 1).toString())
+                    }
+
 
 //                    getAttendence()
 

@@ -34,8 +34,8 @@ class MyVisitsAdapter(private val mList: ArrayList<ProjectInfo>, private val das
         with(holder){
             with(mList[position]){
                binding.locationPosition.text = mContext.getString(R.string.visit)+" "+mList[position].visit_number+" | "+ mList[position].location_name + if(mList[position].is_revisit==1) "(Revisit)" else ""
-                binding.visit.text = if(mList[position].visit_status.equals("ASSIGNED", ignoreCase = true)) "Pending" else "Completed"
-                binding.visit.setTextColor(Color.parseColor(if(mList[position].visit_status.equals("ASSIGNED", ignoreCase = true)) "#FF9F43" else "#53D28C"))
+                binding.visit.text = if(mList[position].visit_status.equals("ASSIGNED", ignoreCase = true) || mList[position].visit_status.equals("INITIATED", ignoreCase = true)) "Pending" else "Completed"
+                binding.visit.setTextColor(Color.parseColor(if(mList[position].visit_status.equals("ASSIGNED", ignoreCase = true) || mList[position].visit_status.equals("INITIATED", ignoreCase = true)) "#FF9F43" else "#53D28C"))
                 binding.root.setOnClickListener{
                     dashboardInterface.redirectToAttendence(this)
                 }

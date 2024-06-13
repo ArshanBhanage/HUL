@@ -135,7 +135,7 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                                 requireContext().getString(R.string.visit) + visit.visit_number,
                                 FormFillFragment.newInstance(
                                     Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
-                                    Gson().toJson(schoolFormViewModel.projectInfo.value)
+                                    Gson().toJson(visit)
                                 )
                             )
                         } else {
@@ -143,7 +143,7 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                                 requireContext().getString(R.string.visit) + visit.visit_number,
                                 FormDetailsFragment.newInstance(
                                     Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
-                                    Gson().toJson(schoolFormViewModel.projectInfo.value)
+                                    Gson().toJson(visit)
                                 )
                             )
                         }

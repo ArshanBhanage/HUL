@@ -41,6 +41,10 @@ class APIController @Inject constructor(private val mContext: Context) :
                 .loginUser(requestModel)
                 .enqueue(this)
 
+            ApiExtentions.ApiDef.ADD_VISIT -> retrofit.create(ApiInterface::class.java)
+                .addVisit(requestModel)
+                .enqueue(this)
+
             ApiExtentions.ApiDef.GET_LOGO -> retrofit.create(ApiInterface::class.java)
                 .getLogo(requestModel!!.projectId!!)
                 .enqueue(this)
@@ -114,7 +118,7 @@ class APIController @Inject constructor(private val mContext: Context) :
             ApiExtentions.ApiDef.GET_VISIT_DATA -> if (requestModel != null) {
                 requestModel.loadImages?.let {
                     retrofit.create(ApiInterface::class.java)
-                        .getVisitData(requestModel.visitId, requestModel.project, it)
+                        .getVisitData(requestModel.visitId!!, requestModel.project, it)
                         .enqueue(this)
                 }
             }

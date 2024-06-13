@@ -94,6 +94,9 @@ interface ApiInterface {
     @POST("app/users/v1/verify_otp")
     fun loginUser(@Body param: RequestModel?): Call<ResponseBody?>
 
+    @POST("/app/visits/v1/addVisit/")
+    fun addVisit(@Body param: RequestModel?): Call<ResponseBody?>
+
     @GET("app/projects/v1/logo/{projectId}")
     fun getLogo(@Path(value = "projectId", encoded = true) projectId: String): Call<ResponseBody?>
 
