@@ -141,4 +141,6 @@
     <string name="pending">Pending</string>
     <string name="completed">Completed</string>
     <string name="mobilisers_image">Mobilisers Image</string>
+    <string name="mobiliser_name">Mobiliser Name</string>
+    <string name="logout">Logout</string>
 </resources>

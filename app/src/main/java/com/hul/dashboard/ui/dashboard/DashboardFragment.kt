@@ -1,14 +1,19 @@
 package com.hul.dashboard.ui.dashboard
 
+import android.app.AlertDialog
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,17 +25,19 @@ import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
 import com.hul.curriculam.Curriculam
-import com.hul.dashboard.Dashboard
+import com.hul.curriculam.ui.schoolCode.SchoolCodeAdapter
 import com.hul.dashboard.DashboardComponent
 import com.hul.data.Attendencemodel
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
+import com.hul.data.SchoolCode
 import com.hul.databinding.FragmentDashboardBinding
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
+import com.hul.utils.redirectToLogin
 import com.hul.utils.redirectionAlertDialogue
 import com.hul.utils.setProgressDialog
 import org.json.JSONObject
@@ -59,6 +66,12 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     @Inject
     lateinit var apiController: APIController
+
+    var adapter: SchoolCodeAdapter? = null
+
+    var schoolCodes: ArrayList<SchoolCode> = ArrayList()
+
+    var selectedSchoolCode: SchoolCode? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -101,12 +114,107 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         binding.date.text = formatDate(Date(), "dd MMM yyyy")
         binding.txtLatter.text = userInfo.projectName.trim().split("")[1].uppercase()
 
+        binding.rlProfile.setOnClickListener {
+            showCustomDialog()
+        }
+
+        binding.schoolCode.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Code to execute before the text is changed
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Code to execute when the text is changed
+                if(!binding.schoolCode.text.isEmpty()) {
+                    getSchoolCodes(binding.schoolCode.text.toString())
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Code to execute after the text is changed
+            }
+        })
+
+        binding.schoolCode.setOnItemClickListener { parent, view, position, id ->
+            selectedSchoolCode = schoolCodes[position]
+            binding.schoolCode.setText(selectedSchoolCode!!.external_id1)
+            schoolCodes[position].id?.let { getSchoolVisits(it) }
+        }
+
         return root
     }
+
+    fun getSchoolCodes(s: String) {
+
+        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+            //setProgressDialog(requireContext(), "Loading Leads")
+            apiController.getApiResponse(
+                this,
+                getSchoolCodesModel(s),
+                ApiExtentions.ApiDef.SCHOOL_CODES.ordinal
+            )
+        } else {
+            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.SCHOOL_CODES.ordinal, this)
+        }
+
+    }
+
+    private fun getSchoolCodesModel(s: String): RequestModel {
+        return RequestModel(
+            projectId = userInfo.projectId,
+            externalId = s
+        )
+    }
+
+    fun getSchoolVisits(schoolId: Int) {
+
+        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+            //setProgressDialog(requireContext(), "Loading Leads")
+            apiController.getApiResponse(
+                this,
+                getSVisitsBySchoolCode(schoolId),
+                ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE.ordinal
+            )
+        } else {
+            noInternetDialogue(
+                requireContext(),
+                ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE.ordinal,
+                this
+            )
+        }
+
+    }
+
+    private fun getSVisitsBySchoolCode(id: Int): RequestModel {
+        return RequestModel(
+            schoolId = id,
+        )
+    }
+
 
     fun formatDate(date: Date, format: String): String {
         val dateFormat = SimpleDateFormat(format, Locale.getDefault())
         return dateFormat.format(date)
+    }
+
+    private fun showCustomDialog() {
+        val builder: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(context)
+        val inflater = getLayoutInflater()
+        val dialogView: View = inflater.inflate(R.layout.profile_dialog, null)
+        builder.setView(dialogView)
+        val alertDialog: android.app.AlertDialog = builder.create()
+
+        val llLogout = dialogView.findViewById<LinearLayout>(R.id.llLogOut);
+        val txtMobiliserName = dialogView.findViewById<TextView>(R.id.txtMobiliserName)
+        txtMobiliserName.text = userInfo.projectName
+
+        llLogout.setOnClickListener {
+            alertDialog.dismiss()
+            userInfo.authToken = ""
+            redirectToLogin(requireContext())
+        }
+
+        alertDialog.show()
     }
 
     override fun onDestroyView() {
@@ -118,20 +226,22 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         super.onResume()
 
         loadLocations()
+
+        binding.schoolCode.setText("")
     }
 
     fun loadLocations() {
 
-        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
-            setProgressDialog(requireContext(), "Loading Leads")
-            apiController.getApiResponse(
-                this,
-                loadLocationsModel(),
-                ApiExtentions.ApiDef.VISIT_LIST.ordinal
-            )
-        } else {
-            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.VISIT_LIST.ordinal, this)
-        }
+//        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+//            setProgressDialog(requireContext(), "Loading Leads")
+//            apiController.getApiResponse(
+//                this,
+//                loadLocationsModel(),
+//                ApiExtentions.ApiDef.VISIT_LIST.ordinal
+//            )
+//        } else {
+//            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.VISIT_LIST.ordinal, this)
+//        }
 
     }
 
@@ -164,9 +274,31 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     override fun onApiSuccess(o: String?, objectType: Int) {
 
         cancelProgressDialog()
-        when (ApiExtentions.ApiDef.values()[objectType]) {
+        when (ApiExtentions.ApiDef.entries[objectType]) {
 
-            ApiExtentions.ApiDef.VISIT_LIST -> {
+            ApiExtentions.ApiDef.SCHOOL_CODES -> {
+                val model = JSONObject(o.toString())
+                if (!model.getBoolean("error")) {
+                    val listType: Type = object : TypeToken<List<SchoolCode?>?>() {}.type
+                    schoolCodes =
+                        Gson().fromJson(model.getJSONArray("data").toString(), listType);
+
+                    adapter = SchoolCodeAdapter(
+                        requireContext(),
+                        R.layout.school_code_dropdown,
+                        schoolCodes
+                    )
+
+                    // Set the adapter to the AutoCompleteTextView
+                    binding.schoolCode.setAdapter(adapter)
+                    binding.schoolCode.requestFocus()
+                } else {
+                    redirectionAlertDialogue(requireContext(), model.getString("message"))
+                }
+
+            }
+
+            ApiExtentions.ApiDef.VISIT_LIST, ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE -> {
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     val listType: Type = object : TypeToken<List<ProjectInfo?>?>() {}.type
@@ -179,7 +311,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     binding.visitNumbers.text =
                         projectInfo.size.toString() + " " + requireContext().getString(R.string.visit_number)
                     binding.locationToVisit.adapter = myVisitsAdapter
-                    getAttendence()
+
+//                    getAttendence()
 
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
@@ -231,13 +364,17 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     }
 
     override fun onApiError(message: String?) {
-        redirectionAlertDialogue(requireContext(), message!!)
+        if (message?.equals(context?.getString(R.string.session_expire))!!) {
+            userInfo.authToken = ""
+            redirectionAlertDialogue(requireContext(), message!!)
+        } else {
+            redirectionAlertDialogue(requireContext(), message!!)
+        }
     }
 
     override fun retry(type: Int) {
 
         when (ApiExtentions.ApiDef.values()[type]) {
-            ApiExtentions.ApiDef.VISIT_LIST -> loadLocations()
             ApiExtentions.ApiDef.GET_ATTENDENCE -> getAttendence()
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
         }
@@ -245,6 +382,22 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     }
 
     override fun redirectToAttendence(projectInfo: ProjectInfo) {
+        val bundle = Bundle()
+        bundle.putString(
+            "schoolInformation",
+            Gson().toJson(selectedSchoolCode)
+        )
+        bundle.putString(
+            "projectInfo",
+            Gson().toJson(projectInfo)
+        )
+        findNavController().navigate(
+            R.id.action_schoolCodeFragment_to_schoolFormFragment,
+            bundle
+        )
+    }
+
+    /*override fun redirectToAttendence(projectInfo: ProjectInfo) {
 
         if (dashboardViewModel.attendenceToday.value!!.present!!) {
             redirectToCurriculam(projectInfo)
@@ -256,11 +409,11 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                 bundle
             )
         }
-    }
+    }*/
 
     private fun redirectToCurriculam(projectInfo: ProjectInfo) {
         val intent = Intent(activity, Curriculam::class.java)
-        intent.putExtra("projectInfo",Gson().toJson(projectInfo))
+        intent.putExtra("projectInfo", Gson().toJson(projectInfo))
         startActivity(intent)
     }
 }

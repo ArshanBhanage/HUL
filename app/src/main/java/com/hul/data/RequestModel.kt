@@ -36,5 +36,6 @@ data class RequestModel(
     val filename: String? = null,
 
     val collected_by: String? = null,
-    val schoolVisitData: SchoolVisitData? = null
+    val schoolVisitData: SchoolVisitData? = null,
+    val schoolId : Int? = null
 )

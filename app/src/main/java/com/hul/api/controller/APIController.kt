@@ -85,6 +85,13 @@ class APIController @Inject constructor(private val mContext: Context) :
                 }
             }
 
+            ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE -> requestModel?.schoolId?.let {
+                retrofit.create(ApiInterface::class.java)
+                    .getListOfVisits(it)
+                    .enqueue(this)
+            }
+
+
             ApiExtentions.ApiDef.LEAD_DETAILS -> retrofit.create(ApiInterface::class.java)
                 .getLeadDetails(requestModel!!.leadId!!)
                 .enqueue(this)

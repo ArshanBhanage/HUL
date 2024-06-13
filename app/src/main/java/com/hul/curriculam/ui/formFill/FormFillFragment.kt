@@ -549,8 +549,7 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
 
     override fun retry(type: Int) {
 
-        when (ApiExtentions.ApiDef.values()[type]) {
-            ApiExtentions.ApiDef.SUBMIT_SCHOOL_FORM -> submitForm()
+        when (ApiExtentions.ApiDef.entries[type]) {
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
         }
 

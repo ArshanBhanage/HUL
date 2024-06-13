@@ -28,6 +28,7 @@ class ApiExtentions {
         GET_PERFORMANCE,
         GET_VISIT_DATA,
         SAVE_SCHOOL_ACTIVITY_DATA,
-        VISIT_DATA
+        VISIT_DATA,
+        VISIT_LIST_BY_SCHOOL_CODE
     }
 }

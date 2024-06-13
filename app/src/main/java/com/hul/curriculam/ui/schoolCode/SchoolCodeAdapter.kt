@@ -8,10 +8,11 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import com.hul.R
+import com.hul.data.ProjectInfo
 import com.hul.data.SchoolCode
 import java.util.Locale
 
-class SchoolCodeAdapter (context: Context, private val resource: Int, private val items: List<SchoolCode>) :
+class SchoolCodeAdapter (context: Context, private val resource: Int, private var items: List<SchoolCode>) :
     ArrayAdapter<SchoolCode>(context, resource, items) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -26,6 +27,11 @@ class SchoolCodeAdapter (context: Context, private val resource: Int, private va
         itemText.text = item.external_id1
 
         return view
+    }
+
+    fun updateVisits(newVisits: List<SchoolCode>) {
+        items = newVisits
+        notifyDataSetChanged()
     }
 
     override fun getFilter(): android.widget.Filter {

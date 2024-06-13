@@ -66,8 +66,12 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
             (activity?.application as HULApplication).appComponent.curriculamComponent()
                 .create()
         curriculamComponent.inject(this)
-        schoolFormViewModel.selectedSchoolCode.value = Gson().fromJson(requireArguments().getString("schoolInformation"),SchoolCode::class.java)
-        schoolFormViewModel.projectInfo.value = Gson().fromJson(requireArguments().getString("projectInfo"),ProjectInfo::class.java)
+        schoolFormViewModel.selectedSchoolCode.value = Gson().fromJson(
+            requireArguments().getString("schoolInformation"),
+            SchoolCode::class.java
+        )
+        schoolFormViewModel.projectInfo.value =
+            Gson().fromJson(requireArguments().getString("projectInfo"), ProjectInfo::class.java)
         binding.viewModel = schoolFormViewModel
         getVisitList()
         binding.stats.setOnClickListener {
@@ -93,7 +97,11 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                 ApiExtentions.ApiDef.VISIT_LIST_SINGLE.ordinal
             )
         } else {
-            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.VISIT_LIST_SINGLE.ordinal, this)
+            noInternetDialogue(
+                requireContext(),
+                ApiExtentions.ApiDef.VISIT_LIST_SINGLE.ordinal,
+                this
+            )
         }
 
     }
@@ -120,24 +128,28 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                     binding.viewPager.adapter = adapter
 
                     // Add fragments dynamically
-                    for (visit in schoolFormViewModel.visitList.value!!)
-                    {
-                        if(!visit.visit_status.equals("completed", ignoreCase = true)) {
+                    for (visit in schoolFormViewModel.visitList.value!!) {
+                        if (visit.visit_status.equals("ASSIGNED", ignoreCase = true)
+                            || visit.visit_status.equals("INITIATED", ignoreCase = true)) {
                             addNewTab(
                                 requireContext().getString(R.string.visit) + visit.visit_number,
-                                FormFillFragment.newInstance(Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),Gson().toJson(schoolFormViewModel.projectInfo.value))
+                                FormFillFragment.newInstance(
+                                    Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
+                                    Gson().toJson(schoolFormViewModel.projectInfo.value)
+                                )
                             )
-                        }
-                        else{
+                        } else {
                             addNewTab(
                                 requireContext().getString(R.string.visit) + visit.visit_number,
-                                FormDetailsFragment.newInstance(Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),Gson().toJson(schoolFormViewModel.projectInfo.value))
+                                FormDetailsFragment.newInstance(
+                                    Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
+                                    Gson().toJson(schoolFormViewModel.projectInfo.value)
+                                )
                             )
                         }
                     }
 
-                    if(schoolFormViewModel.visitList.value!!.size ==1)
-                    {
+                    if (schoolFormViewModel.visitList.value!!.size == 1) {
                         binding.tabLayout.visibility = View.GONE
                     }
                     // Connect TabLayout with ViewPager2

@@ -35,6 +35,7 @@ import com.hul.utils.redirectionAlertDialogue
 import com.hul.utils.setProgressDialog
 import org.json.JSONObject
 import java.lang.reflect.Type
+import java.util.Collections
 import javax.inject.Inject
 
 class SchoolCodeFragment : Fragment(), ApiHandler, RetryInterface {
@@ -56,6 +57,8 @@ class SchoolCodeFragment : Fragment(), ApiHandler, RetryInterface {
     @Inject
     lateinit var apiController: APIController
 
+    var adapter: SchoolCodeAdapter? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -71,20 +74,20 @@ class SchoolCodeFragment : Fragment(), ApiHandler, RetryInterface {
                 .create()
         curriculamComponent.inject(this)
         binding.viewModel = schoolCodeViewModel
-//        binding.schoolCode.addTextChangedListener(object : TextWatcher {
-//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-//                // Code to execute before the text is changed
-//            }
-//
-//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                // Code to execute when the text is changed
-//                getSchoolCodes(binding.schoolCode.text.toString())
-//            }
-//
-//            override fun afterTextChanged(s: Editable?) {
-//                // Code to execute after the text is changed
-//            }
-//        })
+        binding.schoolCode.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Code to execute before the text is changed
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Code to execute when the text is changed
+                getSchoolCodes(binding.schoolCode.text.toString())
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Code to execute after the text is changed
+            }
+        })
         binding.stats.setOnClickListener {
             requireActivity().onBackPressed()
         }
@@ -107,6 +110,14 @@ class SchoolCodeFragment : Fragment(), ApiHandler, RetryInterface {
             binding.district.setText(schoolCodeViewModel.selectedSchoolCode.value!!.location_address)
         }
         return root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        adapter?.updateVisits(Collections.emptyList())
+        binding.schoolName.setText("")
+        binding.ward.setText("")
+        binding.district.setText("")
     }
 
     fun getSchoolCodes(s: String) {
@@ -134,15 +145,15 @@ class SchoolCodeFragment : Fragment(), ApiHandler, RetryInterface {
     override fun onApiSuccess(o: String?, objectType: Int) {
 
         cancelProgressDialog()
-        when (ApiExtentions.ApiDef.values()[objectType]) {
+        when (ApiExtentions.ApiDef.entries[objectType]) {
 
             ApiExtentions.ApiDef.SCHOOL_CODES -> {
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     val listType: Type = object : TypeToken<List<SchoolCode?>?>() {}.type
-                    var schoolCodes: ArrayList<SchoolCode> =
+                    val schoolCodes: ArrayList<SchoolCode> =
                         Gson().fromJson(model.getJSONArray("data").toString(), listType);
-                    val adapter = SchoolCodeAdapter(
+                    adapter = SchoolCodeAdapter(
                         requireContext(),
                         R.layout.school_code_dropdown,
                         schoolCodes
@@ -176,7 +187,12 @@ class SchoolCodeFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     private fun redirectToSchoolForm() {
-        var bundle = Bundle()
+        if(schoolCodeViewModel.selectedSchoolCode.value == null
+            || requireArguments().getString("projectInfo") == null) {
+            Toast.makeText(requireContext(), "Please fill all the details", Toast.LENGTH_LONG).show()
+            return;
+        }
+        val bundle = Bundle()
         bundle.putString(
             "schoolInformation",
             Gson().toJson(schoolCodeViewModel.selectedSchoolCode.value)

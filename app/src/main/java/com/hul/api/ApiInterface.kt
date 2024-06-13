@@ -48,6 +48,11 @@ interface ApiInterface {
         @Query("mobiliserId") mobiliserId: Int
     ): Call<ResponseBody?>
 
+    @GET("app/visits/v1/get_list_of_visits/{id}")
+    fun getListOfVisits(
+        @Path("id") id: Int
+    ): Call<ResponseBody?>
+
     @GET("app/leads/v1/getLeads/{lead_id}")
     fun getLeadDetails(@Path(value = "lead_id", encoded = true) leadId: String): Call<ResponseBody?>
 

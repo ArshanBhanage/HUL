@@ -8,7 +8,9 @@ import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.RadioButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -31,12 +33,14 @@ import com.hul.data.RequestModel
 import com.hul.data.ResponseModel
 import com.hul.data.UserDetails
 import com.hul.databinding.FragmentDashboardAuditorBinding
+import com.hul.loginRegistraion.LoginRegistrationActivity
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
+import com.hul.utils.redirectToLogin
 import com.hul.utils.redirectionAlertDialogue
 import org.json.JSONObject
 import java.lang.reflect.Type
@@ -69,6 +73,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     lateinit var mobilisersAdapter: MobilisersAdapter
 
+    lateinit var userDetails: UserDetails
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -99,7 +105,9 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             showOptionsDialog()
         }
 
-        binding.txtLatter.text = userInfo.projectName.trim().split("")[1].uppercase()
+        binding.rlProfile.setOnClickListener {
+            showCustomDialog()
+        }
 
         return root
     }
@@ -118,6 +126,26 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         super.onResume()
         mobiliserUsers.clear()
         getLogo()
+    }
+
+    private fun showCustomDialog() {
+        val builder: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(context)
+        val inflater = getLayoutInflater()
+        val dialogView: View = inflater.inflate(R.layout.profile_dialog, null)
+        builder.setView(dialogView)
+        val alertDialog: android.app.AlertDialog = builder.create()
+
+        val llLogout = dialogView.findViewById<LinearLayout>(R.id.llLogOut);
+        val txtMobiliserName = dialogView.findViewById<TextView>(R.id.txtMobiliserName)
+        txtMobiliserName.text = userDetails.user_fullname
+
+        llLogout.setOnClickListener {
+            alertDialog.dismiss()
+            userInfo.authToken = ""
+            redirectToLogin(requireContext())
+        }
+
+        alertDialog.show()
     }
 
     private fun getLogo() {
@@ -147,7 +175,6 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             ApiExtentions.ApiDef.GET_PERFORMANCE.ordinal
         )
     }
-
 
 
     private fun getUserDetailsModel(): RequestModel {
@@ -188,13 +215,16 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             ApiExtentions.ApiDef.GET_USER_DETAILS -> {
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
-                    val userResponse = Gson().fromJson(
+                    userDetails = Gson().fromJson(
                         model.getJSONObject("data").toString(),
                         UserDetails::class.java
                     )
 
-                    mobiliserUsers.addAll(userResponse.users_mapped)
-                    mobilisersAdapter = MobilisersAdapter(ArrayList(mobiliserUsers), this, requireContext())
+                    binding.txtLatter.text = userDetails.user_fullname.split("")[1].uppercase()
+
+                    mobiliserUsers.addAll(userDetails.users_mapped)
+                    mobilisersAdapter =
+                        MobilisersAdapter(ArrayList(mobiliserUsers), this, requireContext())
                     binding.recyclerViewMobilisers.adapter = mobilisersAdapter
 
                     getPerformance()
@@ -211,8 +241,10 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                         PerformanceData::class.java
                     )
                     binding.txtVisits.text = performanceData.till_date.total_visits.toString()
-                    binding.txtAttendance.text = performanceData.till_date.attendance.toString() + "%"
-                    binding.txtTotalVisits.text = performanceData.till_date.audit_approval.toString() + "%"
+                    binding.txtAttendance.text =
+                        performanceData.till_date.attendance.toString() + "%"
+                    binding.txtTotalVisits.text =
+                        performanceData.till_date.audit_approval.toString() + "%"
 
                     getAttendance()
                 } else {
@@ -262,7 +294,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             ApiExtentions.ApiDef.GET_LOGO -> {
                 val model: ResponseModel = Gson().fromJson(o, ResponseModel::class.java)
                 if (!model.error) {
-                    val imageBytes = Base64.decode(model.data!!.get("logo").toString(), Base64.DEFAULT)
+                    val imageBytes =
+                        Base64.decode(model.data!!.get("logo").toString(), Base64.DEFAULT)
                     val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
                     binding.imgLogo.setImageBitmap(decodedImage)
 
@@ -280,8 +313,10 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     override fun onApiError(message: String?) {
         if (message?.equals(context?.getString(R.string.session_expire))!!) {
             userInfo.authToken = ""
+            redirectionAlertDialogue(requireContext(), message!!)
+        }else{
+            redirectionAlertDialogue(requireContext(), message!!)
         }
-        redirectionAlertDialogue(requireContext(), message!!)
     }
 
     override fun retry(type: Int) {
