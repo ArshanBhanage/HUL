@@ -383,11 +383,12 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
 
             ApiExtentions.ApiDef.MARK_ATTENDENCE -> {
                 val model = JSONObject(o.toString())
-                if (attendenceViewModel.projectInfo.value!!.project_name != null) {
+                /*if (attendenceViewModel.projectInfo.value!!.project_name != null) {
                     redirectToCurriculam(attendenceViewModel.projectInfo.value!!)
                 } else {
                     requireActivity().onBackPressed()
-                }
+                }*/
+                requireActivity().onBackPressed()
             }
 
             ApiExtentions.ApiDef.UPLOAD_IMAGE -> {

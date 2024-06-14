@@ -31,6 +31,7 @@ import com.hul.curriculam.Curriculam
 import com.hul.curriculam.ui.schoolCode.SchoolCodeAdapter
 import com.hul.dashboard.DashboardComponent
 import com.hul.data.Attendencemodel
+import com.hul.data.PerformanceData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.data.SchoolCode
@@ -162,6 +163,20 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         return root
     }
 
+    private fun getPerformanceModel(): RequestModel {
+        return RequestModel(
+
+        )
+    }
+
+    private fun getPerformance() {
+        apiController.getApiResponse(
+            this,
+            getPerformanceModel(),
+            ApiExtentions.ApiDef.GET_PERFORMANCE.ordinal
+        )
+    }
+
     // Function to hide the keyboard
     private fun hideKeyboard(view: View) {
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -279,6 +294,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         loadLocations()
 
         binding.schoolCode.setText("")
+        getAttendence()
     }
 
     fun loadLocations() {
@@ -326,6 +342,68 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
         cancelProgressDialog()
         when (ApiExtentions.ApiDef.entries[objectType]) {
+
+            ApiExtentions.ApiDef.GET_ATTENDENCE -> {
+                val model = JSONObject(o.toString())
+                if (!model.getBoolean("error")) {
+                    val listType: Type = object : TypeToken<List<Attendencemodel?>?>() {}.type
+                    val items: ArrayList<Attendencemodel> =
+                        Gson().fromJson(model.getJSONArray("data").toString(), listType);
+                    val currentObject = items.get(items.size - 1)
+                    dashboardViewModel.attendenceToday.value = currentObject
+                    items.removeAt(items.size - 1)
+                    // Remove the first element
+                    items.removeAt(0)
+                    val adapter = AttendenceAdapter(requireContext(), items)
+                    binding.gridView.adapter = adapter
+                    if (currentObject.date!!.length > 10) {
+
+                        binding.time.text = currentObject.date!!.substring(
+                            11,
+                            currentObject.date!!.length
+                        )
+                    }
+
+                    if (currentObject.present!!) {
+                        if (currentObject.present!!) {
+                            binding.punchInButton.visibility = View.GONE
+                            binding.punchInButtonDisabled.visibility = View.VISIBLE
+                            binding.punchInButton.isEnabled = false
+                        } else {
+                            binding.punchInButton.visibility = View.VISIBLE
+                        }
+                    } else {
+                        binding.punchInButton.visibility = View.VISIBLE
+                    }
+
+                    getPerformance()
+
+                } else {
+                    redirectionAlertDialogue(requireContext(), model.getString("message"))
+                }
+
+            }
+
+            ApiExtentions.ApiDef.GET_PERFORMANCE -> {
+                val model = JSONObject(o.toString())
+                if (!model.getBoolean("error")) {
+                    try {
+                        val performanceData = Gson().fromJson(
+                            model.getJSONObject("data").toString(),
+                            PerformanceData::class.java
+                        )
+                        binding.txtVisits.text = performanceData.till_date.total_visits.toString()
+                        binding.txtAttendance.text =
+                            performanceData.till_date.attendance.toString() + "%"
+                        binding.txtTotalVisits.text =
+                            performanceData.till_date.audit_approval.toString() + "%"
+                    }catch (e: Exception) {
+
+                    }
+                } else {
+                    redirectionAlertDialogue(requireContext(), model.getString("message"))
+                }
+            }
 
             ApiExtentions.ApiDef.SCHOOL_CODES -> {
                 val model = JSONObject(o.toString())
@@ -388,48 +466,6 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                         addVisit(selectedSchoolCode!!.id.toString(), (projectInfo.size + 1).toString())
                     }
 
-
-//                    getAttendence()
-
-                } else {
-                    redirectionAlertDialogue(requireContext(), model.getString("message"))
-                }
-
-            }
-
-            ApiExtentions.ApiDef.GET_ATTENDENCE -> {
-                val model = JSONObject(o.toString())
-                if (!model.getBoolean("error")) {
-                    val listType: Type = object : TypeToken<List<Attendencemodel?>?>() {}.type
-                    val items: ArrayList<Attendencemodel> =
-                        Gson().fromJson(model.getJSONArray("data").toString(), listType);
-                    val currentObject = items.get(items.size - 1)
-                    dashboardViewModel.attendenceToday.value = currentObject
-                    items.removeAt(items.size - 1)
-                    // Remove the first element
-                    items.removeAt(0)
-                    val adapter = AttendenceAdapter(requireContext(), items)
-                    binding.gridView.adapter = adapter
-                    if (currentObject.date!!.length > 10) {
-
-                        binding.time.text = currentObject.date!!.substring(
-                            11,
-                            currentObject.date!!.length
-                        )
-                    }
-
-                    if (currentObject.present!!) {
-                        if (currentObject.present!!) {
-                            binding.punchInButton.visibility = View.GONE
-                            binding.punchInButtonDisabled.visibility = View.VISIBLE
-                            binding.punchInButton.isEnabled = false
-                        } else {
-                            binding.punchInButton.visibility = View.VISIBLE
-                        }
-                    } else {
-                        binding.punchInButton.visibility = View.VISIBLE
-                    }
-
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -459,19 +495,29 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     }
 
     override fun redirectToAttendence(projectInfo: ProjectInfo) {
-        val bundle = Bundle()
-        bundle.putString(
-            "schoolInformation",
-            Gson().toJson(selectedSchoolCode)
-        )
-        bundle.putString(
-            "projectInfo",
-            Gson().toJson(projectInfo)
-        )
-        findNavController().navigate(
-            R.id.action_schoolCodeFragment_to_schoolFormFragment,
-            bundle
-        )
+
+        if (dashboardViewModel.attendenceToday.value!!.present!!) {
+            val bundle = Bundle()
+            bundle.putString(
+                "schoolInformation",
+                Gson().toJson(selectedSchoolCode)
+            )
+            bundle.putString(
+                "projectInfo",
+                Gson().toJson(projectInfo)
+            )
+            findNavController().navigate(
+                R.id.action_schoolCodeFragment_to_schoolFormFragment,
+                bundle
+            )
+        } else {
+            val bundle = Bundle()
+            bundle.putString("projectInfo", Gson().toJson(projectInfo))
+            findNavController().navigate(
+                R.id.action_dashboardFragment_to_attendenceFragment,
+                bundle
+            )
+        }
     }
 
     /*override fun redirectToAttendence(projectInfo: ProjectInfo) {
