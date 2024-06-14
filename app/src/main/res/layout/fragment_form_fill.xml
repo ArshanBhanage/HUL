@@ -460,7 +460,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:lineHeight="18dp"
-                            android:inputType="number"
+                            android:inputType="text"
                             android:text="@={viewModel.form1}"
                             android:textColor="@color/black"
                             android:textFontWeight="400"
