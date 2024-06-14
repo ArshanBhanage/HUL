@@ -1,22 +1,33 @@
 package com.hul.curriculam.ui.formDetails
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
 import com.google.gson.Gson
 import com.hul.HULApplication
+import com.hul.api.ApiExtentions
+import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
 import com.hul.curriculam.CurriculamComponent
-import com.hul.curriculam.ui.formFill.FormFillFragment
+import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
+import com.hul.data.RequestModel
 import com.hul.data.SchoolCode
 import com.hul.databinding.FragmentFormBinding
 import com.hul.user.UserInfo
+import com.hul.utils.ConnectionDetector
+import com.hul.utils.RetryInterface
+import com.hul.utils.cancelProgressDialog
+import com.hul.utils.noInternetDialogue
+import com.hul.utils.redirectionAlertDialogue
+import com.hul.utils.setProgressDialog
+import org.json.JSONObject
 import javax.inject.Inject
 
-class FormDetailsFragment : Fragment() {
+class FormDetailsFragment : Fragment(), ApiHandler, RetryInterface {
 
     private var _binding: FragmentFormBinding? = null
 
@@ -78,6 +89,69 @@ class FormDetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        getVisitData()
+    }
 
+    override fun onResume() {
+        super.onResume()
+    }
+
+    private fun visitsDataModel(): RequestModel {
+        return formViewModel.projectInfo.value?.visit_id?.let {
+            RequestModel(
+                project = userInfo.projectName,
+                visitId = it,
+                loadImages = false
+            )
+        }!!
+    }
+
+    private fun getVisitData() {
+        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+            setProgressDialog(requireContext(), "Loading Visit data")
+            apiController.getApiResponse(
+                this,
+                visitsDataModel(),
+                ApiExtentions.ApiDef.GET_VISIT_DATA.ordinal
+            )
+        } else {
+            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.GET_VISIT_DATA.ordinal, this)
+        }
+    }
+
+    override fun onApiSuccess(o: String?, objectType: Int) {
+        when (ApiExtentions.ApiDef.entries[objectType]) {
+
+            ApiExtentions.ApiDef.GET_VISIT_DATA -> {
+                cancelProgressDialog()
+                val model = JSONObject(o.toString())
+                formViewModel.visitData.value = Gson().fromJson(
+                    model.getJSONObject("data").toString(),
+                    GetVisitDataResponseData::class.java
+                )
+
+                // For render purpose only
+                if (formViewModel.visitData.value?.visit_1 != null) {
+                    formViewModel.visitDataToView.value = formViewModel.visitData.value?.visit_1
+                } else if (formViewModel.visitData.value?.visit_2 != null) {
+                    formViewModel.visitDataToView.value = formViewModel.visitData.value?.visit_2
+                } else if (formViewModel.visitData.value?.visit_3 != null) {
+                    formViewModel.visitDataToView.value = formViewModel.visitData.value?.visit_3
+                }
+            }
+
+            else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    override fun onApiError(message: String?) {
+        cancelProgressDialog()
+        redirectionAlertDialogue(requireContext(), message!!)
+    }
+
+    override fun retry(type: Int) {
+        when (ApiExtentions.ApiDef.entries[type]) {
+            else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
+        }
     }
 }

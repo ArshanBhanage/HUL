@@ -44,6 +44,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
+                        android:id="@+id/visitTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/public_sans"
@@ -53,6 +54,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/visitSubTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/public_sans"

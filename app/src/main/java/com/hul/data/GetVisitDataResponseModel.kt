@@ -7,7 +7,9 @@ data class GetVisitDataResponseModel(
 )
 
 data class GetVisitDataResponseData(
-    val visit_1: Visit1
+    val visit_1: Visit1,
+    val visit_2: Visit1,
+    val visit_3: Visit1
 )
 
 data class Visit1(

@@ -59,7 +59,7 @@
                         app:errorIconTint="@color/red"
                         app:errorTextColor="@color/red"
                         app:layout_constraintTop_toBottomOf="@+id/loginHeader"
-                        app:placeholderText="@string/username_placeholder"
+                        app:placeholderText="@string/enter_here"
                         app:prefixTextColor="@color/black">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -70,7 +70,8 @@
                             android:textColor="@color/black"
                             android:textFontWeight="400"
                             android:textSize="16sp"
-                            android:enabled="false"/>
+                            android:enabled="false"
+                            android:text='@{viewModel.visitDataToView.u_dice_code.value}'/>
 
 
                     </com.google.android.material.textfield.TextInputLayout>
@@ -108,7 +109,8 @@
                             android:textColor="@color/black"
                             android:textFontWeight="400"
                             android:textSize="16sp"
-                            android:enabled="false"/>
+                            android:enabled="false"
+                            android:text='@{viewModel.visitDataToView.school_name.value}'/>
 
 
                     </com.google.android.material.textfield.TextInputLayout>

@@ -6,8 +6,10 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.SchoolCode
+import com.hul.data.Visit1
 import com.hul.loginRegistraion.loginwithpin.InValid
 import com.hul.loginRegistraion.loginwithpin.Valid
 import com.hul.user.UserInfo
@@ -218,5 +220,8 @@ class FormFillViewModel @Inject constructor(
             "Enter filled trackers collected"
         }
     }
+
+    var visitData = MutableLiveData<GetVisitDataResponseData>(null)
+    var visitDataToView = MutableLiveData<Visit1>(null)
 
 }

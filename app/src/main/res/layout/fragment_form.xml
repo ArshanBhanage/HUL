@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text="@string/disce_code"
+                android:text='@{viewModel.visitDataToView.u_dice_code.value}'
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text="@string/school_name"
+                android:text='@{viewModel.visitDataToView.school_name.value}'
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
@@ -96,7 +96,7 @@
                         android:layout_height="match_parent"
                         android:fontFamily="@font/public_sans"
                         android:lineHeight="28dp"
-                        android:text="10"
+                        android:text='@{viewModel.visitDataToView.no_of_teachers_trained.value}'
                         android:textColor="#444050"
                         android:textFontWeight="700"
                         android:textSize="15sp"
@@ -122,7 +122,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/public_sans"
                         android:lineHeight="28dp"
-                        android:text="100"
+                        android:text='@{viewModel.visitDataToView.number_of_students_as_per_record.value}'
                         android:textColor="#444050"
                         android:textFontWeight="700"
                         android:textSize="15sp"
@@ -143,7 +143,26 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text="@string/school_name"
+                android:text='@{viewModel.visitDataToView.number_of_books_distributed.value}'
+                android:textColor="#444050"
+                android:textFontWeight="700"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/public_sans"
+                android:layout_marginTop="24dp"
+                android:text="@string/representetive_name"
+                android:textColor="#6d6b77"
+                android:textFontWeight="400"
+                android:textSize="13sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/public_sans"
+                android:lineHeight="28dp"
+                android:text='@{viewModel.visitDataToView.school_representative_who_collected_the_books.value}'
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
@@ -162,26 +181,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text="@string/school_name"
-                android:textColor="#444050"
-                android:textFontWeight="700"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/public_sans"
-                android:layout_marginTop="24dp"
-                android:text="@string/representetive_number"
-                android:textColor="#6d6b77"
-                android:textFontWeight="400"
-                android:textSize="13sp" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/public_sans"
-                android:lineHeight="28dp"
-                android:text="@string/school_name"
+                android:text=""
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
@@ -200,7 +200,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text="@string/school_name"
+                android:text='@{viewModel.visitDataToView.principal.value}'
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
@@ -219,7 +219,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text="@string/school_name"
+                android:text='@{viewModel.visitDataToView.principal_contact_details.value}'
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
@@ -238,7 +238,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text="@string/school_name"
+                android:text=""
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
@@ -257,7 +257,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text="@string/school_name"
+                android:text=""
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"

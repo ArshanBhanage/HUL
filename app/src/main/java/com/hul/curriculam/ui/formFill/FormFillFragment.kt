@@ -40,6 +40,7 @@ import com.hul.curriculam.CurriculamComponent
 import com.hul.curriculam.ui.formDetails.FormDetailsFragment
 import com.hul.curriculam.ui.schoolForm.PagerAdapter
 import com.hul.dashboard.ui.attendence.AttendenceFragment
+import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.data.SchoolCode
@@ -264,9 +265,32 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
         }
     }
 
+    private fun visitsDataModel(): RequestModel {
+        return formFillViewModel.projectInfo.value?.visit_id?.let {
+            RequestModel(
+                project = userInfo.projectName,
+                visitId = it,
+                loadImages = false
+            )
+        }!!
+    }
+
+    private fun getVisitData() {
+        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+            setProgressDialog(requireContext(), "Loading Visit data")
+            apiController.getApiResponse(
+                this,
+                visitsDataModel(),
+                ApiExtentions.ApiDef.GET_VISIT_DATA.ordinal
+            )
+        } else {
+            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.GET_VISIT_DATA.ordinal, this)
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        getVisitData()
     }
 
     // TODO: Step 1.1, Review variables (no changes).
@@ -516,6 +540,24 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
                 }
             }
 
+            ApiExtentions.ApiDef.GET_VISIT_DATA -> {
+                cancelProgressDialog()
+                val model = JSONObject(o.toString())
+                formFillViewModel.visitData.value = Gson().fromJson(
+                    model.getJSONObject("data").toString(),
+                    GetVisitDataResponseData::class.java
+                )
+
+                // For render purpose only
+                if (formFillViewModel.visitData.value?.visit_1 != null) {
+                    formFillViewModel.visitDataToView.value = formFillViewModel.visitData.value?.visit_1
+                } else if (formFillViewModel.visitData.value?.visit_2 != null) {
+                    formFillViewModel.visitDataToView.value = formFillViewModel.visitData.value?.visit_2
+                } else if (formFillViewModel.visitData.value?.visit_3 != null) {
+                    formFillViewModel.visitDataToView.value = formFillViewModel.visitData.value?.visit_3
+                }
+            }
+
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
         }
     }
@@ -543,6 +585,7 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
 //    }
 
     override fun onApiError(message: String?) {
+        cancelProgressDialog()
         println(message)
         redirectionAlertDialogue(requireContext(), message!!)
     }

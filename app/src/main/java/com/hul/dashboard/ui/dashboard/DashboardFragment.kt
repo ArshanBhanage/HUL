@@ -1,19 +1,15 @@
 package com.hul.dashboard.ui.dashboard
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -43,7 +39,6 @@ import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectToLogin
 import com.hul.utils.redirectionAlertDialogue
-import com.hul.utils.setProgressDialog
 import org.json.JSONObject
 import java.lang.reflect.Type
 import java.text.SimpleDateFormat
@@ -77,6 +72,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     var selectedSchoolCode: SchoolCode? = null
 
+    var visitList: ArrayList<ProjectInfo> = ArrayList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -93,21 +89,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                 .create()
         dashboardComponent.inject(this)
         binding.viewModel = dashboardViewModel
-//        val adapter = ArrayAdapter(
-//            requireContext(),
-//            android.R.layout.simple_spinner_item, resources.getStringArray(com.hul.R.array.status)
-//        )
-//        binding.autocomplete.setAdapter(adapter)
 
-        var visitList = arrayListOf("Location 1", "Location 2", "Location 3")
         binding.locationToVisit.layoutManager = LinearLayoutManager(context)
-
-
-//        binding.visitedLocation.layoutManager = LinearLayoutManager(context)
-//        val visitedLocationAdapter = VisitedLocationAdapter(visitList, this, requireContext())
-//
-//        // Setting the Adapter with the recyclerview
-//        binding.visitedLocation.adapter = visitedLocationAdapter
 
         binding.myArea.text = userInfo.myArea
 
@@ -126,8 +109,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         binding.schoolCode.onFocusChangeListener = OnFocusChangeListener { view, hasFocus ->
             if (hasFocus) {
                 selectedSchoolCode = null
-            }
-            else{
+            } else {
                 hideKeyboard(view)
             }
         }
@@ -151,8 +133,9 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
             override fun afterTextChanged(s: Editable?) {
                 // Code to execute after the text is changed
-                val obj = schoolCodes.filter { it.external_id1!!.equals(binding.schoolCode.text.toString()) }
-                if(!binding.schoolCode.text.isEmpty() && s.toString().length<10) {
+                val obj =
+                    schoolCodes.filter { it.external_id1!!.equals(binding.schoolCode.text.toString()) }
+                if (!binding.schoolCode.text.isEmpty() && s.toString().length < 10) {
                     getSchoolCodes(binding.schoolCode.text.toString())
                 }
             }
@@ -179,7 +162,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     // Function to hide the keyboard
     private fun hideKeyboard(view: View) {
-        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm =
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
@@ -225,14 +209,13 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     }
 
 
-
     private fun getSVisitsBySchoolCode(id: Int): RequestModel {
         return RequestModel(
             schoolId = id,
         )
     }
 
-    fun addVisit(id: String, visitNumber : String) {
+    fun addVisit(id: String, visitNumber: String) {
 
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
             //setProgressDialog(requireContext(), "Loading Leads")
@@ -251,7 +234,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     }
 
-    private fun addVisitModel(id: String, visitNumber : String): RequestModel {
+    private fun addVisitModel(id: String, visitNumber: String): RequestModel {
         return RequestModel(
             location_id = id,
             visit_number = visitNumber
@@ -397,7 +380,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                             performanceData.till_date.attendance.toString() + "%"
                         binding.txtTotalVisits.text =
                             performanceData.till_date.audit_approval.toString() + "%"
-                    }catch (e: Exception) {
+                    } catch (e: Exception) {
 
                     }
                 } else {
@@ -441,29 +424,31 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     val listType: Type = object : TypeToken<List<ProjectInfo?>?>() {}.type
-                    val projectInfo: ArrayList<ProjectInfo> =
+                    visitList =
                         Gson().fromJson(model.getJSONArray("data").toString(), listType);
 
-                    val myVisitsAdapter = MyVisitsAdapter(projectInfo, this, requireContext())
+                    val myVisitsAdapter = MyVisitsAdapter(visitList, this, requireContext())
 
                     // Setting the Adapter with the recyclerview
                     binding.visitNumbers.text =
-                        projectInfo.size.toString() + " " + requireContext().getString(R.string.visit_number)
+                        visitList.size.toString() + " " + requireContext().getString(R.string.visit_number)
                     binding.locationToVisit.adapter = myVisitsAdapter
 
                     var flag = true
 
-                    for (project in projectInfo) {
-                        if(project.visit_status.equals("ASSIGNED", ignoreCase = true)
-                            || project.visit_status.equals("INITIATED", ignoreCase = true))
-                        {
+                    for (project in visitList) {
+                        if (project.visit_status.equals("ASSIGNED", ignoreCase = true)
+                            || project.visit_status.equals("INITIATED", ignoreCase = true)
+                        ) {
                             flag = false
                         }
                     }
 
-                    if(flag)
-                    {
-                        addVisit(selectedSchoolCode!!.id.toString(), (projectInfo.size + 1).toString())
+                    if (flag) {
+                        addVisit(
+                            selectedSchoolCode!!.id.toString(),
+                            (visitList.size + 1).toString()
+                        )
                     }
 
                 } else {
@@ -503,8 +488,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                 Gson().toJson(selectedSchoolCode)
             )
             bundle.putString(
-                "projectInfo",
-                Gson().toJson(projectInfo)
+                "visitList",
+                Gson().toJson(visitList)
             )
             findNavController().navigate(
                 R.id.action_schoolCodeFragment_to_schoolFormFragment,
