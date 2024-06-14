@@ -115,7 +115,7 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
     override fun onApiSuccess(o: String?, objectType: Int) {
 
         cancelProgressDialog()
-        when (ApiExtentions.ApiDef.values()[objectType]) {
+        when (ApiExtentions.ApiDef.entries[objectType]) {
 
             ApiExtentions.ApiDef.VISIT_LIST_SINGLE -> {
                 val model = JSONObject(o.toString())
@@ -175,7 +175,7 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
 
     override fun retry(type: Int) {
 
-        when (ApiExtentions.ApiDef.values()[type]) {
+        when (ApiExtentions.ApiDef.entries[type]) {
             ApiExtentions.ApiDef.VISIT_LIST_SINGLE -> getVisitList()
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
         }
