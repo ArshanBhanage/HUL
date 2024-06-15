@@ -45,6 +45,7 @@ import com.hul.utils.redirectionAlertDialogue
 import org.json.JSONObject
 import java.lang.reflect.Type
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
@@ -99,6 +100,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             redirectToAttendence(ProjectInfo(location_id = "1"))
         }
 
+        binding.dayToday.text = getCurrentDayOfWeek()
         binding.date.text = formatDate(Date(), "dd MMM yyyy")
 
         binding.tillDateButton.setOnClickListener {
@@ -115,6 +117,12 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     fun formatDate(date: Date, format: String): String {
         val dateFormat = SimpleDateFormat(format, Locale.getDefault())
         return dateFormat.format(date)
+    }
+
+    fun getCurrentDayOfWeek(): String {
+        val calendar = Calendar.getInstance()
+        val dateFormat = SimpleDateFormat("EEEE", Locale.getDefault())
+        return dateFormat.format(calendar.time)
     }
 
     override fun onDestroyView() {

@@ -12,11 +12,16 @@ import com.hul.data.ProjectInfo
 import com.hul.data.SchoolCode
 import java.util.Locale
 
-class SchoolCodeAdapter (context: Context, private val resource: Int, private var items: List<SchoolCode>) :
+class SchoolCodeAdapter(
+    context: Context,
+    private val resource: Int,
+    private var items: List<SchoolCode>
+) :
     ArrayAdapter<SchoolCode>(context, resource, items) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view: View = convertView ?: LayoutInflater.from(context).inflate(resource, parent, false)
+        val view: View =
+            convertView ?: LayoutInflater.from(context).inflate(resource, parent, false)
 
         val item = items[position]
 
@@ -41,7 +46,9 @@ class SchoolCodeAdapter (context: Context, private val resource: Int, private va
                     items
                 } else {
                     val filterPattern = constraint.toString().lowercase(Locale.getDefault()).trim()
-                    items.filter { it.external_id1!!.lowercase(Locale.getDefault()).contains(filterPattern) }
+                    items.filter {
+                        it.external_id1!!.lowercase(Locale.getDefault()).contains(filterPattern)
+                    }
                 }
 
                 return FilterResults().apply {
@@ -51,9 +58,11 @@ class SchoolCodeAdapter (context: Context, private val resource: Int, private va
             }
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                clear()
-                addAll(results?.values as List<SchoolCode>)
-                notifyDataSetChanged()
+                if (results?.values != null) {
+                    clear()
+                    addAll(results.values as List<SchoolCode>)
+                    notifyDataSetChanged()
+                }
             }
         }
     }

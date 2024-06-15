@@ -144,4 +144,9 @@
     <string name="mobiliser_name">Mobiliser Name</string>
     <string name="logout">Logout</string>
     <string name="visit_1_header">Visit 1 School Activity</string>
+
+    <string name="visit_pic_1">Image of the school building</string>
+    <string name="visit_pic_2">Selfie with the school UDICE Code</string>
+    <string name="visit_pic_3">Image of students with Swasthya curriculum books in their hand</string>
+    <string name="visit_pic_4">Image of Acknowledgement</string>
 </resources>

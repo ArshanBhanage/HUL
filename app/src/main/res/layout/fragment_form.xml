@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text='@{viewModel.visitDataToView.u_dice_code.value}'
+                android:text='@{viewModel.uDiceCode}'
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text='@{viewModel.visitDataToView.school_name.value}'
+                android:text='@{viewModel.selectedSchoolCode.location_name}'
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
@@ -257,7 +257,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text=""
+                android:text=''
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"

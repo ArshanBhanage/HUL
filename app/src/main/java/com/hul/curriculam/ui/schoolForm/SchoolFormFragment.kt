@@ -87,6 +87,8 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
         schoolFormViewModel.visitList.value =
             Gson().fromJson(requireArguments().getString("visitList"), listType);
 
+        val uDiceCode = requireArguments().getString("uDiceCode")
+
         adapter = PagerAdapter(requireActivity())
         binding.viewPager.adapter = adapter
 
@@ -103,7 +105,8 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                     requireContext().getString(R.string.visit) + visit.visit_number,
                     FormFillFragment.newInstance(
                         Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
-                        Gson().toJson(visit)
+                        Gson().toJson(visit),
+                        uDiceCode
                     )
                 )
             } else {
@@ -112,7 +115,8 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                     requireContext().getString(R.string.visit) + visit.visit_number,
                     FormDetailsFragment.newInstance(
                         Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
-                        Gson().toJson(visit)
+                        Gson().toJson(visit),
+                        uDiceCode
                     )
                 )
             }

@@ -19,5 +19,12 @@ data class VisitData(
     val school_closed: VisitDetails? = null,
     val school_representative_who_collected_the_books: VisitDetails? = null,
     val principal_contact_details: VisitDetails? = null,
-    val principal: VisitDetails? = null
+    val principal: VisitDetails? = null,
+    val visit_image_1: VisitDetails? = null,
+    val visit_image_2: VisitDetails? = null,
+    val visit_image_3: VisitDetails? = null,
+    val visit_image_4: VisitDetails? = null,
+    val remark: VisitDetails? = null,
+    val revisit: VisitDetails? = null,
+
 )

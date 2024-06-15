@@ -35,13 +35,11 @@ class FormFillViewModel @Inject constructor(
     var imageUrl2 = MutableLiveData<String>("")
     var imageUrl3 = MutableLiveData<String>("")
     var imageUrl4 = MutableLiveData<String>("")
-    var imageUrl5 = MutableLiveData<String>("")
 
     var imageApiUrl1 = MutableLiveData<String>("")
     var imageApiUrl2 = MutableLiveData<String>("")
     var imageApiUrl3 = MutableLiveData<String>("")
     var imageApiUrl4 = MutableLiveData<String>("")
-    var imageApiUrl5 = MutableLiveData<String>("")
 
     val loginEnabled = MediatorLiveData<Boolean>(true)
 
@@ -51,37 +49,44 @@ class FormFillViewModel @Inject constructor(
     var form4 = MutableLiveData<Boolean>(false)
     var form5 = MutableLiveData<String>("")
 
+    var uDiceCode = MutableLiveData<String>(null)
+
+    var noOfBooksHandedOver = MutableLiveData<String>("")
+
+    val form4Text = MediatorLiveData<String>("Yes")
+
     init {
+
+        form4Text.addSource(form4) { value ->
+            form4Text.value = if (value) "Yes" else "No"
+        }
+
         loginEnabled.addSource(imageUrl1) {
-            loginEnabled.value = it.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0 && imageUrl5.value!!.length > 0 && form1.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
+            loginEnabled.value = it.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0  && form1.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
         }
 
         loginEnabled.addSource(imageUrl2) {
-            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0 && imageUrl5.value!!.length > 0 && form1.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
+            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0  && form1.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
         }
 
         loginEnabled.addSource(imageUrl3) {
-            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl4.value!!.length > 0 && imageUrl5.value!!.length > 0 && form1.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
+            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl4.value!!.length > 0  && form1.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
         }
 
         loginEnabled.addSource(imageUrl4) {
-            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl5.value!!.length > 0 && form1.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
-        }
-
-        loginEnabled.addSource(imageUrl5) {
-            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0 && form1.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
+            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0  && form1.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
         }
 
         loginEnabled.addSource(form1) {
-            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0 && imageUrl5.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
+            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
         }
 
         loginEnabled.addSource(form2) {
-            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0 && imageUrl5.value!!.length > 0 && form1.value!!.length > 0 && form3.value!!.length > 0
+            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0  && form1.value!!.length > 0 && form3.value!!.length > 0
         }
 
         loginEnabled.addSource(form3) {
-            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0 && imageUrl5.value!!.length > 0 && form2.value!!.length > 0 && form2.value!!.length > 0
+            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0  && form2.value!!.length > 0 && form2.value!!.length > 0
         }
 
     }
@@ -117,16 +122,6 @@ class FormFillViewModel @Inject constructor(
     }
 
     val capture4Visibility: LiveData<Int> = imageUrl4.map {
-        if(it.length>0)
-        {
-            View.INVISIBLE
-        }
-        else{
-            View.VISIBLE
-        }
-    }
-
-    val capture5Visibility: LiveData<Int> = imageUrl5.map {
         if(it.length>0)
         {
             View.INVISIBLE
@@ -175,18 +170,6 @@ class FormFillViewModel @Inject constructor(
             View.GONE
         }
     }
-
-    val captured5Visibility: LiveData<Int> = capture5Visibility.map {
-        if(it == View.INVISIBLE)
-        {
-            View.VISIBLE
-        }
-        else{
-            View.GONE
-        }
-    }
-
-
 
     val form1Error: LiveData<String> = form1.map {
 

@@ -185,7 +185,7 @@
                                 app:layout_constraintTop_toBottomOf="@+id/cal">
 
                                 <TextView
-                                    android:id="@+id/day"
+                                    android:id="@+id/dayToday"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Friday"
@@ -204,7 +204,7 @@
                                     android:textSize="12sp"
                                     android:textStyle="bold"
                                     app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toBottomOf="@+id/day" />
+                                    app:layout_constraintTop_toBottomOf="@+id/dayToday" />
 
                                 <TextView
                                     android:id="@+id/punch_time"

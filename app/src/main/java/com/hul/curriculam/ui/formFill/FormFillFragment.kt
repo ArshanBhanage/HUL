@@ -10,6 +10,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.Looper
 import android.provider.Settings
 import androidx.fragment.app.Fragment
@@ -63,6 +64,7 @@ import javax.inject.Inject
 class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
 
     private var _binding: FragmentFormFillBinding? = null
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -84,6 +86,10 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
     lateinit var uploadFileController: UploadFileController
 
     var imageIndex: Int = 0
+
+    private lateinit var countDownTimer: CountDownTimer
+
+    var isTimerStarted = false;
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -113,19 +119,20 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.schoolName.setText(formFillViewModel.selectedSchoolCode.value!!.location_name)
 
         binding.capture1.setOnClickListener {
-            redirectToCamera(0,"Back",requireContext().getString(R.string.school_pic1))
+            redirectToCamera(0, "Back", requireContext().getString(R.string.school_pic1))
         }
         binding.capture2.setOnClickListener {
-            redirectToCamera(1,"Image Capture Front",requireContext().getString(R.string.school_pic2))
+            redirectToCamera(
+                1,
+                "Image Capture Front",
+                requireContext().getString(R.string.school_pic2)
+            )
         }
         binding.capture3.setOnClickListener {
-            redirectToCamera(2,"Back",requireContext().getString(R.string.school_pic3))
+            redirectToCamera(2, "Back", requireContext().getString(R.string.school_pic3))
         }
         binding.capture4.setOnClickListener {
-            redirectToCamera(3,"Back",requireContext().getString(R.string.school_pic4))
-        }
-        binding.capture5.setOnClickListener {
-            redirectToCamera(4,"Back",requireContext().getString(R.string.school_pic5))
+            redirectToCamera(3, "Back", requireContext().getString(R.string.school_pic4))
         }
 
         binding.proceed.setOnClickListener {
@@ -135,32 +142,37 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
             }
         }
 
-        binding.view1.setOnClickListener { formFillViewModel.imageUrl1.value?.let { it1 ->
-            showImagePreview(
-                it1
-            )
-        } }
-        binding.view2.setOnClickListener { formFillViewModel.imageUrl2.value?.let { it1 ->
-            showImagePreview(
-                it1
-            )
-        } }
-        binding.view3.setOnClickListener { formFillViewModel.imageUrl3.value?.let { it1 ->
-            showImagePreview(
-                it1
-            )
-        } }
+        binding.view1.setOnClickListener {
+            formFillViewModel.imageUrl1.value?.let { it1 ->
+                showImagePreview(
+                    it1
+                )
+            }
+        }
+        binding.view2.setOnClickListener {
+            formFillViewModel.imageUrl2.value?.let { it1 ->
+                showImagePreview(
+                    it1
+                )
+            }
+        }
+        binding.view3.setOnClickListener {
+            formFillViewModel.imageUrl3.value?.let { it1 ->
+                showImagePreview(
+                    it1
+                )
+            }
+        }
 
-        binding.view4.setOnClickListener { formFillViewModel.imageUrl4.value?.let { it1 ->
-            showImagePreview(
-                it1
-            )
-        } }
-        binding.view5.setOnClickListener { formFillViewModel.imageUrl5.value?.let { it1 ->
-            showImagePreview(
-                it1
-            )
-        } }
+        binding.view4.setOnClickListener {
+            formFillViewModel.imageUrl4.value?.let { it1 ->
+                showImagePreview(
+                    it1
+                )
+            }
+        }
+
+        formFillViewModel.uDiceCode.value = requireArguments().getString(U_DICE_CODE)
 
         if (allPermissionsGranted()) {
             checkLocationSettings()
@@ -193,15 +205,19 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
             0 -> {
                 fileName = visitPrefix + "_picture_of_school_name.jpeg";
             }
+
             1 -> {
                 fileName = visitPrefix + "_selfie_with_school_name.jpeg";
             }
+
             2 -> {
                 fileName = visitPrefix + "_students_showing_filled_tracker.jpeg";
             }
+
             3 -> {
                 fileName = visitPrefix + "_teacher_handling_trackers.jpeg";
             }
+
             4 -> {
                 fileName = visitPrefix + "_acknowledgement_letter.jpeg";
             }
@@ -235,13 +251,14 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
                 val position = data!!.getIntExtra("position", 0)
                 val imageUrl = result.data!!.getStringExtra("imageUrl")
 
+                startTimer()
+
                 // Update the view model's imageUrl at the corresponding position
                 when (position) {
                     0 -> formFillViewModel.imageUrl1.value = imageUrl
                     1 -> formFillViewModel.imageUrl2.value = imageUrl
                     2 -> formFillViewModel.imageUrl3.value = imageUrl
                     3 -> formFillViewModel.imageUrl4.value = imageUrl
-                    4 -> formFillViewModel.imageUrl5.value = imageUrl
                 }
             }
         }
@@ -250,6 +267,7 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
     companion object {
         private const val ARG_CONTENT1 = "content1"
         private const val ARG_CONTENT2 = "content2"
+        private const val U_DICE_CODE = "uDiceCode"
 
         private val REQUIRED_PERMISSIONS = arrayOf(
             Manifest.permission.CAMERA,
@@ -257,10 +275,11 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
 
-        fun newInstance(content1: String, content2: String) = FormFillFragment().apply {
+        fun newInstance(content1: String, content2: String, uDiceCode: String?) = FormFillFragment().apply {
             arguments = Bundle().apply {
                 putString(ARG_CONTENT1, content1)
                 putString(ARG_CONTENT2, content2)
+                putString(U_DICE_CODE, uDiceCode)
             }
         }
     }
@@ -465,25 +484,21 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
 
         return RequestModel(
             project = userInfo.projectName,
-            visit_id = formFillViewModel.projectInfo.value!!.location_id,
+            visit_id = formFillViewModel.projectInfo.value!!.visit_id.toString(),
             visitData = VisitData(
-                no_of_teachers_trained= VisitDetails(value = formFillViewModel.form1.value),
-                number_of_books_distributed= VisitDetails(value = 25.toString()),
-                number_of_students_as_per_record= VisitDetails(value = 25.toString()),
-                picture_of_acknowledgement_letter= VisitDetails(value = formFillViewModel.imageApiUrl1.value),
-                picture_of_school_with_name_visible= formFillViewModel.imageApiUrl2.value,
-                picture_of_school_with_unique_code= formFillViewModel.imageApiUrl3.value,
-                picture_of_students_with_book_distribution= formFillViewModel.imageApiUrl4.value,
-                picture_of_students_with_book_distribution2= formFillViewModel.imageApiUrl5.value,
-                picture_of_students_with_book_distribution3= null,
-                picture_of_teachers_seeing_the_video= null,
-                school_closed= VisitDetails(value = false),
-                school_name= binding.schoolName.text.toString(),
+                no_of_teachers_trained = VisitDetails(value = formFillViewModel.form1.value),
+                number_of_books_distributed = VisitDetails(value = formFillViewModel.noOfBooksHandedOver.value),
+                visit_image_1 = VisitDetails(value = formFillViewModel.imageApiUrl1.value),
+                visit_image_2 = VisitDetails(value = formFillViewModel.imageApiUrl2.value),
+                visit_image_3 = VisitDetails(value = formFillViewModel.imageApiUrl3.value),
+                visit_image_4 = VisitDetails(value = formFillViewModel.imageApiUrl4.value),
+                school_name = binding.schoolName.text.toString(),
                 school_representative_who_collected_the_books = VisitDetails(value = binding.form1.text.toString()),
                 principal_contact_details = VisitDetails(value = binding.form2.text.toString()),
-                principal = VisitDetails(value = "Arman Singh"),
+                revisit = VisitDetails(value = binding.form4),
+                remark = VisitDetails(value = binding.form5.text),
                 u_dice_code = binding.disceCode.text.toString(),
-                visit_id= 2.toString()
+                visit_id = formFillViewModel.projectInfo.value!!.visit_id.toString(),
             )
         )
     }
@@ -505,7 +520,11 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
                 cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
-                    Toast.makeText(requireContext(), "Visit data submitted successfully", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Visit data submitted successfully",
+                        Toast.LENGTH_LONG
+                    ).show()
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -532,10 +551,6 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
                 } else if (uploadImageData != null && imageIndex == 3) {
                     imageIndex += 1;
                     formFillViewModel.imageApiUrl4.value = uploadImageData.url
-                    uploadImage(formFillViewModel.imageUrl5.value?.toUri()!!)
-                } else if (uploadImageData != null && imageIndex == 4) {
-                    imageIndex += 1;
-                    formFillViewModel.imageApiUrl5.value = uploadImageData.url
                     submitForm()
                 }
             }
@@ -550,11 +565,14 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
 
                 // For render purpose only
                 if (formFillViewModel.visitData.value?.visit_1 != null) {
-                    formFillViewModel.visitDataToView.value = formFillViewModel.visitData.value?.visit_1
+                    formFillViewModel.visitDataToView.value =
+                        formFillViewModel.visitData.value?.visit_1
                 } else if (formFillViewModel.visitData.value?.visit_2 != null) {
-                    formFillViewModel.visitDataToView.value = formFillViewModel.visitData.value?.visit_2
+                    formFillViewModel.visitDataToView.value =
+                        formFillViewModel.visitData.value?.visit_2
                 } else if (formFillViewModel.visitData.value?.visit_3 != null) {
-                    formFillViewModel.visitDataToView.value = formFillViewModel.visitData.value?.visit_3
+                    formFillViewModel.visitDataToView.value =
+                        formFillViewModel.visitData.value?.visit_3
                 }
             }
 
@@ -596,5 +614,39 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
         }
 
+    }
+
+    private fun startTimer() {
+        if (isTimerStarted) {
+            return
+        }
+
+        isTimerStarted = true
+        binding.proceed.isEnabled = false
+
+        val totalTime = 1 * 60 * 1000L
+
+        // Set initial time before starting the timer
+        updateTimerText(totalTime)
+        binding.llTimer.visibility = View.VISIBLE
+
+        countDownTimer = object : CountDownTimer(totalTime, 1000L) {
+            override fun onTick(millisUntilFinished: Long) {
+                updateTimerText(millisUntilFinished)
+            }
+
+            override fun onFinish() {
+                binding.llTimer.visibility = View.GONE
+                binding.proceed.isEnabled = true
+            }
+        }
+
+        countDownTimer.start()
+    }
+
+    private fun updateTimerText(millisUntilFinished: Long) {
+        val minutesLeft = millisUntilFinished / 1000 / 60
+        val secondsLeft = (millisUntilFinished / 1000) % 60
+        binding.txtClock.text = String.format("Submit in %d:%02d minutes", minutesLeft, secondsLeft)
     }
 }

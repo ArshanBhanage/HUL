@@ -42,6 +42,9 @@ import com.hul.utils.redirectionAlertDialogue
 import org.json.JSONObject
 import java.lang.reflect.Type
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
@@ -74,6 +77,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     var visitList: ArrayList<ProjectInfo> = ArrayList()
 
+    var uDiceCode: String? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -99,6 +104,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             redirectToAttendence(ProjectInfo(location_id = "1"))
         }
 
+        binding.dayToday.text = getCurrentDayOfWeek()
         binding.date.text = formatDate(Date(), "dd MMM yyyy")
         binding.txtLatter.text = userInfo.projectName.trim().split("")[1].uppercase()
 
@@ -133,8 +139,6 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
             override fun afterTextChanged(s: Editable?) {
                 // Code to execute after the text is changed
-                val obj =
-                    schoolCodes.filter { it.external_id1!!.equals(binding.schoolCode.text.toString()) }
                 if (!binding.schoolCode.text.isEmpty() && s.toString().length < 10) {
                     getSchoolCodes(binding.schoolCode.text.toString())
                 }
@@ -244,6 +248,12 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     fun formatDate(date: Date, format: String): String {
         val dateFormat = SimpleDateFormat(format, Locale.getDefault())
         return dateFormat.format(date)
+    }
+
+    fun getCurrentDayOfWeek(): String {
+        val calendar = Calendar.getInstance()
+        val dateFormat = SimpleDateFormat("EEEE", Locale.getDefault())
+        return dateFormat.format(calendar.time)
     }
 
     private fun showCustomDialog() {
@@ -401,6 +411,10 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                         schoolCodes
                     )
 
+                    if (schoolCodes.isNotEmpty()) {
+                        uDiceCode = schoolCodes.get(0).external_id1
+                    }
+
                     // Set the adapter to the AutoCompleteTextView
                     binding.schoolCode.setAdapter(adapter)
                     binding.schoolCode.requestFocus()
@@ -427,12 +441,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     visitList =
                         Gson().fromJson(model.getJSONArray("data").toString(), listType);
 
-                    val myVisitsAdapter = MyVisitsAdapter(visitList, this, requireContext())
-
-                    // Setting the Adapter with the recyclerview
-                    binding.visitNumbers.text =
-                        visitList.size.toString() + " " + requireContext().getString(R.string.visit_number)
-                    binding.locationToVisit.adapter = myVisitsAdapter
+                    val pendingVisits: ArrayList<ProjectInfo> = ArrayList()
 
                     var flag = true
 
@@ -441,15 +450,23 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                             || project.visit_status.equals("INITIATED", ignoreCase = true)
                         ) {
                             flag = false
+                            pendingVisits.add(project)
                         }
                     }
 
-                    if (flag) {
+                    if (flag && visitList.size < 3) {
                         addVisit(
                             selectedSchoolCode!!.id.toString(),
                             (visitList.size + 1).toString()
                         )
                     }
+
+                    val myVisitsAdapter = MyVisitsAdapter(pendingVisits, this, requireContext())
+
+                    // Setting the Adapter with the recyclerview
+                    binding.visitNumbers.text =
+                        visitList.size.toString() + " " + requireContext().getString(R.string.visit_number)
+                    binding.locationToVisit.adapter = myVisitsAdapter
 
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
@@ -483,6 +500,10 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
         if (dashboardViewModel.attendenceToday.value!!.present!!) {
             val bundle = Bundle()
+            bundle.putString(
+                "uDiceCode",
+                uDiceCode
+            )
             bundle.putString(
                 "schoolInformation",
                 Gson().toJson(selectedSchoolCode)

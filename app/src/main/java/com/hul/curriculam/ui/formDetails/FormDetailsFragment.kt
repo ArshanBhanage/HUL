@@ -71,6 +71,8 @@ class FormDetailsFragment : Fragment(), ApiHandler, RetryInterface {
             ProjectInfo::class.java
         )
 
+        formViewModel.uDiceCode.value = requireArguments().getString(U_DICE_CODE)
+
         binding.viewModel = formViewModel
         return root
     }
@@ -78,11 +80,13 @@ class FormDetailsFragment : Fragment(), ApiHandler, RetryInterface {
     companion object {
         private const val ARG_CONTENT1 = "content1"
         private const val ARG_CONTENT2 = "content2"
+        private const val U_DICE_CODE = "uDiceCode"
 
-        fun newInstance(content1: String, content2: String) = FormDetailsFragment().apply {
+        fun newInstance(content1: String, content2: String, uDiceCode: String?) = FormDetailsFragment().apply {
             arguments = Bundle().apply {
                 putString(ARG_CONTENT1, content1)
                 putString(ARG_CONTENT2, content2)
+                putString(U_DICE_CODE, uDiceCode)
             }
         }
     }
