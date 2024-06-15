@@ -77,8 +77,6 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     var visitList: ArrayList<ProjectInfo> = ArrayList()
 
-    var uDiceCode: String? = null
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -411,10 +409,6 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                         schoolCodes
                     )
 
-                    if (schoolCodes.isNotEmpty()) {
-                        uDiceCode = schoolCodes.get(0).external_id1
-                    }
-
                     // Set the adapter to the AutoCompleteTextView
                     binding.schoolCode.setAdapter(adapter)
                     binding.schoolCode.requestFocus()
@@ -500,6 +494,12 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
         if (dashboardViewModel.attendenceToday.value!!.present!!) {
             val bundle = Bundle()
+            var uDiceCode = ""
+            uDiceCode = if(selectedSchoolCode?.external_id1 != null) {
+                selectedSchoolCode?.external_id1!!
+            }else{
+                selectedSchoolCode?.external_id2.toString()
+            }
             bundle.putString(
                 "uDiceCode",
                 uDiceCode

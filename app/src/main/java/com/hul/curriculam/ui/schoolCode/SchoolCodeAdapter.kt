@@ -29,7 +29,11 @@ class SchoolCodeAdapter(
         val itemText: TextView = view.findViewById(R.id.itemText)
 
 
-        itemText.text = item.external_id1
+        if (item.external_id1 != null) {
+            itemText.text = item.external_id1
+        } else {
+            itemText.text = item.external_id2
+        }
 
         return view
     }
@@ -47,7 +51,10 @@ class SchoolCodeAdapter(
                 } else {
                     val filterPattern = constraint.toString().lowercase(Locale.getDefault()).trim()
                     items.filter {
-                        it.external_id1!!.lowercase(Locale.getDefault()).contains(filterPattern)
+                        (it.external_id1 != null && it.external_id1?.lowercase(Locale.getDefault())
+                            ?.contains(filterPattern) == true)
+                                || (it.external_id2 != null && it.external_id2?.lowercase(Locale.getDefault())
+                            ?.contains(filterPattern) == true)
                     }
                 }
 
@@ -58,11 +65,9 @@ class SchoolCodeAdapter(
             }
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                if (results?.values != null) {
-                    clear()
-                    addAll(results.values as List<SchoolCode>)
-                    notifyDataSetChanged()
-                }
+                clear()
+                addAll(results?.values as List<SchoolCode>)
+                notifyDataSetChanged()
             }
         }
     }

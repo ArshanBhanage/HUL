@@ -115,8 +115,6 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
             ProjectInfo::class.java
         )
         binding.viewModel = formFillViewModel
-        binding.disceCode.setText(formFillViewModel.selectedSchoolCode.value!!.external_id1_description)
-        binding.schoolName.setText(formFillViewModel.selectedSchoolCode.value!!.location_name)
 
         binding.capture1.setOnClickListener {
             redirectToCamera(0, "Back", requireContext().getString(R.string.school_pic1))
