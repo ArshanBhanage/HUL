@@ -21,7 +21,7 @@
     <string name="enter_school_name">Enter School name</string>
     <string name="remarks">Remark</string>
     <string name="type_code">Type your 6 digit security code</string>
-    <string name="username_placeholder">Enter your mobile number</string>
+    <string name="username_placeholder">Enter here</string>
     <string name="enter_here">Enter here</string>
     <string name="enter_remark">Enter remark</string>
     <string name="entervalue">Enter value</string>
@@ -112,6 +112,9 @@
     <string name="teacher_no">No. of teachers trained</string>
     <string name="student_no">No. of students as per record</string>
     <string name="books_no">No. of books handed over to school</string>
+    <string name="tracker_no">No. of filled trackers collected</string>
+    <string name="more_tracker">School asked to revisit for more tracker collection</string>
+    <string name="teachers_trained">No. of teachers trained</string>
     <string name="representetive_name">Name of the school representative who collected the books</string>
     <string name="representetive_number">Mobile Number of the school representative who collected the books</string>
     <string name="principal_name">Name of the Principal</string>
@@ -124,11 +127,12 @@
     <string name="school_pic4">Image of teachers handing over the trackers</string>
     <string name="school_pic5">Acknowledgement letter picture</string>
     
-    <string name="form1">Name of the school representative who the mobiliser met</string>
-    <string name="form2">Mobile Number of the school representative who the mobiliser met</string>
-    <string name="form3">No. of filled trackers collected</string>
-    <string name="form4">School asked to revisit for more tracker collection</string>
-    <string name="form5">Yes</string>
+    <string name="form1">Name of the school representative who collected the books</string>
+    <string name="form2">Mobile Number of the school representative who collected the books</string>
+    <string name="form3">Name of the Principal</string>
+    <string name="form4">Mobile number of the Principal</string>
+    <string name="form5">Revisit Applicable</string>
+    <string name="form6">Is the curriculum on track?</string>
     <string name="till_date">Till Date</string>
     <string name="view_school_location">View School Location</string>
     <string name="no_of_books_handed_over">No. of books handed over to school</string>
@@ -147,6 +151,8 @@
 
     <string name="visit_pic_1">Image of the school building</string>
     <string name="visit_pic_2">Selfie with the school UDICE Code</string>
-    <string name="visit_pic_3">Image of students with Swasthya curriculum books in their hand</string>
+    <string name="visit_pic_3">Image of teachers seeing training video with books placed on table</string>
+    <string name="visit_pic_6">Image of filled trackers on principal’s desk with the principal </string>
     <string name="visit_pic_4">Image of Acknowledgement</string>
+    <string name="visit_pic_5">Image of students with Swasthya Curriculum books in their hands</string>
 </resources>

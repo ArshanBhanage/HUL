@@ -1,4 +1,4 @@
-package com.hul.curriculam.ui.formDetails
+package com.hul.curriculam.ui.form2Details
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,7 +9,7 @@ import com.hul.data.Visit1
 import com.hul.user.UserInfo
 import javax.inject.Inject
 
-class FormViewModel @Inject constructor(
+class Form2ViewModel @Inject constructor(
     private val userInfo: UserInfo,
 ) : ViewModel() {
 

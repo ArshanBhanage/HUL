@@ -16,8 +16,11 @@ import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
 import com.hul.curriculam.CurriculamComponent
-import com.hul.curriculam.ui.formDetails.FormDetailsFragment
-import com.hul.curriculam.ui.formFill.FormFillFragment
+import com.hul.curriculam.ui.form1Details.Form1DetailsFragment
+import com.hul.curriculam.ui.form1Fill.Form1FillFragment
+import com.hul.curriculam.ui.form2Details.Form2DetailsFragment
+import com.hul.curriculam.ui.form2Fill.Form2FillFragment
+import com.hul.curriculam.ui.form3Fill.Form3FillFragment
 import com.hul.data.ProjectInfo
 import com.hul.data.SchoolCode
 import com.hul.databinding.FragmentSchoolFormBinding
@@ -101,24 +104,58 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                 || visit.visit_status.equals("INITIATED", ignoreCase = true)
             ) {
                 currentVisit = visit
-                addNewTab(
-                    requireContext().getString(R.string.visit) + visit.visit_number,
-                    FormFillFragment.newInstance(
-                        Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
-                        Gson().toJson(visit),
-                        uDiceCode
+                when(visit.visit_number)
+                {
+                    "1" ->addNewTab(
+                        requireContext().getString(R.string.visit) + visit.visit_number,
+                        Form1FillFragment.newInstance(
+                            Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
+                            Gson().toJson(visit),
+                            uDiceCode
+                        )
                     )
-                )
+                    "2" ->addNewTab(
+                        requireContext().getString(R.string.visit) + visit.visit_number,
+                        Form2FillFragment.newInstance(
+                            Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
+                            Gson().toJson(visit),
+                            uDiceCode
+                        )
+                    )
+                    "3" ->addNewTab(
+                        requireContext().getString(R.string.visit) + visit.visit_number,
+                        Form3FillFragment.newInstance(
+                            Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
+                            Gson().toJson(visit),
+                            uDiceCode
+                        )
+                    )
+
+                }
+
             } else {
                 completedVisit = visit
-                addNewTab(
-                    requireContext().getString(R.string.visit) + visit.visit_number,
-                    FormDetailsFragment.newInstance(
-                        Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
-                        Gson().toJson(visit),
-                        uDiceCode
+                when(visit.visit_number)
+                {
+                    "1" ->addNewTab(
+                        requireContext().getString(R.string.visit) + visit.visit_number,
+                        Form1DetailsFragment.newInstance(
+                            Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
+                            Gson().toJson(visit),
+                            uDiceCode
+                        )
                     )
-                )
+                    "2" ->addNewTab(
+                        requireContext().getString(R.string.visit) + visit.visit_number,
+                        Form2DetailsFragment.newInstance(
+                            Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
+                            Gson().toJson(visit),
+                            uDiceCode
+                        )
+                    )
+
+                }
+
             }
         }
 

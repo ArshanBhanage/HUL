@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="com.hul.curriculam.ui.formDetails.FormViewModel" />
+            type="com.hul.curriculam.ui.form1Details.Form1ViewModel" />
     </data>
 
     <androidx.core.widget.NestedScrollView
@@ -87,7 +87,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/public_sans"
                         android:layout_marginTop="24dp"
-                        android:text="@string/teacher_no"
+                        android:text="@string/books_no"
                         android:textColor="#6d6b77"
                         android:textFontWeight="400"
                         android:textSize="13sp" />
@@ -113,7 +113,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/public_sans"
                         android:layout_marginTop="24dp"
-                        android:text="@string/student_no"
+                        android:text="@string/teachers_trained"
                         android:textColor="#6d6b77"
                         android:textFontWeight="400"
                         android:textSize="13sp" />
@@ -134,7 +134,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:layout_marginTop="24dp"
-                android:text="@string/books_no"
+                android:text="@string/form1"
                 android:textColor="#6d6b77"
                 android:textFontWeight="400"
                 android:textSize="13sp" />
@@ -143,7 +143,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text='@{viewModel.visitDataToView.number_of_books_distributed.value}'
+                android:text='@{viewModel.visitDataToView.name_of_the_school_representative_who_collected_the_books.value}'
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
@@ -153,7 +153,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:layout_marginTop="24dp"
-                android:text="@string/representetive_name"
+                android:text="@string/form2"
                 android:textColor="#6d6b77"
                 android:textFontWeight="400"
                 android:textSize="13sp" />
@@ -162,7 +162,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text='@{viewModel.visitDataToView.school_representative_who_collected_the_books.value}'
+                android:text='@{viewModel.visitDataToView.mobile_number_of_the_school_representative_who_collected_the_books.value}'
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
@@ -172,7 +172,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:layout_marginTop="24dp"
-                android:text="@string/representetive_number"
+                android:text="@string/form3"
                 android:textColor="#6d6b77"
                 android:textFontWeight="400"
                 android:textSize="13sp" />
@@ -181,7 +181,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text=""
+                android:text='@{viewModel.visitDataToView.name_of_the_principal.value}'
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
@@ -191,7 +191,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:layout_marginTop="24dp"
-                android:text="@string/principal_name"
+                android:text="@string/form4"
                 android:textColor="#6d6b77"
                 android:textFontWeight="400"
                 android:textSize="13sp" />
@@ -200,7 +200,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text='@{viewModel.visitDataToView.principal.value}'
+                android:text='@{viewModel.visitDataToView.mobile_number_of_the_principal.value}'
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
@@ -210,7 +210,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:layout_marginTop="24dp"
-                android:text="@string/principal_number"
+                android:text="@string/form5"
                 android:textColor="#6d6b77"
                 android:textFontWeight="400"
                 android:textSize="13sp" />
@@ -219,7 +219,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text='@{viewModel.visitDataToView.principal_contact_details.value}'
+                android:text="@{viewModel.visitDataToView.revisit_applicable.value}"
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
@@ -238,30 +238,30 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text=""
+                android:text='@{viewModel.visitDataToView.remark.value}'
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
                 android:textStyle="bold" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/public_sans"
-                android:layout_marginTop="24dp"
-                android:text="@string/revisit_applicable"
-                android:textColor="#6d6b77"
-                android:textFontWeight="400"
-                android:textSize="13sp" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/public_sans"
-                android:lineHeight="28dp"
-                android:text=''
-                android:textColor="#444050"
-                android:textFontWeight="700"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:fontFamily="@font/public_sans"-->
+<!--                android:layout_marginTop="24dp"-->
+<!--                android:text="@string/revisit_applicable"-->
+<!--                android:textColor="#6d6b77"-->
+<!--                android:textFontWeight="400"-->
+<!--                android:textSize="13sp" />-->
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:fontFamily="@font/public_sans"-->
+<!--                android:lineHeight="28dp"-->
+<!--                android:text=''-->
+<!--                android:textColor="#444050"-->
+<!--                android:textFontWeight="700"-->
+<!--                android:textSize="15sp"-->
+<!--                android:textStyle="bold" />-->
         </LinearLayout>
         </androidx.cardview.widget.CardView>
 

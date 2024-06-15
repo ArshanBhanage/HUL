@@ -1,4 +1,4 @@
-package com.hul.curriculam.ui.formFill
+package com.hul.curriculam.ui.form2Fill
 
 import android.view.View
 import androidx.lifecycle.LiveData
@@ -10,15 +10,10 @@ import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.SchoolCode
 import com.hul.data.Visit1
-import com.hul.loginRegistraion.loginwithpin.InValid
-import com.hul.loginRegistraion.loginwithpin.Valid
 import com.hul.user.UserInfo
-import com.hul.utils.initialLetterValidation
-import com.hul.utils.numberValidation
-import com.hul.utils.repaetValidation
 import javax.inject.Inject
 
-class FormFillViewModel @Inject constructor(
+class Form2FillViewModel @Inject constructor(
     private val userInfo: UserInfo,
 )  : ViewModel() {
 
@@ -43,50 +38,51 @@ class FormFillViewModel @Inject constructor(
 
     val loginEnabled = MediatorLiveData<Boolean>(true)
 
+
+    val timerFinished = MediatorLiveData<Boolean>(false)
+
     var form1 = MutableLiveData<String>("")
     var form2 = MutableLiveData<String>("")
-    var form3 = MutableLiveData<String>("")
-    var form4 = MutableLiveData<Boolean>(false)
+    var form3 = MutableLiveData<Boolean>(false)
+    var form4 = MutableLiveData<String>("")
     var form5 = MutableLiveData<String>("")
 
     var uDiceCode = MutableLiveData<String>(null)
 
     var noOfBooksHandedOver = MutableLiveData<String>("")
 
+    var teachersTrained = MutableLiveData<String>("")
+
     val form4Text = MediatorLiveData<String>("Yes")
 
     init {
 
-        form4Text.addSource(form4) { value ->
-            form4Text.value = if (value) "Yes" else "No"
-        }
+//        form4Text.addSource(form4) { value ->
+//            form4Text.value = if (value) "Yes" else "No"
+//        }
 
         loginEnabled.addSource(imageUrl1) {
-            loginEnabled.value = it.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0  && form1.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
+            loginEnabled.value = it.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0 && form1.value!!.length > 0 && form2.value!!.length > 0 
         }
 
         loginEnabled.addSource(imageUrl2) {
-            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0  && form1.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
+            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0 && form1.value!!.length > 0 && form2.value!!.length > 0 
         }
 
         loginEnabled.addSource(imageUrl3) {
-            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl4.value!!.length > 0  && form1.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
+            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl4.value!!.length > 0 && form1.value!!.length > 0 && form2.value!!.length > 0 
         }
 
         loginEnabled.addSource(imageUrl4) {
-            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0  && form1.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
+            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && form1.value!!.length > 0 && form2.value!!.length > 0 
         }
 
         loginEnabled.addSource(form1) {
-            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
+            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0 && form2.value!!.length > 0 
         }
 
         loginEnabled.addSource(form2) {
-            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0  && form1.value!!.length > 0 && form3.value!!.length > 0
-        }
-
-        loginEnabled.addSource(form3) {
-            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0  && form2.value!!.length > 0 && form2.value!!.length > 0
+            loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0 && form1.value!!.length > 0
         }
 
     }
@@ -171,6 +167,28 @@ class FormFillViewModel @Inject constructor(
         }
     }
 
+    val noOfBooksHandedOverError: LiveData<String> = noOfBooksHandedOver.map {
+
+        if(it.length > 0)
+        {
+            ""
+        }
+        else{
+            "Enter value"
+        }
+    }
+
+    val teachersTrainedError: LiveData<String> = teachersTrained.map {
+
+        if(it.length > 0)
+        {
+            ""
+        }
+        else{
+            "Enter value"
+        }
+    }
+
     val form1Error: LiveData<String> = form1.map {
 
         if(it.length > 0)
@@ -184,23 +202,40 @@ class FormFillViewModel @Inject constructor(
 
     val form2Error: LiveData<String> = form2.map {
 
-        if(it.length > 0)
+        if(it.length > 0 && it.length == 10)
         {
             ""
         }
-        else{
+        else if(it.length==0){
             "Enter mobile number"
+        }
+        else{
+            "Enter correct mobile number"
         }
     }
 
-    val form3Error: LiveData<String> = form3.map {
+    val form3text: LiveData<String> = form3.map {
 
-        if(it.length > 0)
+        if(it)
+        {
+            "Yes"
+        }
+        else{
+            "No"
+        }
+    }
+
+    val form4Error: LiveData<String> = form4.map {
+
+        if(it.length > 0 && it.length == 10)
         {
             ""
         }
+        else if(it.length==0){
+            "Enter mobile number"
+        }
         else{
-            "Enter filled trackers collected"
+            "Enter correct mobile number"
         }
     }
 

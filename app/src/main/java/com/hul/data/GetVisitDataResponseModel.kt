@@ -27,7 +27,14 @@ data class Visit1(
     val picture_of_school_with_unique_code: FieldData,
     val picture_of_teachers_seeing_the_video: FieldData,
     val picture_of_students_with_book_distribution: FieldData,
-    val picture_of_acknowledgement_letter: FieldData
+    val picture_of_acknowledgement_letter: FieldData,
+    val name_of_the_school_representative_who_collected_the_books: FieldData,
+    val mobile_number_of_the_school_representative_who_collected_the_books: FieldData,
+    val name_of_the_principal: FieldData,
+    val mobile_number_of_the_principal: FieldData,
+    val revisit_applicable: FieldData,
+    val curriculum_on_track : FieldData,
+    val remark: FieldData,
 )
 
 data class FieldData(

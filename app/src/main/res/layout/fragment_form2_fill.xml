@@ -1,0 +1,572 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.hul.curriculam.ui.form2Fill.Form2FillViewModel" />
+    </data>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#f8f9fa">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:layout_marginTop="24dp"
+            android:paddingBottom="56dp">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:layout_marginVertical="16dp"
+                android:background="@color/white"
+                app:cardCornerRadius="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        android:lineHeight="28dp"
+                        android:text="@string/disce_code"
+                        android:textColor="#2F2B3D"
+                        android:textFontWeight="400"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        app:errorIconTint="@color/red"
+                        app:errorTextColor="@color/red"
+                        app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+                        app:placeholderText="@string/enter_here"
+                        app:prefixTextColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/disce_code"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineHeight="18dp"
+                            android:textColor="@color/black"
+                            android:textFontWeight="400"
+                            android:textSize="16sp"
+                            android:enabled="false"
+                            android:text='@{viewModel.uDiceCode}'/>
+
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        android:lineHeight="28dp"
+                        android:text="@string/school_name"
+                        android:textColor="#2F2B3D"
+                        android:textFontWeight="400"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        app:errorIconTint="@color/red"
+                        app:errorTextColor="@color/red"
+                        app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+                        app:placeholderText="@string/enter_here"
+                        app:prefixTextColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/schoolName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineHeight="18dp"
+                            android:textColor="@color/black"
+                            android:textFontWeight="400"
+                            android:textSize="16sp"
+                            android:enabled="false"
+                            android:text='@{viewModel.selectedSchoolCode.location_name}'/>
+
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/public_sans"
+                            android:lineHeight="28dp"
+                            android:text="@string/visit_pic_1"
+                            android:textColor="#6d6b77"
+                            android:textFontWeight="400"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:layout_marginRight="10dp"
+                            app:layout_constraintEnd_toStartOf="@+id/capture1"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <LinearLayout
+                            android:id="@+id/actions1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:visibility="@{viewModel.captured1Visibility}">
+
+                            <ImageView
+                                android:id="@+id/view1"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginRight="10dp"
+                                android:src="@mipmap/view" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@mipmap/circlecheck" />
+
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/capture1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="35dp"
+                            android:background="#dde0f6"
+                            android:fontFamily="@font/publicsans"
+                            android:paddingHorizontal="20dp"
+                            android:text="@string/capture"
+                            android:textAllCaps="false"
+                            android:textColor="@color/purple_500"
+                            android:textFontWeight="700"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:visibility="@{viewModel.capture1Visibility}"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/public_sans"
+                            android:lineHeight="28dp"
+                            android:text="@string/visit_pic_2"
+                            android:textColor="#6d6b77"
+                            android:textFontWeight="400"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:layout_marginRight="10dp"
+                            app:layout_constraintEnd_toStartOf="@+id/capture2"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <LinearLayout
+                            android:id="@+id/actions2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:visibility="@{viewModel.captured2Visibility}"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <ImageView
+                                android:id="@+id/view2"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginRight="10dp"
+                                android:src="@mipmap/view" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@mipmap/circlecheck" />
+
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/capture2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="35dp"
+                            android:background="#dde0f6"
+                            android:fontFamily="@font/publicsans"
+                            android:paddingHorizontal="20dp"
+                            android:text="@string/capture"
+                            android:textAllCaps="false"
+                            android:textColor="@color/purple_500"
+                            android:textFontWeight="700"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:visibility="@{viewModel.capture2Visibility}"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/public_sans"
+                            android:lineHeight="28dp"
+                            android:text="@string/visit_pic_5"
+                            android:textColor="#6d6b77"
+                            android:textFontWeight="400"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:layout_marginRight="10dp"
+                            app:layout_constraintEnd_toStartOf="@+id/capture3"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <LinearLayout
+                            android:id="@+id/actions3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:visibility="@{viewModel.captured3Visibility}">
+
+                            <ImageView
+                                android:id="@+id/view3"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginRight="10dp"
+                                android:src="@mipmap/view" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@mipmap/circlecheck" />
+
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/capture3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="35dp"
+                            android:background="#dde0f6"
+                            android:fontFamily="@font/publicsans"
+                            android:paddingHorizontal="20dp"
+                            android:text="@string/capture"
+                            android:visibility="@{viewModel.capture3Visibility}"
+                            android:textAllCaps="false"
+                            android:textColor="@color/purple_500"
+                            android:textFontWeight="700"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/public_sans"
+                            android:lineHeight="28dp"
+                            android:text="@string/visit_pic_4"
+                            android:textColor="#6d6b77"
+                            android:textFontWeight="400"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:layout_marginRight="10dp"
+                            app:layout_constraintEnd_toStartOf="@+id/capture4"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <LinearLayout
+                            android:id="@+id/actions4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:visibility="@{viewModel.captured4Visibility}"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <ImageView
+                                android:id="@+id/view4"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginRight="10dp"
+                                android:src="@mipmap/view" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@mipmap/circlecheck" />
+
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/capture4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="35dp"
+                            android:background="#dde0f6"
+                            android:fontFamily="@font/publicsans"
+                            android:paddingHorizontal="20dp"
+                            android:text="@string/capture"
+                            android:textAllCaps="false"
+                            android:textColor="@color/purple_500"
+                            android:textFontWeight="700"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:visibility="@{viewModel.capture4Visibility}"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        android:lineHeight="28dp"
+                        android:text="@string/form1"
+                        android:textColor="#2F2B3D"
+                        android:textFontWeight="400"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="24dp"
+                        app:layout_constraintTop_toTopOf="parent" />
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        app:error="@{viewModel.form1Error}"
+                        app:errorIconTint="@color/red"
+                        app:errorTextColor="@color/red"
+                        app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+                        app:placeholderText="@string/username_placeholder"
+                        app:prefixTextColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/form1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineHeight="18dp"
+                            android:inputType="text"
+                            android:text="@={viewModel.form1}"
+                            android:textColor="@color/black"
+                            android:textFontWeight="400"
+                            android:textSize="16sp"
+                            android:enabled="true"/>
+
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        android:lineHeight="28dp"
+                        android:text="@string/form2"
+                        android:textColor="#2F2B3D"
+                        android:textFontWeight="400"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent" />
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        app:error="@{viewModel.form2Error}"
+                        app:errorIconTint="@color/red"
+                        app:errorTextColor="@color/red"
+                        app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+                        app:placeholderText="@string/username_placeholder"
+                        app:prefixTextColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/form2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineHeight="18dp"
+                            android:inputType="number"
+                            android:maxLength="10"
+                            android:text="@={viewModel.form2}"
+                            android:textColor="@color/black"
+                            android:textFontWeight="400"
+                            android:textSize="16sp"
+                            android:enabled="true"/>
+
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        android:lineHeight="28dp"
+                        android:text="@string/form6"
+                        android:textColor="#2F2B3D"
+                        android:textFontWeight="400"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/form4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="@={viewModel.form3}"
+                            android:layout_marginTop="10dp"
+                            android:theme="@style/SCBSwitch"
+                            android:layout_marginRight="10dp"
+                            />
+                        <TextView
+                            android:id="@+id/booleanText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/public_sans"
+                            android:lineHeight="28dp"
+                            android:text="@{viewModel.form3text}"
+                            android:textColor="#2F2B3D"
+                            android:textFontWeight="400"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:layout_gravity="center"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        android:lineHeight="28dp"
+                        android:layout_marginTop="24dp"
+                        android:text="@string/remarks"
+                        android:textColor="#2F2B3D"
+                        android:textFontWeight="400"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent" />
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        app:errorIconTint="@color/red"
+                        app:errorTextColor="@color/red"
+                        app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+                        app:placeholderText="@string/username_placeholder"
+                        app:prefixTextColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/form5"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineHeight="18dp"
+                            android:text="@={viewModel.form5}"
+                            android:textColor="@color/black"
+                            android:textFontWeight="400"
+                            android:textSize="16sp"
+                            android:enabled="true"/>
+
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/proceed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/button_background_blue"
+                        android:fontFamily="@font/publicsans"
+                        android:text="@string/submit"
+                        android:textColor="@color/white"
+                        android:textFontWeight="700"
+                        android:textStyle="bold"
+                        android:enabled="@{viewModel.loginEnabled &amp;&amp; viewModel.timerFinished }"/>
+
+
+                    <LinearLayout
+                        android:id="@+id/llTimer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_horizontal"
+                        android:layout_marginTop="@dimen/_20sdp"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp"
+                            android:src="@drawable/ic_clock" />
+
+                        <TextView
+                            android:id="@+id/txtClock"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/public_sans"
+                            android:text=""
+                            android:textColor="@color/orange"
+                            android:textSize="15sp"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="@dimen/_10sdp"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</layout>

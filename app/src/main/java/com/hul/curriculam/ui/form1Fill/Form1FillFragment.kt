@@ -1,4 +1,4 @@
-package com.hul.curriculam.ui.formFill
+package com.hul.curriculam.ui.form1Fill
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Looper
 import android.provider.Settings
+import android.text.InputFilter
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -26,10 +27,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import com.google.android.material.tabs.TabLayoutMediator
-import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.hul.HULApplication
 import com.hul.R
 import com.hul.api.ApiExtentions
@@ -38,9 +36,6 @@ import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
 import com.hul.camera.CameraActivity
 import com.hul.curriculam.CurriculamComponent
-import com.hul.curriculam.ui.formDetails.FormDetailsFragment
-import com.hul.curriculam.ui.schoolForm.PagerAdapter
-import com.hul.dashboard.ui.attendence.AttendenceFragment
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
@@ -48,7 +43,7 @@ import com.hul.data.SchoolCode
 import com.hul.data.UploadImageData
 import com.hul.data.VisitData
 import com.hul.data.VisitDetails
-import com.hul.databinding.FragmentFormFillBinding
+import com.hul.databinding.FragmentForm1FillBinding
 import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDialogFragment
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
@@ -58,12 +53,11 @@ import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectionAlertDialogue
 import com.hul.utils.setProgressDialog
 import org.json.JSONObject
-import java.lang.reflect.Type
 import javax.inject.Inject
 
-class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
+class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
 
-    private var _binding: FragmentFormFillBinding? = null
+    private var _binding: FragmentForm1FillBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -74,7 +68,7 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
 //    private lateinit var disceCodeEditText: String
 
     @Inject
-    lateinit var formFillViewModel: FormFillViewModel
+    lateinit var form1FillViewModel: Form1FillViewModel
 
     @Inject
     lateinit var userInfo: UserInfo
@@ -97,7 +91,7 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
         savedInstanceState: Bundle?
     ): View {
 
-        _binding = FragmentFormFillBinding.inflate(inflater, container, false)
+        _binding = FragmentForm1FillBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         binding.lifecycleOwner = viewLifecycleOwner
@@ -105,16 +99,16 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
             (activity?.application as HULApplication).appComponent.curriculamComponent()
                 .create()
         curriculamComponent.inject(this)
-        formFillViewModel.selectedSchoolCode.value = Gson().fromJson(
+        form1FillViewModel.selectedSchoolCode.value = Gson().fromJson(
             requireArguments().getString(ARG_CONTENT1),
             SchoolCode::class.java
         )
 
-        formFillViewModel.projectInfo.value = Gson().fromJson(
+        form1FillViewModel.projectInfo.value = Gson().fromJson(
             requireArguments().getString(ARG_CONTENT2),
             ProjectInfo::class.java
         )
-        binding.viewModel = formFillViewModel
+        binding.viewModel = form1FillViewModel
 
         binding.capture1.setOnClickListener {
             redirectToCamera(0, "Back", requireContext().getString(R.string.school_pic1))
@@ -136,26 +130,26 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.proceed.setOnClickListener {
             if (imageIndex == 0) {
                 setProgressDialog(requireContext(), "Uploading")
-                uploadImage(formFillViewModel.imageUrl1.value?.toUri()!!)
+                uploadImage(form1FillViewModel.imageUrl1.value?.toUri()!!)
             }
         }
 
         binding.view1.setOnClickListener {
-            formFillViewModel.imageUrl1.value?.let { it1 ->
+            form1FillViewModel.imageUrl1.value?.let { it1 ->
                 showImagePreview(
                     it1
                 )
             }
         }
         binding.view2.setOnClickListener {
-            formFillViewModel.imageUrl2.value?.let { it1 ->
+            form1FillViewModel.imageUrl2.value?.let { it1 ->
                 showImagePreview(
                     it1
                 )
             }
         }
         binding.view3.setOnClickListener {
-            formFillViewModel.imageUrl3.value?.let { it1 ->
+            form1FillViewModel.imageUrl3.value?.let { it1 ->
                 showImagePreview(
                     it1
                 )
@@ -163,20 +157,33 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
         binding.view4.setOnClickListener {
-            formFillViewModel.imageUrl4.value?.let { it1 ->
+            form1FillViewModel.imageUrl4.value?.let { it1 ->
                 showImagePreview(
                     it1
                 )
             }
         }
 
-        formFillViewModel.uDiceCode.value = requireArguments().getString(U_DICE_CODE)
+        form1FillViewModel.uDiceCode.value = requireArguments().getString(U_DICE_CODE)
 
         if (allPermissionsGranted()) {
             checkLocationSettings()
         } else {
             requestPermission()
         }
+
+        val allowOnlyLettersAndSpacesFilter = InputFilter { source, start, end, dest, dstart, dend ->
+            for (i in start until end) {
+                if (!source[i].isLetter() && !source[i].isWhitespace()) {
+                    return@InputFilter ""
+                }
+            }
+            null
+        }
+
+        binding.form1.filters = arrayOf(allowOnlyLettersAndSpacesFilter)
+
+        binding.form3.filters = arrayOf(allowOnlyLettersAndSpacesFilter)
 
         return root
     }
@@ -253,10 +260,10 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
 
                 // Update the view model's imageUrl at the corresponding position
                 when (position) {
-                    0 -> formFillViewModel.imageUrl1.value = imageUrl
-                    1 -> formFillViewModel.imageUrl2.value = imageUrl
-                    2 -> formFillViewModel.imageUrl3.value = imageUrl
-                    3 -> formFillViewModel.imageUrl4.value = imageUrl
+                    0 -> form1FillViewModel.imageUrl1.value = imageUrl
+                    1 -> form1FillViewModel.imageUrl2.value = imageUrl
+                    2 -> form1FillViewModel.imageUrl3.value = imageUrl
+                    3 -> form1FillViewModel.imageUrl4.value = imageUrl
                 }
             }
         }
@@ -273,7 +280,7 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
 
-        fun newInstance(content1: String, content2: String, uDiceCode: String?) = FormFillFragment().apply {
+        fun newInstance(content1: String, content2: String, uDiceCode: String?) = Form1FillFragment().apply {
             arguments = Bundle().apply {
                 putString(ARG_CONTENT1, content1)
                 putString(ARG_CONTENT2, content2)
@@ -283,7 +290,7 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     private fun visitsDataModel(): RequestModel {
-        return formFillViewModel.projectInfo.value?.visit_id?.let {
+        return form1FillViewModel.projectInfo.value?.visit_id?.let {
             RequestModel(
                 project = userInfo.projectName,
                 visitId = it,
@@ -294,7 +301,7 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
 
     private fun getVisitData() {
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
-            setProgressDialog(requireContext(), "Loading Visit data")
+            //setProgressDialog(requireContext(), "Loading Visit data")
             apiController.getApiResponse(
                 this,
                 visitsDataModel(),
@@ -482,21 +489,23 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
 
         return RequestModel(
             project = userInfo.projectName,
-            visit_id = formFillViewModel.projectInfo.value!!.visit_id.toString(),
+            visit_id = form1FillViewModel.projectInfo.value!!.visit_id.toString(),
             visitData = VisitData(
-                no_of_teachers_trained = VisitDetails(value = formFillViewModel.form1.value),
-                number_of_books_distributed = VisitDetails(value = formFillViewModel.noOfBooksHandedOver.value),
-                visit_image_1 = VisitDetails(value = formFillViewModel.imageApiUrl1.value),
-                visit_image_2 = VisitDetails(value = formFillViewModel.imageApiUrl2.value),
-                visit_image_3 = VisitDetails(value = formFillViewModel.imageApiUrl3.value),
-                visit_image_4 = VisitDetails(value = formFillViewModel.imageApiUrl4.value),
+                no_of_teachers_trained = VisitDetails(value = form1FillViewModel.teachersTrained.value),
+                number_of_books_distributed = VisitDetails(value = form1FillViewModel.noOfBooksHandedOver.value),
+                visit_image_1 = VisitDetails(value = form1FillViewModel.imageApiUrl1.value),
+                visit_image_2 = VisitDetails(value = form1FillViewModel.imageApiUrl2.value),
+                visit_image_3 = VisitDetails(value = form1FillViewModel.imageApiUrl3.value),
+                visit_image_4 = VisitDetails(value = form1FillViewModel.imageApiUrl4.value),
                 school_name = binding.schoolName.text.toString(),
-                school_representative_who_collected_the_books = VisitDetails(value = binding.form1.text.toString()),
-                principal_contact_details = VisitDetails(value = binding.form2.text.toString()),
-                revisit = VisitDetails(value = binding.form4),
-                remark = VisitDetails(value = binding.form5.text),
+                name_of_the_school_representative_who_collected_the_books = VisitDetails(value = form1FillViewModel.form1.value.toString()),
+                mobile_number_of_the_school_representative_who_collected_the_books = VisitDetails(value = form1FillViewModel.form2.value.toString()),
+                name_of_the_principal = VisitDetails(value = form1FillViewModel.form3.value.toString()),
+                mobile_number_of_the_principal = VisitDetails(value = form1FillViewModel.form4.value.toString()),
+                revisit_applicable = VisitDetails(value = if(form1FillViewModel.form6.value!!) "Yes" else "No"),
+                remark = VisitDetails(value = form1FillViewModel.form5.value),
                 u_dice_code = binding.disceCode.text.toString(),
-                visit_id = formFillViewModel.projectInfo.value!!.visit_id.toString(),
+                visit_id = form1FillViewModel.projectInfo.value!!.visit_id.toString(),
             )
         )
     }
@@ -523,6 +532,7 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
                         "Visit data submitted successfully",
                         Toast.LENGTH_LONG
                     ).show()
+                    requireActivity().onBackPressed()
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -536,19 +546,19 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
                 )
                 if (uploadImageData != null && imageIndex == 0) {
                     imageIndex += 1;
-                    formFillViewModel.imageApiUrl1.value = uploadImageData.url
-                    uploadImage(formFillViewModel.imageUrl2.value?.toUri()!!)
+                    form1FillViewModel.imageApiUrl1.value = uploadImageData.url
+                    uploadImage(form1FillViewModel.imageUrl2.value?.toUri()!!)
                 } else if (uploadImageData != null && imageIndex == 1) {
                     imageIndex += 1;
-                    formFillViewModel.imageApiUrl2.value = uploadImageData.url
-                    uploadImage(formFillViewModel.imageUrl3.value?.toUri()!!)
+                    form1FillViewModel.imageApiUrl2.value = uploadImageData.url
+                    uploadImage(form1FillViewModel.imageUrl3.value?.toUri()!!)
                 } else if (uploadImageData != null && imageIndex == 2) {
                     imageIndex += 1;
-                    formFillViewModel.imageApiUrl3.value = uploadImageData.url
-                    uploadImage(formFillViewModel.imageUrl4.value?.toUri()!!)
+                    form1FillViewModel.imageApiUrl3.value = uploadImageData.url
+                    uploadImage(form1FillViewModel.imageUrl4.value?.toUri()!!)
                 } else if (uploadImageData != null && imageIndex == 3) {
                     imageIndex += 1;
-                    formFillViewModel.imageApiUrl4.value = uploadImageData.url
+                    form1FillViewModel.imageApiUrl4.value = uploadImageData.url
                     submitForm()
                 }
             }
@@ -556,21 +566,21 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
             ApiExtentions.ApiDef.GET_VISIT_DATA -> {
                 cancelProgressDialog()
                 val model = JSONObject(o.toString())
-                formFillViewModel.visitData.value = Gson().fromJson(
+                form1FillViewModel.visitData.value = Gson().fromJson(
                     model.getJSONObject("data").toString(),
                     GetVisitDataResponseData::class.java
                 )
 
                 // For render purpose only
-                if (formFillViewModel.visitData.value?.visit_1 != null) {
-                    formFillViewModel.visitDataToView.value =
-                        formFillViewModel.visitData.value?.visit_1
-                } else if (formFillViewModel.visitData.value?.visit_2 != null) {
-                    formFillViewModel.visitDataToView.value =
-                        formFillViewModel.visitData.value?.visit_2
-                } else if (formFillViewModel.visitData.value?.visit_3 != null) {
-                    formFillViewModel.visitDataToView.value =
-                        formFillViewModel.visitData.value?.visit_3
+                if (form1FillViewModel.visitData.value?.visit_1 != null) {
+                    form1FillViewModel.visitDataToView.value =
+                        form1FillViewModel.visitData.value?.visit_1
+                } else if (form1FillViewModel.visitData.value?.visit_2 != null) {
+                    form1FillViewModel.visitDataToView.value =
+                        form1FillViewModel.visitData.value?.visit_2
+                } else if (form1FillViewModel.visitData.value?.visit_3 != null) {
+                    form1FillViewModel.visitDataToView.value =
+                        form1FillViewModel.visitData.value?.visit_3
                 }
             }
 
@@ -620,7 +630,7 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
         isTimerStarted = true
-        binding.proceed.isEnabled = false
+        //binding.proceed.isEnabled = false
 
         val totalTime = 1 * 60 * 1000L
 
@@ -635,7 +645,7 @@ class FormFillFragment : Fragment(), ApiHandler, RetryInterface {
 
             override fun onFinish() {
                 binding.llTimer.visibility = View.GONE
-                binding.proceed.isEnabled = true
+                form1FillViewModel.timerFinished.value = true
             }
         }
 

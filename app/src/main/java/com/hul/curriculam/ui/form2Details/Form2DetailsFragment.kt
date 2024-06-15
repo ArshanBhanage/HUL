@@ -1,4 +1,4 @@
-package com.hul.curriculam.ui.formDetails
+package com.hul.curriculam.ui.form2Details
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,20 +16,20 @@ import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.data.SchoolCode
-import com.hul.databinding.FragmentFormBinding
+import com.hul.databinding.FragmentForm1Binding
+import com.hul.databinding.FragmentForm2Binding
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectionAlertDialogue
-import com.hul.utils.setProgressDialog
 import org.json.JSONObject
 import javax.inject.Inject
 
-class FormDetailsFragment : Fragment(), ApiHandler, RetryInterface {
+class Form2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
 
-    private var _binding: FragmentFormBinding? = null
+    private var _binding: FragmentForm2Binding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -38,7 +38,7 @@ class FormDetailsFragment : Fragment(), ApiHandler, RetryInterface {
     private lateinit var curriculamComponent: CurriculamComponent
 
     @Inject
-    lateinit var formViewModel: FormViewModel
+    lateinit var form2ViewModel: Form2ViewModel
 
     @Inject
     lateinit var userInfo: UserInfo
@@ -52,7 +52,7 @@ class FormDetailsFragment : Fragment(), ApiHandler, RetryInterface {
         savedInstanceState: Bundle?
     ): View {
 
-        _binding = FragmentFormBinding.inflate(inflater, container, false)
+        _binding = FragmentForm2Binding.inflate(inflater, container, false)
         val root: View = binding.root
 
         binding.lifecycleOwner = viewLifecycleOwner
@@ -61,19 +61,19 @@ class FormDetailsFragment : Fragment(), ApiHandler, RetryInterface {
                 .create()
         curriculamComponent.inject(this)
 
-        formViewModel.selectedSchoolCode.value = Gson().fromJson(
+        form2ViewModel.selectedSchoolCode.value = Gson().fromJson(
             requireArguments().getString(ARG_CONTENT1),
             SchoolCode::class.java
         )
 
-        formViewModel.projectInfo.value = Gson().fromJson(
+        form2ViewModel.projectInfo.value = Gson().fromJson(
             requireArguments().getString(ARG_CONTENT2),
             ProjectInfo::class.java
         )
 
-        formViewModel.uDiceCode.value = requireArguments().getString(U_DICE_CODE)
+        form2ViewModel.uDiceCode.value = requireArguments().getString(U_DICE_CODE)
 
-        binding.viewModel = formViewModel
+        binding.viewModel = form2ViewModel
         return root
     }
 
@@ -82,7 +82,7 @@ class FormDetailsFragment : Fragment(), ApiHandler, RetryInterface {
         private const val ARG_CONTENT2 = "content2"
         private const val U_DICE_CODE = "uDiceCode"
 
-        fun newInstance(content1: String, content2: String, uDiceCode: String?) = FormDetailsFragment().apply {
+        fun newInstance(content1: String, content2: String, uDiceCode: String?) = Form2DetailsFragment().apply {
             arguments = Bundle().apply {
                 putString(ARG_CONTENT1, content1)
                 putString(ARG_CONTENT2, content2)
@@ -101,7 +101,7 @@ class FormDetailsFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     private fun visitsDataModel(): RequestModel {
-        return formViewModel.projectInfo.value?.visit_id?.let {
+        return form2ViewModel.projectInfo.value?.visit_id?.let {
             RequestModel(
                 project = userInfo.projectName,
                 visitId = it,
@@ -112,7 +112,7 @@ class FormDetailsFragment : Fragment(), ApiHandler, RetryInterface {
 
     private fun getVisitData() {
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
-            setProgressDialog(requireContext(), "Loading Visit data")
+            //setProgressDialog(requireContext(), "Loading Visit data")
             apiController.getApiResponse(
                 this,
                 visitsDataModel(),
@@ -129,18 +129,18 @@ class FormDetailsFragment : Fragment(), ApiHandler, RetryInterface {
             ApiExtentions.ApiDef.GET_VISIT_DATA -> {
                 cancelProgressDialog()
                 val model = JSONObject(o.toString())
-                formViewModel.visitData.value = Gson().fromJson(
+                form2ViewModel.visitData.value = Gson().fromJson(
                     model.getJSONObject("data").toString(),
                     GetVisitDataResponseData::class.java
                 )
 
                 // For render purpose only
-                if (formViewModel.visitData.value?.visit_1 != null) {
-                    formViewModel.visitDataToView.value = formViewModel.visitData.value?.visit_1
-                } else if (formViewModel.visitData.value?.visit_2 != null) {
-                    formViewModel.visitDataToView.value = formViewModel.visitData.value?.visit_2
-                } else if (formViewModel.visitData.value?.visit_3 != null) {
-                    formViewModel.visitDataToView.value = formViewModel.visitData.value?.visit_3
+                if (form2ViewModel.visitData.value?.visit_1 != null) {
+                    form2ViewModel.visitDataToView.value = form2ViewModel.visitData.value?.visit_1
+                } else if (form2ViewModel.visitData.value?.visit_2 != null) {
+                    form2ViewModel.visitDataToView.value = form2ViewModel.visitData.value?.visit_2
+                } else if (form2ViewModel.visitData.value?.visit_3 != null) {
+                    form2ViewModel.visitDataToView.value = form2ViewModel.visitData.value?.visit_3
                 }
             }
 

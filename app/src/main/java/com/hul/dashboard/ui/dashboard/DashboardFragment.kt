@@ -42,8 +42,6 @@ import com.hul.utils.redirectionAlertDialogue
 import org.json.JSONObject
 import java.lang.reflect.Type
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.TextStyle
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -102,7 +100,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             redirectToAttendence(ProjectInfo(location_id = "1"))
         }
 
-        binding.dayToday.text = getCurrentDayOfWeek()
+        binding.dayToday.text = dayOfWeek()
         binding.date.text = formatDate(Date(), "dd MMM yyyy")
         binding.txtLatter.text = userInfo.projectName.trim().split("")[1].uppercase()
 
@@ -248,10 +246,36 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         return dateFormat.format(date)
     }
 
-    fun getCurrentDayOfWeek(): String {
+    fun dayOfWeek() : String{
         val calendar = Calendar.getInstance()
-        val dateFormat = SimpleDateFormat("EEEE", Locale.getDefault())
-        return dateFormat.format(calendar.time)
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+
+        return when (dayOfWeek) {
+            Calendar.SUNDAY -> "SUNDAY"
+            Calendar.MONDAY -> "MONDAY"
+            Calendar.TUESDAY -> "TUESDAY"
+            Calendar.WEDNESDAY -> "WEDNESDAY"
+            Calendar.THURSDAY -> "THURSDAY"
+            Calendar.FRIDAY -> "FRIDAY"
+            Calendar.SATURDAY -> "SATURDAY"
+            else -> "UNKNOWN"
+        }
+    }
+
+    fun getDayOfWeek(): String {
+        val calendar = Calendar.getInstance()
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+
+        return when (dayOfWeek) {
+            Calendar.SUNDAY -> "SUNDAY"
+            Calendar.MONDAY -> "MONDAY"
+            Calendar.TUESDAY -> "TUESDAY"
+            Calendar.WEDNESDAY -> "WEDNESDAY"
+            Calendar.THURSDAY -> "THURSDAY"
+            Calendar.FRIDAY -> "FRIDAY"
+            Calendar.SATURDAY -> "SATURDAY"
+            else -> "UNKNOWN"
+        }
     }
 
     private fun showCustomDialog() {

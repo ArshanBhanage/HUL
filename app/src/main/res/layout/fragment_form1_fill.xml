@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="com.hul.curriculam.ui.formFill.FormFillViewModel" />
+            type="com.hul.curriculam.ui.form1Fill.Form1FillViewModel" />
     </data>
 
     <androidx.core.widget.NestedScrollView
@@ -115,12 +115,6 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-
-
-
-
-
-
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -141,6 +135,7 @@
                         android:fontFamily="@font/public_sans"
                         app:boxStrokeErrorColor="@color/red"
                         app:errorEnabled="true"
+                        app:error="@{viewModel.noOfBooksHandedOverError}"
                         app:errorIconTint="@color/red"
                         app:errorTextColor="@color/red"
                         app:layout_constraintTop_toBottomOf="@+id/loginHeader"
@@ -152,14 +147,53 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:lineHeight="18dp"
+                            android:inputType="number"
                             android:textColor="@color/black"
                             android:textSize="16sp"
-                            android:text='@{viewModel.noOfBooksHandedOver}'/>
+                            android:text="@={viewModel.noOfBooksHandedOver}"/>
 
 
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        android:lineHeight="28dp"
+                        android:text="@string/teachers_trained"
+                        android:textColor="#2F2B3D"
+                        android:textFontWeight="400"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent" />
 
+                    <com.google.android.material.textfield.TextInputLayout
+
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        app:error="@{viewModel.teachersTrainedError}"
+                        app:errorIconTint="@color/red"
+                        app:errorTextColor="@color/red"
+                        app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+                        app:placeholderText="@string/enter_here"
+                        app:prefixTextColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/teachersTrained"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineHeight="18dp"
+                            android:inputType="number"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:text="@={viewModel.teachersTrained}"/>
+
+
+                    </com.google.android.material.textfield.TextInputLayout>
 
 
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -485,6 +519,7 @@
                             android:layout_height="wrap_content"
                             android:lineHeight="18dp"
                             android:inputType="number"
+                            android:maxLength="10"
                             android:text="@={viewModel.form2}"
                             android:textColor="@color/black"
                             android:textFontWeight="400"
@@ -523,7 +558,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:lineHeight="18dp"
-                            android:inputType="number"
+                            android:inputType="text"
                             android:text="@={viewModel.form3}"
                             android:textColor="@color/black"
                             android:textFontWeight="400"
@@ -543,14 +578,42 @@
                         android:textSize="15sp"
                         android:textStyle="bold"
                         app:layout_constraintTop_toTopOf="parent" />
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        app:error="@{viewModel.form4Error}"
+                        app:errorIconTint="@color/red"
+                        app:errorTextColor="@color/red"
+                        app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+                        app:placeholderText="@string/username_placeholder"
+                        app:prefixTextColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/form4"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineHeight="18dp"
+                            android:inputType="number"
+                            android:maxLength="10"
+                            android:text="@={viewModel.form4}"
+                            android:textColor="@color/black"
+                            android:textFontWeight="400"
+                            android:textSize="16sp"
+                            android:enabled="true"/>
+
+
+                    </com.google.android.material.textfield.TextInputLayout>
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
                         <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/form4"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="@={viewModel.form4}"
+                            android:checked="@={viewModel.form6}"
                             android:layout_marginTop="10dp"
                             android:theme="@style/SCBSwitch"
                             android:layout_marginRight="10dp"
@@ -617,7 +680,7 @@
                         android:textColor="@color/white"
                         android:textFontWeight="700"
                         android:textStyle="bold"
-                        android:enabled="false"/>
+                        android:enabled="@{viewModel.loginEnabled &amp;&amp; viewModel.timerFinished }"/>
 
 
                     <LinearLayout
