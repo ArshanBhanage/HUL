@@ -7,6 +7,8 @@ import android.app.Application
 import android.util.Log
 import com.hul.di.AppComponent
 import com.hul.di.DaggerAppComponent
+import com.hul.sync.HulDatabase
+import com.hul.sync.VisitDataRepository
 
 open class HULApplication : Application() {
 
@@ -15,6 +17,8 @@ open class HULApplication : Application() {
         // We pass the applicationContext that will be used as Context in the graph
         DaggerAppComponent.factory().create(applicationContext)
     }
+
+
 
     companion object {
         const val IS_DEBUG = true

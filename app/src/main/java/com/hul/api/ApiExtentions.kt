@@ -33,6 +33,7 @@ class ApiExtentions {
         ADD_VISIT,
         GET_DISTRICTS,
         GET_STATES,
-        ADD_NEW_SCHOOL
+        ADD_NEW_SCHOOL,
+        VISIT_LIST_BY_STATUS,
     }
 }
