@@ -194,6 +194,8 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
 
         binding.form3.filters = arrayOf(allowOnlyLettersAndSpacesFilter)
 
+        binding.studentNo.setText(schoolCode.location_data_field1)
+
         binding.txtDirections.setOnClickListener {
             if(currentLocation != null) {
                 form1FillViewModel.selectedSchoolCode.value?.longitude?.let { it1 ->
@@ -534,6 +536,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
             visit_id = form1FillViewModel.projectInfo.value!!.visit_id.toString(),
             visitData = VisitData(
                 no_of_teachers_trained = VisitDetails(value = form1FillViewModel.teachersTrained.value),
+                no_of_students_as_per_record = VisitDetails(value = binding.studentNo.text.toString()),
                 number_of_books_distributed = VisitDetails(value = form1FillViewModel.noOfBooksHandedOver.value),
                 visit_image_1 = VisitDetails(value = form1FillViewModel.imageApiUrl1.value),
                 visit_image_2 = VisitDetails(value = form1FillViewModel.imageApiUrl2.value),

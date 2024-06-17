@@ -98,9 +98,6 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     lateinit var visitDataViewModel: VisitDataViewModel
 
     @Inject
-    lateinit var hulDatabase: HulDatabase
-
-    @Inject
     lateinit var apiController: APIController
 
     var adapter: SchoolCodeAdapter? = null
@@ -160,6 +157,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         binding.viewModel = dashboardViewModel
 
         binding.locationToVisit.layoutManager = LinearLayoutManager(context)
+
+        binding.todaysVisit.layoutManager = LinearLayoutManager(context)
 
         binding.myArea.text = userInfo.myArea
 

@@ -74,6 +74,26 @@
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/public_sans"
+                android:layout_marginTop="24dp"
+                android:text="@string/student_no"
+                android:textColor="#6d6b77"
+                android:textFontWeight="400"
+                android:textSize="13sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/public_sans"
+                android:lineHeight="28dp"
+                android:text='@{viewModel.selectedSchoolCode.location_data_field1}'
+                android:textColor="#444050"
+                android:textFontWeight="700"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">

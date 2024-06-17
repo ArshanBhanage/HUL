@@ -11,6 +11,7 @@ data class VisitData(
     var u_dice_code: String? = null,
     var visit_id: String? = null,
     val no_of_teachers_trained: VisitDetails? = null,
+    val no_of_students_as_per_record: VisitDetails? = null,
     val picture_of_school_name: VisitDetails? = null,
     val selfie_with_school_name_or_u_dice_code: VisitDetails? = null,
     val picture_of_acknowledgement_letter: VisitDetails? = null,
