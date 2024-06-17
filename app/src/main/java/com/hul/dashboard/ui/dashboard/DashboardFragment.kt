@@ -20,6 +20,7 @@ import android.view.View.GONE
 import android.view.View.OnFocusChangeListener
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -546,6 +547,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         val dialogView: View = inflater.inflate(R.layout.add_school_dialog, null)
         builder.setView(dialogView)
         val alertDialog: android.app.AlertDialog = builder.create()
+
+        alertDialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
         val btnClose = dialogView.findViewById<AppCompatButton>(R.id.btnClose);
         val btnAdd = dialogView.findViewById<AppCompatButton>(R.id.btnAdd);
