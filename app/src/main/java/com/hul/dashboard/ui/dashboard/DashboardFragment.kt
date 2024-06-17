@@ -166,7 +166,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         binding.schoolCode.onFocusChangeListener = OnFocusChangeListener { view, hasFocus ->
             if (hasFocus) {
                 selectedSchoolCode = null
-                binding.llGetDirection.visibility = View.GONE
+                binding.llGetDirection.visibility = GONE
             } else {
                 hideKeyboard(view)
             }
@@ -175,7 +175,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         binding.schoolCode.setOnItemClickListener { parent, view, position, id ->
             selectedSchoolCode = schoolCodes[position]
             binding.llGetDirection.visibility =
-                if (selectedSchoolCode!!.lattitude == null) View.GONE else View.VISIBLE
+                if (selectedSchoolCode!!.lattitude == null) GONE else VISIBLE
             if (selectedSchoolCode?.id != -1) {
                 binding.schoolCode.setText(selectedSchoolCode!!.external_id1)
             } else {
@@ -714,7 +714,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     }
                     val adapter = AttendenceAdapter(requireContext(), items)
                     binding.gridView.adapter = adapter
-                    if (currentObject.date!!.length > 10) {
+                    if (currentObject.date != null && currentObject.date?.length!! > 10) {
 
                         binding.time.text = currentObject.date!!.substring(
                             11,
@@ -724,14 +724,14 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
                     if (currentObject.present!!) {
                         if (currentObject.present!!) {
-                            binding.punchInButton.visibility = View.GONE
-                            binding.punchInButtonDisabled.visibility = View.VISIBLE
+                            binding.punchInButton.visibility = GONE
+                            binding.punchInButtonDisabled.visibility = VISIBLE
                             binding.punchInButton.isEnabled = false
                         } else {
-                            binding.punchInButton.visibility = View.VISIBLE
+                            binding.punchInButton.visibility = VISIBLE
                         }
                     } else {
-                        binding.punchInButton.visibility = View.VISIBLE
+                        binding.punchInButton.visibility = VISIBLE
                     }
 
                     getPerformance()
@@ -772,8 +772,13 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     if (schoolCodes.size > 0) {
                         selectedSchoolCode = schoolCodes[0]
                         binding.llGetDirection.visibility =
-                            if (selectedSchoolCode!!.lattitude == null) View.GONE else View.VISIBLE
+                            if (selectedSchoolCode!!.lattitude == null) GONE else VISIBLE
+                    } else {
+                        selectedSchoolCode = SchoolCode(-1)
+                        selectedSchoolCode?.external_id1 = "Add New"
+                        schoolCodes.add(selectedSchoolCode!!)
                     }
+
                     adapter = SchoolCodeAdapter(
                         requireContext(),
                         R.layout.school_code_dropdown,

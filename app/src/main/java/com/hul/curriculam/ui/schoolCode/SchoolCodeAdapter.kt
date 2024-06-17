@@ -1,12 +1,14 @@
 package com.hul.curriculam.ui.schoolCode
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import com.google.gson.Gson
 import com.hul.R
 import com.hul.data.ProjectInfo
 import com.hul.data.SchoolCode
@@ -74,6 +76,8 @@ class SchoolCodeAdapter(
                 val schoolCodes = results?.values as List<SchoolCode>
                 addAll(schoolCodes)
                 notifyDataSetChanged()
+
+                Log.e("uDice codes : ", Gson().toJson(schoolCodes))
             }
         }
     }

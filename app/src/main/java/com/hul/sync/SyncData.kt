@@ -7,6 +7,8 @@ import androidx.room.PrimaryKey
 data class SyncData(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val jsonData: String,
-    val visitNumber: Int // Only values 1, 2, or 3
+    val visitNumber: Int, // Only values 1, 2, or 3,
+    val eDiceCode: String,
+    val formData: String
 )
 
