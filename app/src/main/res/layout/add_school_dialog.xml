@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -24,7 +24,6 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -36,7 +35,6 @@
             android:layout_marginTop="@dimen/_15sdp"/>
 
         <com.google.android.material.textfield.TextInputLayout
-
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -56,8 +54,6 @@
                 android:textSize="16sp"
                 android:text=''/>
         </com.google.android.material.textfield.TextInputLayout>
-
-
 
         <TextView
             android:layout_width="match_parent"
@@ -90,7 +86,6 @@
                 android:text=''/>
         </com.google.android.material.textfield.TextInputLayout>
 
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -122,7 +117,6 @@
                 android:text=''/>
         </com.google.android.material.textfield.TextInputLayout>
 
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -153,7 +147,6 @@
                 android:textSize="16sp"
                 android:text=''/>
         </com.google.android.material.textfield.TextInputLayout>
-
 
         <TextView
             android:layout_width="match_parent"
@@ -218,5 +211,4 @@
 
     </LinearLayout>
 
-
-</ScrollView>
+</androidx.core.widget.NestedScrollView>
