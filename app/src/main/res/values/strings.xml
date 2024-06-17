@@ -155,4 +155,12 @@
     <string name="visit_pic_6">Image of filled trackers on principal’s desk with the principal </string>
     <string name="visit_pic_4">Image of Acknowledgement</string>
     <string name="visit_pic_5">Image of students with Swasthya Curriculum books in their hands</string>
+    <string name="add_school_code">Add school code</string>
+    <string name="add_school">Add School</string>
+    <string name="ward_block">Ward/Block</string>
+    <string name="state">State</string>
+    <string name="btnAdd">Add</string>
+    <string name="btnClose">Close</string>
+    <string name="select_district">Select District</string>
+    <string name="get_directions">Get Directions</string>
 </resources>

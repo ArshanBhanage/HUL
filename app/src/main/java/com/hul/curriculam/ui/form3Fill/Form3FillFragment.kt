@@ -14,6 +14,7 @@ import android.os.CountDownTimer
 import android.os.Looper
 import android.provider.Settings
 import android.text.InputFilter
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -49,6 +50,7 @@ import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDial
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
+import com.hul.utils.TimeUtils
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectionAlertDialogue
@@ -86,6 +88,8 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
 
     var isTimerStarted = false;
 
+    private var currentLocation: Location? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -100,10 +104,16 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
             (activity?.application as HULApplication).appComponent.curriculamComponent()
                 .create()
         curriculamComponent.inject(this)
-        form3FillViewModel.selectedSchoolCode.value = Gson().fromJson(
+
+        val schoolCode = Gson().fromJson(
             requireArguments().getString(ARG_CONTENT1),
             SchoolCode::class.java
         )
+
+        binding.llGetDirection.visibility =
+            if (schoolCode.lattitude == null) View.GONE else View.VISIBLE
+
+        form3FillViewModel.selectedSchoolCode.value = schoolCode
 
         form3FillViewModel.projectInfo.value = Gson().fromJson(
             requireArguments().getString(ARG_CONTENT2),
@@ -186,6 +196,21 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
 
         binding.form3.filters = arrayOf(allowOnlyLettersAndSpacesFilter)
 
+        binding.llGetDirection.setOnClickListener {
+            if(currentLocation != null) {
+                form3FillViewModel.selectedSchoolCode.value?.longitude?.let { it1 ->
+                    form3FillViewModel.selectedSchoolCode.value?.lattitude?.let { it2 ->
+                        openGoogleMapsForDirections(
+                            currentLocation!!.latitude,
+                            currentLocation!!.longitude,
+                            it2,
+                            it1
+                        )
+                    }
+                }
+            }
+        }
+
         return root
     }
 
@@ -193,6 +218,24 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
         val imageUri = Uri.parse(imagePath)
         val newFragment = ImagePreviewDialogFragment.newInstance(imageUri)
         newFragment.show(childFragmentManager, "image_preview")
+    }
+
+    private fun openGoogleMapsForDirections(
+        lat: Double,
+        lng: Double,
+        destinationLat: String,
+        destinationLng: String
+    ) {
+
+        val destLat = TimeUtils.parseCoordinate(destinationLat)
+        val destLng = TimeUtils.parseCoordinate(destinationLng)
+
+        // Build the URI for the directions request
+        val uri =
+            Uri.parse("http://maps.google.com/maps?saddr=$lat,$lng&daddr=$destLat,$destLng")
+
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        startActivity(intent)
     }
 
 
@@ -332,7 +375,6 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
     // Used only for local storage of the last known location. Usually, this would be saved to your
 // database, but because this is a simplified sample without a full database, we only need the
 // last location to create a Notification if the user navigates away from the app.
-    private var currentLocation: Location? = null
 
     private val requestPermission =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -632,7 +674,7 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
         isTimerStarted = true
         //binding.proceed.isEnabled = false
 
-        val totalTime = 1 * 60 * 1000L
+        val totalTime = 20 * 60 * 1000L
 
         // Set initial time before starting the timer
         updateTimerText(totalTime)

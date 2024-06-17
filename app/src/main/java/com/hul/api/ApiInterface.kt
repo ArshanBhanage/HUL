@@ -1,4 +1,5 @@
 package com.hul.api
+
 import com.hul.data.*
 import com.hul.data.RequestModel
 import okhttp3.MultipartBody
@@ -130,6 +131,15 @@ interface ApiInterface {
 
     @POST("app/visits/v1/addVisitData/")
     fun visitData(@Body requestModel: RequestModel): Call<ResponseBody?>
+
+    @GET("app/projects/v1/areas")
+    fun getDistricts(@Query("projectId") projectId: String): Call<ResponseBody?>
+
+    @GET("app/projects/v1/states")
+    fun getStates(@Query("projectId") projectId: String): Call<ResponseBody?>
+
+    @POST("app/projects/v1/addLocation/")
+    fun addSchool(@Body requestModel: RequestModel): Call<ResponseBody?>
 
     companion object {
         const val BASE_URL = "http://3.7.149.234:8000/"

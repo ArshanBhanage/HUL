@@ -5,6 +5,7 @@ data class SchoolCode(
     var area_id: Int? = null,
     var location_name: String? = null,
     var location_type: String? = null,
+    var lattitude: String? = null,
     var longitude: String? = null,
     var external_id1: String? = null,
     var external_id1_description: String? = null,

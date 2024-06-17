@@ -34,7 +34,7 @@
                 <ImageView
                     android:layout_width="@dimen/_80sdp"
                     android:layout_height="@dimen/_40sdp"
-                    android:src="@mipmap/hullogo"
+                    android:src="@drawable/ic_curriculum_logo"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_20ssp"
                     android:textStyle="bold"

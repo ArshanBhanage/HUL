@@ -28,7 +28,6 @@ class SchoolCodeAdapter(
         val itemImage: ImageView = view.findViewById(R.id.itemImage)
         val itemText: TextView = view.findViewById(R.id.itemText)
 
-
         if (item.external_id1 != null) {
             itemText.text = item.external_id1
         } else {
@@ -46,7 +45,7 @@ class SchoolCodeAdapter(
     override fun getFilter(): android.widget.Filter {
         return object : android.widget.Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
-                val filteredList = if (constraint.isNullOrEmpty()) {
+                var filteredList = if (constraint.isNullOrEmpty()) {
                     items
                 } else {
                     val filterPattern = constraint.toString().lowercase(Locale.getDefault()).trim()
@@ -58,6 +57,12 @@ class SchoolCodeAdapter(
                     }
                 }
 
+                if (filteredList.isEmpty()) {
+                    val schoolCode: SchoolCode = SchoolCode(-1)
+                    schoolCode.external_id1 = "Add New"
+                    filteredList = listOf(schoolCode)
+                }
+
                 return FilterResults().apply {
                     values = filteredList
                     count = filteredList.size
@@ -66,7 +71,8 @@ class SchoolCodeAdapter(
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
                 clear()
-                addAll(results?.values as List<SchoolCode>)
+                val schoolCodes = results?.values as List<SchoolCode>
+                addAll(schoolCodes)
                 notifyDataSetChanged()
             }
         }

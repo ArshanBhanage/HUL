@@ -36,6 +36,7 @@ import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
 import com.hul.camera.CameraActivity
 import com.hul.curriculam.CurriculamComponent
+import com.hul.curriculam.ui.form2Fill.Form2FillFragment
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
@@ -48,6 +49,7 @@ import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDial
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
+import com.hul.utils.TimeUtils
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectionAlertDialogue
@@ -99,15 +101,22 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
             (activity?.application as HULApplication).appComponent.curriculamComponent()
                 .create()
         curriculamComponent.inject(this)
-        form1FillViewModel.selectedSchoolCode.value = Gson().fromJson(
+
+        val schoolCode = Gson().fromJson(
             requireArguments().getString(ARG_CONTENT1),
             SchoolCode::class.java
         )
+
+        binding.llGetDirection.visibility =
+            if (schoolCode.lattitude == null) View.GONE else View.VISIBLE
+
+        form1FillViewModel.selectedSchoolCode.value = schoolCode
 
         form1FillViewModel.projectInfo.value = Gson().fromJson(
             requireArguments().getString(ARG_CONTENT2),
             ProjectInfo::class.java
         )
+
         binding.viewModel = form1FillViewModel
 
         binding.capture1.setOnClickListener {
@@ -185,7 +194,40 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
 
         binding.form3.filters = arrayOf(allowOnlyLettersAndSpacesFilter)
 
+        binding.txtDirections.setOnClickListener {
+            if(currentLocation != null) {
+                form1FillViewModel.selectedSchoolCode.value?.longitude?.let { it1 ->
+                    form1FillViewModel.selectedSchoolCode.value?.lattitude?.let { it2 ->
+                        openGoogleMapsForDirections(
+                            currentLocation!!.latitude,
+                            currentLocation!!.longitude,
+                            it2,
+                            it1
+                        )
+                    }
+                }
+            }
+        }
+
         return root
+    }
+
+    private fun openGoogleMapsForDirections(
+        lat: Double,
+        lng: Double,
+        destinationLat: String,
+        destinationLng: String
+    ) {
+
+        val destLat = TimeUtils.parseCoordinate(destinationLat)
+        val destLng = TimeUtils.parseCoordinate(destinationLng)
+
+        // Build the URI for the directions request
+        val uri =
+            Uri.parse("http://maps.google.com/maps?saddr=$lat,$lng&daddr=$destLat,$destLng")
+
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        startActivity(intent)
     }
 
     private fun showImagePreview(imagePath: String) {
@@ -632,7 +674,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
         isTimerStarted = true
         //binding.proceed.isEnabled = false
 
-        val totalTime = 1 * 60 * 1000L
+        val totalTime = 20 * 60 * 1000L
 
         // Set initial time before starting the timer
         updateTimerText(totalTime)

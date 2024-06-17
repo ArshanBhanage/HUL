@@ -17,4 +17,7 @@ class DashboardViewModel @Inject constructor(
     val text: LiveData<String> = _text
 
     val attendenceToday = MutableLiveData<Attendencemodel>()
+
+    var longitude = MutableLiveData<String>()
+    var lattitude = MutableLiveData<String>()
 }

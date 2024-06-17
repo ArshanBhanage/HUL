@@ -3,6 +3,7 @@ package com.hul.dashboard
 import com.hul.dashboard.ui.attendence.AttendenceFragment
 import com.hul.dashboard.ui.dashboard.DashboardFragment
 import com.hul.di.ActivityScope
+import com.hul.di.SyncModule
 import dagger.Subcomponent
 
 /**
@@ -21,5 +22,4 @@ interface DashboardComponent {
     fun inject(activity: Dashboard)
     fun inject(dashboard: DashboardFragment)
     fun inject(attendence: AttendenceFragment)
-
 }

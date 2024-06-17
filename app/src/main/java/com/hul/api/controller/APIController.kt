@@ -37,6 +37,7 @@ class APIController @Inject constructor(private val mContext: Context) :
             ApiExtentions.ApiDef.SEND_OTP -> retrofit.create(ApiInterface::class.java)
                 .sendOTP(requestModel)
                 .enqueue(this)
+
             ApiExtentions.ApiDef.LOGIN -> retrofit.create(ApiInterface::class.java)
                 .loginUser(requestModel)
                 .enqueue(this)
@@ -58,7 +59,7 @@ class APIController @Inject constructor(private val mContext: Context) :
                 .enqueue(this)
 
             ApiExtentions.ApiDef.SCHOOL_CODES -> retrofit.create(ApiInterface::class.java)
-                .getSchoolCodes(requestModel!!.projectId,requestModel.externalId)
+                .getSchoolCodes(requestModel!!.projectId, requestModel.externalId)
                 .enqueue(this)
 
             ApiExtentions.ApiDef.MARK_ATTENDENCE -> retrofit.create(ApiInterface::class.java)
@@ -101,12 +102,13 @@ class APIController @Inject constructor(private val mContext: Context) :
                 .enqueue(this)
 
             ApiExtentions.ApiDef.SUBMIT_LEAD -> retrofit.create(ApiInterface::class.java)
-                .submitLead(requestModel!!.leadId!!,RequestModel())
+                .submitLead(requestModel!!.leadId!!, RequestModel())
                 .enqueue(this)
 
             ApiExtentions.ApiDef.UPLOADED_DOCUMENT_LIST -> retrofit.create(ApiInterface::class.java)
                 .getUploadedDocument(requestModel!!.leadId!!)
                 .enqueue(this)
+
             ApiExtentions.ApiDef.GET_USER_DETAILS -> retrofit.create(ApiInterface::class.java)
                 .getUserDetails()
                 .enqueue(this)
@@ -122,6 +124,7 @@ class APIController @Inject constructor(private val mContext: Context) :
                         .enqueue(this)
                 }
             }
+
             ApiExtentions.ApiDef.VISIT_DATA -> retrofit.create(ApiInterface::class.java)
                 .visitData(requestModel!!)
                 .enqueue(this)
@@ -130,6 +133,21 @@ class APIController @Inject constructor(private val mContext: Context) :
                 .visitData(requestModel!!)
                 .enqueue(this)
 
+            ApiExtentions.ApiDef.GET_DISTRICTS -> requestModel?.projectId?.let {
+                retrofit.create(ApiInterface::class.java)
+                    .getDistricts(it)
+                    .enqueue(this)
+            }
+
+            ApiExtentions.ApiDef.GET_STATES -> requestModel?.projectId?.let {
+                retrofit.create(ApiInterface::class.java)
+                    .getStates(it)
+                    .enqueue(this)
+            }
+
+            ApiExtentions.ApiDef.ADD_NEW_SCHOOL -> retrofit.create(ApiInterface::class.java)
+                .addSchool(requestModel!!)
+                .enqueue(this)
 
             else -> Toast.makeText(mContext, "API NOT INTEGRATED", Toast.LENGTH_LONG).show()
         }
@@ -142,8 +160,8 @@ class APIController @Inject constructor(private val mContext: Context) :
     ) {
         if (response.code() == 200 || response.code() == 201) {
             mHandler.onApiSuccess(response.body()!!.string(), apiId)
-        } else if(response.code() == 401) {
-            if(ApiExtentions.ApiDef.values()[apiId]!=ApiExtentions.ApiDef.GET_LOGO && ApiExtentions.ApiDef.values()[apiId]!=ApiExtentions.ApiDef.GET_BANNER) {
+        } else if (response.code() == 401) {
+            if (ApiExtentions.ApiDef.values()[apiId] != ApiExtentions.ApiDef.GET_LOGO && ApiExtentions.ApiDef.values()[apiId] != ApiExtentions.ApiDef.GET_BANNER) {
                 mHandler.onApiError(mContext.getString(R.string.session_expire))
             }
         } else {
@@ -151,10 +169,8 @@ class APIController @Inject constructor(private val mContext: Context) :
             var response = JSONObject(response.errorBody()!!.string())
             try {
                 mHandler.onApiError(response.getJSONArray("error_details").get(0).toString())
-            }
-            catch (e:Exception)
-            {
-                if(ApiExtentions.ApiDef.values()[apiId]!=ApiExtentions.ApiDef.GET_LOGO && ApiExtentions.ApiDef.values()[apiId]!=ApiExtentions.ApiDef.GET_BANNER) {
+            } catch (e: Exception) {
+                if (ApiExtentions.ApiDef.values()[apiId] != ApiExtentions.ApiDef.GET_LOGO && ApiExtentions.ApiDef.values()[apiId] != ApiExtentions.ApiDef.GET_BANNER) {
                     mHandler.onApiError("Something went wrong")
                 }
             }

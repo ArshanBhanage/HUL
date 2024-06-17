@@ -33,4 +33,22 @@ object TimeUtils {
         // Step 3: Format the date to get the month
         return dateFormat.format(date)
     }
+
+    fun parseCoordinate(coordinate: String): Double {
+        val pattern = """([-+]?[0-9]*\.?[0-9]+)([NSEW])""".toRegex()
+        val matchResult = pattern.find(coordinate)
+
+        if (matchResult != null) {
+            val (value, direction) = matchResult.destructured
+            val decimalValue = value.toDouble()
+
+            return when (direction) {
+                "N", "E" -> decimalValue
+                "S", "W" -> -decimalValue
+                else -> throw IllegalArgumentException("Invalid coordinate direction: $direction")
+            }
+        } else {
+            throw IllegalArgumentException("Invalid coordinate format: $coordinate")
+        }
+    }
 }

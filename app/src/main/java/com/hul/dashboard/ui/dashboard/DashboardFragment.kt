@@ -1,21 +1,42 @@
 package com.hul.dashboard.ui.dashboard
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
+import android.os.Looper
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.View.OnFocusChangeListener
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.hul.HULApplication
@@ -27,14 +48,18 @@ import com.hul.curriculam.Curriculam
 import com.hul.curriculam.ui.schoolCode.SchoolCodeAdapter
 import com.hul.dashboard.DashboardComponent
 import com.hul.data.Attendencemodel
+import com.hul.data.District
 import com.hul.data.PerformanceData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.data.SchoolCode
+import com.hul.data.State
 import com.hul.databinding.FragmentDashboardBinding
+import com.hul.screens.field_auditor_dashboard.ui.school_activity.SchoolActivityFragment
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
+import com.hul.utils.TimeUtils.parseCoordinate
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectToLogin
@@ -47,8 +72,8 @@ import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
-
-class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragmentInterface {
+class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragmentInterface,
+    ListDialogInterface {
 
     private var _binding: FragmentDashboardBinding? = null
 
@@ -74,6 +99,36 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     var selectedSchoolCode: SchoolCode? = null
 
     var visitList: ArrayList<ProjectInfo> = ArrayList()
+
+    var districtList: ArrayList<District> = ArrayList()
+    var stateList: ArrayList<State> = ArrayList()
+
+    var districtCallBack: ListDialogInterface? = null;
+
+    var stateCallBack: ListDialogInterface? = null;
+
+    private var currentLocation: Location? = null
+    private lateinit var locationCallback: LocationCallback
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var locationRequest: LocationRequest
+
+
+    private val requestPermission =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val granted = permissions.entries.all {
+                it.value == true
+            }
+            if (granted) {
+                checkLocationSettings()
+            } else {
+                requestPermission()
+            }
+        }
+
+    /*@Inject
+    lateinit var syncDataViewModelFactory: SyncDataViewModelFactory
+
+    private val syncDataViewModel: SyncDataViewModel by viewModels { syncDataViewModelFactory }*/
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -111,6 +166,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         binding.schoolCode.onFocusChangeListener = OnFocusChangeListener { view, hasFocus ->
             if (hasFocus) {
                 selectedSchoolCode = null
+                binding.llGetDirection.visibility = View.GONE
             } else {
                 hideKeyboard(view)
             }
@@ -118,7 +174,13 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
         binding.schoolCode.setOnItemClickListener { parent, view, position, id ->
             selectedSchoolCode = schoolCodes[position]
-            binding.schoolCode.setText(selectedSchoolCode!!.external_id1)
+            binding.llGetDirection.visibility =
+                if (selectedSchoolCode!!.lattitude == null) View.GONE else View.VISIBLE
+            if (selectedSchoolCode?.id != -1) {
+                binding.schoolCode.setText(selectedSchoolCode!!.external_id1)
+            } else {
+                binding.schoolCode.setText("")
+            }
             schoolCodes[position].id?.let { getSchoolVisits(it) }
             binding.schoolCode.clearFocus()
         }
@@ -141,9 +203,47 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             }
         })
 
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                super.onLocationResult(locationResult)
 
+                Log.e("Location :: ", locationResult.lastLocation.toString())
+
+                // Normally, you want to save a new location to a database. We are simplifying
+                // things a bit and just saving it as a local variable, as we only need it again
+                // if a Notification is created (when the user navigates away from app).
+                currentLocation = locationResult.lastLocation
+                fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+            }
+        }
+
+        binding.llGetDirection.setOnClickListener {
+            if (currentLocation != null && selectedSchoolCode != null) {
+                selectedSchoolCode!!.longitude?.let { it1 ->
+                    selectedSchoolCode!!.lattitude?.let { it2 ->
+                        openGoogleMapsForDirections(
+                            currentLocation!!.latitude,
+                            currentLocation!!.longitude,
+                            it2,
+                            it1
+                        )
+                    }
+                }
+            }
+        }
+
+
+        if (allPermissionsGranted()) {
+            checkLocationSettings()
+        } else {
+            requestPermission()
+        }
 
         return root
+    }
+
+    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+        ContextCompat.checkSelfPermission(requireContext(), it) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun getPerformanceModel(): RequestModel {
@@ -182,6 +282,60 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     }
 
+    private fun showDistrictDialog(districtList: ArrayList<District>) {
+        val builder: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(context)
+        val inflater = getLayoutInflater()
+        val dialogView: View = inflater.inflate(R.layout.list_dialog, null)
+        builder.setView(dialogView)
+        val alertDialog: android.app.AlertDialog = builder.create()
+
+        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.recyclerView);
+        val adapter: DistrictsAdapter =
+            DistrictsAdapter(districtList, object : ListDialogInterface {
+                override fun onDistrictSelect(district: District) {
+                    districtCallBack?.onDistrictSelect(district)
+                    alertDialog.dismiss()
+                }
+
+                override fun onStateSelect(state: State) {
+
+                }
+            }, requireActivity())
+
+        recyclerView.adapter = adapter
+
+        alertDialog.show()
+    }
+
+    private fun showStateDialog(stateList: ArrayList<State>) {
+        val builder: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(context)
+        val inflater = getLayoutInflater()
+        val dialogView: View = inflater.inflate(R.layout.list_dialog, null)
+        builder.setView(dialogView)
+        val alertDialog: android.app.AlertDialog = builder.create()
+
+        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.recyclerView);
+        val dialogTitle = dialogView.findViewById<TextView>(R.id.dialogTitle);
+
+        dialogTitle.setText("Select State")
+
+        val adapter: StateAdapter =
+            StateAdapter(stateList, object : ListDialogInterface {
+                override fun onDistrictSelect(district: District) {
+
+                }
+
+                override fun onStateSelect(state: State) {
+                    stateCallBack?.onStateSelect(state)
+                    alertDialog.dismiss()
+                }
+            }, requireActivity())
+
+        recyclerView.adapter = adapter
+
+        alertDialog.show()
+    }
+
     private fun getSchoolCodesModel(s: String): RequestModel {
         return RequestModel(
             projectId = userInfo.projectId,
@@ -193,11 +347,16 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
             //setProgressDialog(requireContext(), "Loading Leads")
-            apiController.getApiResponse(
-                this,
-                getSVisitsBySchoolCode(schoolId),
-                ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE.ordinal
-            )
+            if (schoolId == -1) {
+                // Add new school
+                showAddSchoolDialog()
+            } else {
+                apiController.getApiResponse(
+                    this,
+                    getSVisitsBySchoolCode(schoolId),
+                    ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE.ordinal
+                )
+            }
         } else {
             noInternetDialogue(
                 requireContext(),
@@ -208,10 +367,54 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     }
 
+    fun getDistrictList(callBack: ListDialogInterface) {
+
+        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+            districtCallBack = callBack
+            apiController.getApiResponse(
+                this,
+                getDistricts(userInfo.projectId),
+                ApiExtentions.ApiDef.GET_DISTRICTS.ordinal
+            )
+        } else {
+            noInternetDialogue(
+                requireContext(),
+                ApiExtentions.ApiDef.GET_DISTRICTS.ordinal,
+                this
+            )
+        }
+
+    }
+
+    fun getStateList(callBack: ListDialogInterface) {
+
+        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+            stateCallBack = callBack
+            apiController.getApiResponse(
+                this,
+                getDistricts(userInfo.projectId),
+                ApiExtentions.ApiDef.GET_STATES.ordinal
+            )
+        } else {
+            noInternetDialogue(
+                requireContext(),
+                ApiExtentions.ApiDef.GET_STATES.ordinal,
+                this
+            )
+        }
+
+    }
+
 
     private fun getSVisitsBySchoolCode(id: Int): RequestModel {
         return RequestModel(
             schoolId = id,
+        )
+    }
+
+    private fun getDistricts(id: String): RequestModel {
+        return RequestModel(
+            projectId = id,
         )
     }
 
@@ -246,7 +449,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         return dateFormat.format(date)
     }
 
-    fun dayOfWeek() : String{
+    fun dayOfWeek(): String {
         val calendar = Calendar.getInstance()
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
 
@@ -293,6 +496,101 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             alertDialog.dismiss()
             userInfo.authToken = ""
             redirectToLogin(requireContext())
+        }
+
+        alertDialog.show()
+    }
+
+    private fun showAddSchoolDialog() {
+        val builder: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(context)
+        val inflater = getLayoutInflater()
+        val dialogView: View = inflater.inflate(R.layout.add_school_dialog, null)
+        builder.setView(dialogView)
+        val alertDialog: android.app.AlertDialog = builder.create()
+
+        val btnClose = dialogView.findViewById<AppCompatButton>(R.id.btnClose);
+        val btnAdd = dialogView.findViewById<AppCompatButton>(R.id.btnAdd);
+
+        val edtSchoolCode = dialogView.findViewById<TextInputEditText>(R.id.edtSchoolCode);
+        val edtSchoolName = dialogView.findViewById<TextInputEditText>(R.id.edtSchoolName);
+        val edtWardBlock = dialogView.findViewById<TextInputEditText>(R.id.edtWardBlock);
+        val edtState = dialogView.findViewById<TextInputEditText>(R.id.edtState);
+        val edtDistrict = dialogView.findViewById<TextInputEditText>(R.id.edtDistrict);
+
+        var districtToSubmit: District? = null
+        var stateToSubmit: State? = null
+
+        edtDistrict.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                getDistrictList(object : ListDialogInterface {
+                    override fun onDistrictSelect(district: District) {
+                        edtDistrict.setText(district.area_name)
+                        districtToSubmit = district
+                    }
+
+                    override fun onStateSelect(state: State) {
+
+                    }
+                })
+            }
+        }
+
+        edtState.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                getStateList(object : ListDialogInterface {
+                    override fun onDistrictSelect(district: District) {
+
+                    }
+
+                    override fun onStateSelect(state: State) {
+                        edtState.setText(state.location_state)
+                        stateToSubmit = state
+                    }
+                })
+            }
+        }
+
+        btnAdd.setOnClickListener {
+
+            val schoolCode = edtSchoolCode.text.toString()
+            val schoolName = edtSchoolName.text.toString()
+            val wardBlock = edtWardBlock.text.toString()
+
+            if (schoolCode.isEmpty() || schoolName.isEmpty() || wardBlock.isEmpty()
+                || stateToSubmit == null || districtToSubmit == null
+            ) {
+                Toast.makeText(requireContext(), "Please fill all inputs", Toast.LENGTH_LONG).show()
+            } else {
+
+                alertDialog.dismiss()
+
+                val addSchoolModel = RequestModel(
+                    location_name = schoolName,
+                    area_id = districtToSubmit!!.area_id.toString(),
+                    project_id = userInfo.projectId,
+                    location_type = "School",
+                    lattitude = dashboardViewModel.lattitude.value,
+                    longitude = dashboardViewModel.longitude.value,
+                    external_id1 = schoolCode,
+                    external_id1_description = "U DICE Code",
+                    external_id2 = null,
+                    external_id2_description = "Temp Code",
+                    location_ward = wardBlock,
+                    location_district = districtToSubmit!!.area_name,
+                    location_state = stateToSubmit!!.location_state,
+                    remarks = ""
+                )
+
+                apiController.getApiResponse(
+                    this,
+                    addSchoolModel,
+                    ApiExtentions.ApiDef.ADD_NEW_SCHOOL.ordinal
+                )
+            }
+        }
+
+        btnClose.setOnClickListener {
+            alertDialog.dismiss()
         }
 
         alertDialog.show()
@@ -358,6 +656,47 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         cancelProgressDialog()
         when (ApiExtentions.ApiDef.entries[objectType]) {
 
+            ApiExtentions.ApiDef.ADD_NEW_SCHOOL -> {
+                val model = JSONObject(o.toString())
+                if (!model.getBoolean("error")) {
+                    Toast.makeText(requireContext(), "School added successfully", Toast.LENGTH_LONG)
+                        .show()
+                    getSchoolVisits(model.getInt("data"))
+                    selectedSchoolCode = null;
+                    binding.llGetDirection.visibility = GONE
+                    addVisit(
+                        model.getInt("data").toString(),
+                        1.toString()
+                    )
+                } else {
+                    redirectionAlertDialogue(requireContext(), model.getString("message"))
+                }
+            }
+
+            ApiExtentions.ApiDef.GET_STATES -> {
+                val model = JSONObject(o.toString())
+                if (!model.getBoolean("error")) {
+                    val listType: Type = object : TypeToken<List<State?>?>() {}.type
+                    stateList =
+                        Gson().fromJson(model.getJSONArray("data").toString(), listType);
+                    showStateDialog(stateList);
+                } else {
+                    redirectionAlertDialogue(requireContext(), model.getString("message"))
+                }
+            }
+
+            ApiExtentions.ApiDef.GET_DISTRICTS -> {
+                val model = JSONObject(o.toString())
+                if (!model.getBoolean("error")) {
+                    val listType: Type = object : TypeToken<List<District?>?>() {}.type
+                    districtList =
+                        Gson().fromJson(model.getJSONArray("data").toString(), listType);
+                    showDistrictDialog(districtList);
+                } else {
+                    redirectionAlertDialogue(requireContext(), model.getString("message"))
+                }
+            }
+
             ApiExtentions.ApiDef.GET_ATTENDENCE -> {
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
@@ -366,9 +705,13 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                         Gson().fromJson(model.getJSONArray("data").toString(), listType);
                     val currentObject = items.get(items.size - 1)
                     dashboardViewModel.attendenceToday.value = currentObject
-                    items.removeAt(items.size - 1)
-                    // Remove the first element
-                    items.removeAt(0)
+                    try {
+                        items.removeAt(items.size - 1)
+                        // Remove the first element
+                        items.removeAt(0)
+                    } catch (e: Exception) {
+                        Log.e(DashboardFragment::class.qualifiedName, "onApiSuccess: " + e.message)
+                    }
                     val adapter = AttendenceAdapter(requireContext(), items)
                     binding.gridView.adapter = adapter
                     if (currentObject.date!!.length > 10) {
@@ -426,7 +769,11 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     val listType: Type = object : TypeToken<List<SchoolCode?>?>() {}.type
                     schoolCodes =
                         Gson().fromJson(model.getJSONArray("data").toString(), listType);
-
+                    if (schoolCodes.size > 0) {
+                        selectedSchoolCode = schoolCodes[0]
+                        binding.llGetDirection.visibility =
+                            if (selectedSchoolCode!!.lattitude == null) View.GONE else View.VISIBLE
+                    }
                     adapter = SchoolCodeAdapter(
                         requireContext(),
                         R.layout.school_code_dropdown,
@@ -445,7 +792,9 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             ApiExtentions.ApiDef.ADD_VISIT -> {
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
-                    getSchoolVisits(selectedSchoolCode!!.id!!)
+                    if (selectedSchoolCode != null) {
+                        getSchoolVisits(selectedSchoolCode!!.id!!)
+                    }
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -468,7 +817,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                             || project.visit_status.equals("INITIATED", ignoreCase = true)
                         ) {
                             flag = false
-                            pendingVisits.add(project)
+                            project.let { pendingVisits.add(it) }
                         }
                     }
 
@@ -519,9 +868,9 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         if (dashboardViewModel.attendenceToday.value!!.present!!) {
             val bundle = Bundle()
             var uDiceCode = ""
-            uDiceCode = if(selectedSchoolCode?.external_id1 != null) {
+            uDiceCode = if (selectedSchoolCode?.external_id1 != null) {
                 selectedSchoolCode?.external_id1!!
-            }else{
+            } else {
                 selectedSchoolCode?.external_id2.toString()
             }
             bundle.putString(
@@ -568,5 +917,108 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         val intent = Intent(activity, Curriculam::class.java)
         intent.putExtra("projectInfo", Gson().toJson(projectInfo))
         startActivity(intent)
+    }
+
+    override fun onDistrictSelect(district: District) {
+
+    }
+
+    override fun onStateSelect(state: State) {
+
+    }
+
+    private fun requestLocation() {
+        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        requestLocation.launch(intent)
+    }
+
+    private fun requestPermission() {
+        requestPermission.launch(SchoolActivityFragment.REQUIRED_PERMISSIONS)
+    }
+
+    private val requestLocation =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { permissions ->
+            checkLocationSettings()
+        }
+
+    private fun checkLocationSettings() {
+        val locationManager =
+            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        if (!isGpsEnabled) {
+            //Toast.makeText(this, "GPS is not enabled", Toast.LENGTH_SHORT).show()
+            requestLocation()
+        } else {
+            requestLocationUpdates()
+            // Location services are enabled
+            //Toast.makeText(this, "Location services are enabled", Toast.LENGTH_SHORT).show()
+            // Proceed with location-related operations
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun requestLocationUpdates() {
+
+        // Initialize FusedLocationProviderClient
+        fusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(requireActivity())
+
+
+        locationRequest = LocationRequest.create().apply {
+            // Sets the desired interval for active location updates. This interval is inexact. You
+            // may not receive updates at all if no location sources are available, or you may
+            // receive them less frequently than requested. You may also receive updates more
+            // frequently than requested if other applications are requesting location at a more
+            // frequent interval.
+            //
+            // IMPORTANT NOTE: Apps running on Android 8.0 and higher devices (regardless of
+            // targetSdkVersion) may receive updates less frequently than this interval when the app
+            // is no longer in the foreground.
+            interval = 60
+
+            // Sets the fastest rate for active location updates. This interval is exact, and your
+            // application will never receive updates more frequently than this value.
+            fastestInterval = 30
+
+            // Sets the maximum time when batched location updates are delivered. Updates may be
+            // delivered sooner than this interval.
+            maxWaitTime = 10
+
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+
+        fusedLocationProviderClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    }
+
+    private fun openGoogleMapsForDirections(
+        lat: Double,
+        lng: Double,
+        destinationLat: String,
+        destinationLng: String
+    ) {
+
+        val destLat = parseCoordinate(destinationLat)
+        val destLng = parseCoordinate(destinationLng)
+
+        // Build the URI for the directions request
+        val uri =
+            Uri.parse("http://maps.google.com/maps?saddr=$lat,$lng&daddr=$destLat,$destLng")
+
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        startActivity(intent)
+    }
+
+
+    companion object {
+        private val REQUIRED_PERMISSIONS = arrayOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+
     }
 }

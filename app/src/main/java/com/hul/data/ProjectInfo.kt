@@ -1,6 +1,7 @@
 package com.hul.data
 
 data class ProjectInfo(
+    var id: Int? = null,
     var visit_id: Int? = null,
     var visit_number: String? = null,
     var location_id: String? = null,

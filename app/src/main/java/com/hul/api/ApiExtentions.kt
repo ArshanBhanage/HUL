@@ -30,6 +30,9 @@ class ApiExtentions {
         SAVE_SCHOOL_ACTIVITY_DATA,
         VISIT_DATA,
         VISIT_LIST_BY_SCHOOL_CODE,
-        ADD_VISIT
+        ADD_VISIT,
+        GET_DISTRICTS,
+        GET_STATES,
+        ADD_NEW_SCHOOL
     }
 }
