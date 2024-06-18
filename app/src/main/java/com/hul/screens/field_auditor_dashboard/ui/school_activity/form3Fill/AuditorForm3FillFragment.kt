@@ -40,14 +40,12 @@ import com.hul.curriculam.ui.form3Fill.Form3FillViewModel
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
-import com.hul.data.SchoolCode
 import com.hul.data.UploadImageData
 import com.hul.data.VisitData
 import com.hul.data.VisitDetails
+import com.hul.databinding.FragmentForm3FillAuditorBinding
 import com.hul.databinding.FragmentForm3FillBinding
 import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDialogFragment
-import com.hul.screens.field_auditor_dashboard.ui.school_activity.form1Fill.AuditorForm1FillFragment
-import com.hul.screens.field_auditor_dashboard.ui.school_activity.form2Fill.AuditorForm2FillFragment
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
@@ -61,7 +59,7 @@ import javax.inject.Inject
 
 class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
 
-    private var _binding: FragmentForm3FillBinding? = null
+    private var _binding: FragmentForm3FillAuditorBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -89,15 +87,13 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
 
     var isTimerStarted = false;
 
-    private var currentLocation: Location? = null
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
 
-        _binding = FragmentForm3FillBinding.inflate(inflater, container, false)
+        _binding = FragmentForm3FillAuditorBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         binding.lifecycleOwner = viewLifecycleOwner
@@ -109,20 +105,17 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.viewModel = form3FillViewModel
 
         binding.capture1.setOnClickListener {
-            redirectToCamera(0, "Back", requireContext().getString(R.string.school_pic1))
+            redirectToCamera(0, "Back", requireContext().getString(R.string.auditor_visit_3_pic_1))
         }
         binding.capture2.setOnClickListener {
             redirectToCamera(
                 1,
                 "Image Capture Front",
-                requireContext().getString(R.string.school_pic2)
+                requireContext().getString(R.string.auditor_visit_2_pic_2)
             )
         }
         binding.capture3.setOnClickListener {
-            redirectToCamera(2, "Back", requireContext().getString(R.string.school_pic3))
-        }
-        binding.capture4.setOnClickListener {
-            redirectToCamera(3, "Back", requireContext().getString(R.string.school_pic4))
+            redirectToCamera(2, "Back", requireContext().getString(R.string.auditor_visit_3_pic_3))
         }
 
         binding.proceed.setOnClickListener {
@@ -154,14 +147,6 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
             }
         }
 
-        binding.view4.setOnClickListener {
-            form3FillViewModel.imageUrl4.value?.let { it1 ->
-                showImagePreview(
-                    it1
-                )
-            }
-        }
-
         if (allPermissionsGranted()) {
             checkLocationSettings()
         } else {
@@ -179,10 +164,8 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
 
         binding.form1.filters = arrayOf(allowOnlyLettersAndSpacesFilter)
 
-        binding.form3.filters = arrayOf(allowOnlyLettersAndSpacesFilter)
-
-        binding.llGetDirection.setOnClickListener {
-            if(currentLocation != null) {
+        binding.txtDirections.setOnClickListener {
+            if (currentLocation != null) {
                 form3FillViewModel.selectedSchoolCode.value?.longitude?.let { it1 ->
                     form3FillViewModel.selectedSchoolCode.value?.lattitude?.let { it2 ->
                         openGoogleMapsForDirections(
@@ -201,9 +184,24 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
             ProjectInfo::class.java
         )
 
-        getVisitData()
+        binding.btnPositive.setOnClickListener {
+            binding.btnPositive.visibility = View.GONE
+            binding.btnNegative.visibility = View.GONE
+            binding.trueIconBooks.visibility = View.VISIBLE
+            form3FillViewModel.isBookDistributionApproved.value = 1;
+        }
+
+        binding.btnNegative.setOnClickListener {
+            binding.btnPositive.visibility = View.GONE
+            binding.btnNegative.visibility = View.GONE
+        }
 
         return root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        getVisitData()
     }
 
     private fun showImagePreview(imagePath: String) {
@@ -292,8 +290,6 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
                 val position = data!!.getIntExtra("position", 0)
                 val imageUrl = result.data!!.getStringExtra("imageUrl")
 
-                startTimer()
-
                 // Update the view model's imageUrl at the corresponding position
                 when (position) {
                     0 -> form3FillViewModel.imageUrl1.value = imageUrl
@@ -364,6 +360,7 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
     // Used only for local storage of the last known location. Usually, this would be saved to your
 // database, but because this is a simplified sample without a full database, we only need the
 // last location to create a Notification if the user navigates away from the app.
+    private var currentLocation: Location? = null
 
     private val requestPermission =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -503,18 +500,20 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     fun submitForm() {
-
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
             //setProgressDialog(requireContext(), "Loading Leads")
             apiController.getApiResponse(
                 this,
                 submitModel(),
-                ApiExtentions.ApiDef.VISIT_DATA.ordinal
+                ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA.ordinal
             )
         } else {
-            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.VISIT_DATA.ordinal, this)
+            noInternetDialogue(
+                requireContext(),
+                ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA.ordinal,
+                this
+            )
         }
-
     }
 
     private fun submitModel(): RequestModel {
@@ -522,27 +521,39 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
         return RequestModel(
             project = userInfo.projectName,
             visit_id = form3FillViewModel.projectInfo.value!!.visit_id.toString(),
+            collected_by = userInfo.userType,
             visitData = VisitData(
-                no_of_filled_trackers_collected = VisitDetails(value = form3FillViewModel.noOfFilledTrackersCollected.value),
-                visit_image_1 = VisitDetails(value = form3FillViewModel.imageApiUrl1.value),
-                visit_image_2 = VisitDetails(value = form3FillViewModel.imageApiUrl2.value),
-                visit_image_3 = VisitDetails(value = form3FillViewModel.imageApiUrl3.value),
-                visit_image_4 = VisitDetails(value = form3FillViewModel.imageApiUrl4.value),
-                school_name = VisitDetails(value =binding.schoolName.text.toString()),
-                name_of_the_school_representative_who_collected_the_books = VisitDetails(value = form3FillViewModel.form1.value.toString()),
-                mobile_number_of_the_school_representative_who_collected_the_books = VisitDetails(value = form3FillViewModel.form2.value.toString()),
-                name_of_the_principal = VisitDetails(value = form3FillViewModel.form3.value.toString()),
-                mobile_number_of_the_principal = VisitDetails(value = form3FillViewModel.form4.value.toString()),
-                revisit_applicable = VisitDetails(value = if(form3FillViewModel.form6.value!!) "Yes" else "No"),
-                remark = VisitDetails(value = form3FillViewModel.form5.value),
-                u_dice_code = VisitDetails(value =binding.disceCode.text.toString()),
+                u_dice_code = VisitDetails(value = binding.disceCode.text.toString()),
+                school_name = VisitDetails(value = binding.schoolName.text.toString()),
+                number_of_books_distributed = VisitDetails(
+                    value = binding.edtNoOfBooksHandedOver.text.toString(),
+                    is_approved = form3FillViewModel.isBookDistributionApproved.value
+                ),
+                number_of_books_given_school = VisitDetails(value = form3FillViewModel.noOfBooksGivenToSchool.value),
+                auditor_visit_image_1 = VisitDetails(value = form3FillViewModel.imageApiUrl1.value),
+                auditor_visit_image_2 = VisitDetails(value = form3FillViewModel.imageApiUrl2.value),
+                auditor_visit_image_3 = VisitDetails(value = form3FillViewModel.imageApiUrl3.value),
                 visit_id = form3FillViewModel.projectInfo.value!!.visit_id.toString(),
+                were_file_trackers_collected = VisitDetails(value = binding.switchBookDistribution.isChecked),
+                number_of_trackers_collected = VisitDetails(value = binding.edtFilledTrackers.text.toString()),
+                remark = VisitDetails(value = binding.form5.text.toString())
             )
         )
     }
 
     override fun onApiSuccess(o: String?, objectType: Int) {
         when (ApiExtentions.ApiDef.entries[objectType]) {
+
+            ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA -> {
+                cancelProgressDialog()
+                val model = JSONObject(o.toString())
+                if (!model.getBoolean("error")) {
+                    Toast.makeText(requireContext(), "Data saved successfully", Toast.LENGTH_LONG)
+                        .show()
+                } else {
+                    redirectionAlertDialogue(requireContext(), model.getString("message"))
+                }
+            }
 
             ApiExtentions.ApiDef.SUBMIT_SCHOOL_FORM -> {
                 cancelProgressDialog()
@@ -586,10 +597,6 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
                 } else if (uploadImageData != null && imageIndex == 2) {
                     imageIndex += 1;
                     form3FillViewModel.imageApiUrl3.value = uploadImageData.url
-                    uploadImage(form3FillViewModel.imageUrl4.value?.toUri()!!)
-                } else if (uploadImageData != null && imageIndex == 3) {
-                    imageIndex += 1;
-                    form3FillViewModel.imageApiUrl4.value = uploadImageData.url
                     submitForm()
                 }
             }
@@ -645,7 +652,6 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
 
     override fun onApiError(message: String?) {
         cancelProgressDialog()
-        println(message)
         redirectionAlertDialogue(requireContext(), message!!)
     }
 
@@ -657,19 +663,13 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
 
     }
 
-    private fun startTimer() {
-        form3FillViewModel.timerFinished.value = true
-    }
-
     // ToDo : Need to impl Two way binding, due to current timeline applying manually
     private fun fillData() {
-        binding.disceCode.setText(form3FillViewModel.visitData.value?.visit_1?.u_dice_code?.value.toString())
-        binding.schoolName.setText(form3FillViewModel.visitData.value?.visit_1?.school_name?.value.toString())
-        binding.noOfBooksHanded.setText(form3FillViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value.toString())
-        binding.form1.setText(form3FillViewModel.visitData.value?.visit_1?.name_of_the_school_representative_who_collected_the_books?.value.toString())
-        binding.form2.setText(form3FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_school_representative_who_collected_the_books?.value.toString())
-        binding.form3.setText(form3FillViewModel.visitData.value?.visit_1?.name_of_the_principal?.value.toString())
-        binding.form4.setText(form3FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_principal?.value.toString())
-        binding.form5.setText(form3FillViewModel.visitData.value?.visit_1?.remark?.value.toString())
+        binding.disceCode.setText(form3FillViewModel.visitData.value?.visit_3?.u_dice_code?.value.toString())
+        binding.schoolName.setText(form3FillViewModel.visitData.value?.visit_3?.school_name?.value.toString())
+        binding.form1.setText(form3FillViewModel.visitData.value?.visit_3?.name_of_the_school_representative_who_collected_the_books?.value.toString())
+        binding.form2.setText(form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_school_representative_who_collected_the_books?.value.toString())
+        binding.form5.setText(form3FillViewModel.visitData.value?.visit_3?.remark?.value.toString())
     }
+
 }

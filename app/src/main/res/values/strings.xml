@@ -163,4 +163,15 @@
     <string name="btnClose">Close</string>
     <string name="select_district">Select District</string>
     <string name="get_directions">Get Directions</string>
+    <string name="auditor_visit_1_pic_1">Selfie with the school name or U DICE code</string>
+    <string name="auditor_visit_1_pic_2">Acknowledgement letter picture</string>
+
+    <string name="auditor_visit_2_pic_1">Picture of the school name</string>
+    <string name="auditor_visit_2_pic_2">Selfie with the school name or U DICE code</string>
+    <string name="auditor_visit_2_pic_3">Acknowledgement letter picture</string>
+
+    <string name="auditor_visit_3_pic_1">Picture of the school name</string>
+    <string name="auditor_visit_3_pic_2">Selfie with the school name or U DICE code</string>
+    <string name="auditor_visit_3_pic_3">Trackers acknowledgement form</string>
+    <string name="were_the_filled_trackers_collected">Were the Filled Trackers Collected?</string>
 </resources>

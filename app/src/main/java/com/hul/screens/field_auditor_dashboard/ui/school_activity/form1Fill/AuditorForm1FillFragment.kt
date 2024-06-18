@@ -22,6 +22,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -87,7 +89,7 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
 
     private lateinit var countDownTimer: CountDownTimer
 
-    var isTimerStarted = false;
+    var isBookDistributionApproved = false;
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -107,20 +109,18 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.viewModel = form1FillViewModel
 
         binding.capture1.setOnClickListener {
-            redirectToCamera(0, "Back", requireContext().getString(R.string.school_pic1))
+            redirectToCamera(
+                0,
+                "Image Capture Front",
+                requireContext().getString(R.string.auditor_visit_1_pic_1)
+            )
         }
         binding.capture2.setOnClickListener {
             redirectToCamera(
                 1,
-                "Image Capture Front",
-                requireContext().getString(R.string.school_pic2)
+                "Back",
+                requireContext().getString(R.string.auditor_visit_1_pic_2)
             )
-        }
-        binding.capture3.setOnClickListener {
-            redirectToCamera(2, "Back", requireContext().getString(R.string.school_pic3))
-        }
-        binding.capture4.setOnClickListener {
-            redirectToCamera(3, "Back", requireContext().getString(R.string.school_pic4))
         }
 
         binding.proceed.setOnClickListener {
@@ -139,21 +139,6 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
         }
         binding.view2.setOnClickListener {
             form1FillViewModel.imageUrl2.value?.let { it1 ->
-                showImagePreview(
-                    it1
-                )
-            }
-        }
-        binding.view3.setOnClickListener {
-            form1FillViewModel.imageUrl3.value?.let { it1 ->
-                showImagePreview(
-                    it1
-                )
-            }
-        }
-
-        binding.view4.setOnClickListener {
-            form1FillViewModel.imageUrl4.value?.let { it1 ->
                 showImagePreview(
                     it1
                 )
@@ -178,8 +163,6 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
 
         binding.form1.filters = arrayOf(allowOnlyLettersAndSpacesFilter)
 
-        binding.form3.filters = arrayOf(allowOnlyLettersAndSpacesFilter)
-
         binding.txtDirections.setOnClickListener {
             if (currentLocation != null) {
                 form1FillViewModel.selectedSchoolCode.value?.longitude?.let { it1 ->
@@ -199,6 +182,18 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
             requireArguments().getString(PROJECT_INFO),
             ProjectInfo::class.java
         )
+
+        binding.btnPositive.setOnClickListener {
+            binding.btnPositive.visibility = View.GONE
+            binding.btnNegative.visibility = View.GONE
+            binding.trueIconBooks.visibility = View.VISIBLE
+            form1FillViewModel.isBookDistributionApproved.value = 1;
+        }
+
+        binding.btnNegative.setOnClickListener {
+            binding.btnPositive.visibility = View.GONE
+            binding.btnNegative.visibility = View.GONE
+        }
 
         return root
     }
@@ -293,8 +288,6 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 val data: Intent? = result.data
                 val position = data!!.getIntExtra("position", 0)
                 val imageUrl = result.data!!.getStringExtra("imageUrl")
-
-                startTimer()
 
                 // Update the view model's imageUrl at the corresponding position
                 when (position) {
@@ -512,10 +505,10 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
             apiController.getApiResponse(
                 this,
                 submitModel(),
-                ApiExtentions.ApiDef.VISIT_DATA.ordinal
+                ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA.ordinal
             )
         } else {
-            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.VISIT_DATA.ordinal, this)
+            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA.ordinal, this)
         }
 
     }
@@ -525,30 +518,38 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
         return RequestModel(
             project = userInfo.projectName,
             visit_id = form1FillViewModel.projectInfo.value!!.visit_id.toString(),
+            collected_by = userInfo.userType,
             visitData = VisitData(
-                no_of_teachers_trained = VisitDetails(value = form1FillViewModel.teachersTrained.value),
-                number_of_books_distributed = VisitDetails(value = form1FillViewModel.noOfBooksHandedOver.value),
-                visit_image_1 = VisitDetails(value = form1FillViewModel.imageApiUrl1.value),
-                visit_image_2 = VisitDetails(value = form1FillViewModel.imageApiUrl2.value),
-                visit_image_3 = VisitDetails(value = form1FillViewModel.imageApiUrl3.value),
-                visit_image_4 = VisitDetails(value = form1FillViewModel.imageApiUrl4.value),
-                school_name = VisitDetails(value =binding.schoolName.text.toString()),
-                name_of_the_school_representative_who_collected_the_books = VisitDetails(value = form1FillViewModel.form1.value.toString()),
-                mobile_number_of_the_school_representative_who_collected_the_books = VisitDetails(
-                    value = form1FillViewModel.form2.value.toString()
+                u_dice_code = VisitDetails(value = binding.disceCode.text.toString()),
+                school_name = VisitDetails(value = binding.schoolName.text.toString()),
+                number_of_books_distributed = VisitDetails(
+                    value = binding.edtNoOfBooksHandedOver.text.toString(),
+                    is_approved = form1FillViewModel.isBookDistributionApproved.value
                 ),
-                name_of_the_principal = VisitDetails(value = form1FillViewModel.form3.value.toString()),
-                mobile_number_of_the_principal = VisitDetails(value = form1FillViewModel.form4.value.toString()),
-                revisit_applicable = VisitDetails(value = if (form1FillViewModel.form6.value!!) "Yes" else "No"),
-                remark = VisitDetails(value = form1FillViewModel.form5.value),
-                u_dice_code = VisitDetails(value =binding.disceCode.text.toString()),
+                number_of_books_given_school = VisitDetails(value = form1FillViewModel.noOfBooksGivenToSchool.value),
+                auditor_visit_image_1 = VisitDetails(value = form1FillViewModel.imageApiUrl1.value),
+                auditor_visit_image_2 = VisitDetails(value = form1FillViewModel.imageApiUrl2.value),
                 visit_id = form1FillViewModel.projectInfo.value!!.visit_id.toString(),
+                have_book_distribution_to_students_done = VisitDetails(value = binding.switchBookDistribution.isChecked),
+                was_video_shared_with_teachers = VisitDetails(value = binding.switchVideoShared.isChecked),
+                remark = VisitDetails(value = binding.form5.text.toString())
             )
         )
     }
 
     override fun onApiSuccess(o: String?, objectType: Int) {
         when (ApiExtentions.ApiDef.entries[objectType]) {
+
+            ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA -> {
+                cancelProgressDialog()
+                val model = JSONObject(o.toString())
+                if (!model.getBoolean("error")) {
+                    Toast.makeText(requireContext(), "Data saved successfully", Toast.LENGTH_LONG)
+                        .show()
+                } else {
+                    redirectionAlertDialogue(requireContext(), model.getString("message"))
+                }
+            }
 
             ApiExtentions.ApiDef.SUBMIT_SCHOOL_FORM -> {
                 cancelProgressDialog()
@@ -588,14 +589,6 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 } else if (uploadImageData != null && imageIndex == 1) {
                     imageIndex += 1;
                     form1FillViewModel.imageApiUrl2.value = uploadImageData.url
-                    uploadImage(form1FillViewModel.imageUrl3.value?.toUri()!!)
-                } else if (uploadImageData != null && imageIndex == 2) {
-                    imageIndex += 1;
-                    form1FillViewModel.imageApiUrl3.value = uploadImageData.url
-                    uploadImage(form1FillViewModel.imageUrl4.value?.toUri()!!)
-                } else if (uploadImageData != null && imageIndex == 3) {
-                    imageIndex += 1;
-                    form1FillViewModel.imageApiUrl4.value = uploadImageData.url
                     submitForm()
                 }
             }
@@ -663,20 +656,13 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
 
     }
 
-    private fun startTimer() {
-        form1FillViewModel.timerFinished.value = true
-    }
-
     // ToDo : Need to impl Two way binding, due to current timeline applying manually
     private fun fillData() {
         binding.disceCode.setText(form1FillViewModel.visitData.value?.visit_1?.u_dice_code?.value.toString())
         binding.schoolName.setText(form1FillViewModel.visitData.value?.visit_1?.school_name?.value.toString())
-        binding.noOfBooksHanded.setText(form1FillViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value.toString())
-        binding.teachersTrained.setText(form1FillViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.value.toString())
+        binding.edtNoOfBooksHandedOver.setText(form1FillViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value.toString())
         binding.form1.setText(form1FillViewModel.visitData.value?.visit_1?.name_of_the_school_representative_who_collected_the_books?.value.toString())
         binding.form2.setText(form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_school_representative_who_collected_the_books?.value.toString())
-        binding.form3.setText(form1FillViewModel.visitData.value?.visit_1?.name_of_the_principal?.value.toString())
-        binding.form4.setText(form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_principal?.value.toString())
         binding.form5.setText(form1FillViewModel.visitData.value?.visit_1?.remark?.value.toString())
     }
 

@@ -35,4 +35,12 @@ data class VisitData(
     var revisit: VisitDetails? = null,
     var school_name: VisitDetails? = null,
     var u_dice_code: VisitDetails? = null,
+    var have_book_distribution_to_students_done: VisitDetails? = null,
+    var were_file_trackers_collected: VisitDetails? = null,
+    var was_video_shared_with_teachers: VisitDetails? = null,
+    var number_of_books_given_school: VisitDetails? = null,
+    var number_of_trackers_collected: VisitDetails? = null,
+    var auditor_visit_image_1: VisitDetails? = null,
+    var auditor_visit_image_2: VisitDetails? = null,
+    var auditor_visit_image_3: VisitDetails? = null,
 )
