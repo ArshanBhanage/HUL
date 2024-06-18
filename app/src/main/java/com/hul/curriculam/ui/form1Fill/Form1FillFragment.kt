@@ -108,7 +108,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
         )
 
         binding.llGetDirection.visibility =
-            if (schoolCode.lattitude == null) View.GONE else View.VISIBLE
+            if (schoolCode?.lattitude == null) View.GONE else View.VISIBLE
 
         form1FillViewModel.selectedSchoolCode.value = schoolCode
 
@@ -539,14 +539,14 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 visit_image_2 = VisitDetails(value = form1FillViewModel.imageApiUrl2.value),
                 visit_image_3 = VisitDetails(value = form1FillViewModel.imageApiUrl3.value),
                 visit_image_4 = VisitDetails(value = form1FillViewModel.imageApiUrl4.value),
-                school_name = binding.schoolName.text.toString(),
+                school_name = VisitDetails(value =binding.schoolName.text.toString()),
                 name_of_the_school_representative_who_collected_the_books = VisitDetails(value = form1FillViewModel.form1.value.toString()),
                 mobile_number_of_the_school_representative_who_collected_the_books = VisitDetails(value = form1FillViewModel.form2.value.toString()),
                 name_of_the_principal = VisitDetails(value = form1FillViewModel.form3.value.toString()),
                 mobile_number_of_the_principal = VisitDetails(value = form1FillViewModel.form4.value.toString()),
                 revisit_applicable = VisitDetails(value = if(form1FillViewModel.form6.value!!) "Yes" else "No"),
                 remark = VisitDetails(value = form1FillViewModel.form5.value),
-                u_dice_code = binding.disceCode.text.toString(),
+                u_dice_code = VisitDetails(value =binding.disceCode.text.toString()),
                 visit_id = form1FillViewModel.projectInfo.value!!.visit_id.toString(),
             )
         )
@@ -614,7 +614,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 )
 
                 // For render purpose only
-                if (form1FillViewModel.visitData.value?.visit_1 != null) {
+                /*if (form1FillViewModel.visitData.value?.visit_1 != null) {
                     form1FillViewModel.visitDataToView.value =
                         form1FillViewModel.visitData.value?.visit_1
                 } else if (form1FillViewModel.visitData.value?.visit_2 != null) {
@@ -623,7 +623,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 } else if (form1FillViewModel.visitData.value?.visit_3 != null) {
                     form1FillViewModel.visitDataToView.value =
                         form1FillViewModel.visitData.value?.visit_3
-                }
+                }*/
             }
 
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()

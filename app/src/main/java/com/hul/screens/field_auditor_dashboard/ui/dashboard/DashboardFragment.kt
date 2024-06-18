@@ -305,7 +305,9 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     val imageBytes =
                         Base64.decode(model.data!!.get("logo").toString(), Base64.DEFAULT)
                     val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                    binding.imgLogo.setImageBitmap(decodedImage)
+
+                    // Currently disabling dynamic logo, as static logo set already
+                    // binding.imgLogo.setImageBitmap(decodedImage)
 
                     // Get Mobilisers
                     getMobilisers()

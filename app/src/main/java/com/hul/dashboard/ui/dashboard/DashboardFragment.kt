@@ -113,6 +113,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
 
+    var isAddSchoolFlow = false
 
     private val requestPermission =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -198,7 +199,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
             override fun afterTextChanged(s: Editable?) {
                 // Code to execute after the text is changed
-                if (!binding.schoolCode.text.isEmpty() && s.toString().length < 10) {
+                if (binding.schoolCode.text.isNotEmpty() && s.toString().length < 10) {
                     getSchoolCodes(binding.schoolCode.text.toString())
                 }
             }
@@ -610,7 +611,6 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         loadLocations()
 
         binding.schoolCode.setText("")
-        getAttendence()
     }
 
     fun loadLocations() {
@@ -625,6 +625,10 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 //        } else {
 //            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.VISIT_LIST.ordinal, this)
 //        }
+
+        if (dashboardViewModel.attendenceToday.value == null) {
+            getAttendence()
+        }
 
     }
 
@@ -664,13 +668,10 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                 if (!model.getBoolean("error")) {
                     Toast.makeText(requireContext(), "School added successfully", Toast.LENGTH_LONG)
                         .show()
-                    getSchoolVisits(model.getInt("data"))
-                    selectedSchoolCode = null;
+                    selectedSchoolCode = SchoolCode(id = model.getInt("data"));
                     binding.llGetDirection.visibility = GONE
-                    addVisit(
-                        model.getInt("data").toString(),
-                        1.toString()
-                    )
+                    isAddSchoolFlow = true;
+                    getSchoolVisits(model.getInt("data"))
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -725,14 +726,10 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                         )
                     }
 
-                    if (currentObject.present!!) {
-                        if (currentObject.present!!) {
-                            binding.punchInButton.visibility = GONE
-                            binding.punchInButtonDisabled.visibility = VISIBLE
-                            binding.punchInButton.isEnabled = false
-                        } else {
-                            binding.punchInButton.visibility = VISIBLE
-                        }
+                    if (currentObject.present != null) {
+                        binding.punchInButton.visibility = GONE
+                        binding.punchInButtonDisabled.visibility = VISIBLE
+                        binding.punchInButton.isEnabled = false
                     } else {
                         binding.punchInButton.visibility = VISIBLE
                     }
@@ -758,7 +755,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                             performanceData.till_date.attendance.toString() + "%"
                         binding.txtTotalVisits.text =
                             performanceData.till_date.audit_approval.toString() + "%"
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
 
                     }
                 } else {
@@ -800,19 +797,18 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             ApiExtentions.ApiDef.ADD_VISIT -> {
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
-                    if (selectedSchoolCode != null) {
-                        getSchoolVisits(selectedSchoolCode!!.id!!)
-                    }
+                    selectedSchoolCode?.id?.let { getSchoolVisits(it) }
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
-
             }
 
-            ApiExtentions.ApiDef.VISIT_LIST, ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE -> {
+            ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE -> {
                 val model = JSONObject(o.toString())
+
                 if (!model.getBoolean("error")) {
                     val listType: Type = object : TypeToken<List<ProjectInfo?>?>() {}.type
+
                     visitList =
                         Gson().fromJson(model.getJSONArray("data").toString(), listType);
 
@@ -829,19 +825,23 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                         }
                     }
 
-                    if (flag && visitList.size < 3) {
+                    val myVisitsAdapter = MyVisitsAdapter(pendingVisits, this, requireContext())
+
+                    // Setting the Adapter with the recyclerview
+                    binding.locationToVisit.adapter = myVisitsAdapter
+
+                    binding.visitNumbers.text =
+                        visitList.size.toString() + " " + requireContext().getString(R.string.visit_number)
+
+                    if (isAddSchoolFlow && visitList.size > 0) {
+                        isAddSchoolFlow = false
+                        redirectToAttendence(visitList[0])
+                    } else if (flag && visitList.size < 3) {
                         addVisit(
                             selectedSchoolCode!!.id.toString(),
                             (visitList.size + 1).toString()
                         )
                     }
-
-                    val myVisitsAdapter = MyVisitsAdapter(pendingVisits, this, requireContext())
-
-                    // Setting the Adapter with the recyclerview
-                    binding.visitNumbers.text =
-                        visitList.size.toString() + " " + requireContext().getString(R.string.visit_number)
-                    binding.locationToVisit.adapter = myVisitsAdapter
 
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
@@ -864,8 +864,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     override fun retry(type: Int) {
 
-        when (ApiExtentions.ApiDef.values()[type]) {
-            ApiExtentions.ApiDef.GET_ATTENDENCE -> getAttendence()
+        when (ApiExtentions.ApiDef.entries[type]) {
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
         }
 
@@ -873,7 +872,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     override fun redirectToAttendence(projectInfo: ProjectInfo) {
 
-        if (dashboardViewModel.attendenceToday.value!!.present!!) {
+        if (dashboardViewModel.attendenceToday.value?.present == true) {
             val bundle = Bundle()
             var uDiceCode = ""
             uDiceCode = if (selectedSchoolCode?.external_id1 != null) {

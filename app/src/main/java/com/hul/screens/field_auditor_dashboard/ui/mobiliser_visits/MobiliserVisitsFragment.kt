@@ -93,7 +93,8 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
         binding.llPending.setOnClickListener {
             mobiliserVisitsViewModel.pendingSelected.value = true
 
-            val pendingVisits = visits.filter { projectInfo -> projectInfo.visit_status != "SUBMITTED" }
+            val pendingVisits =
+                visits.filter { projectInfo -> projectInfo.visit_status != "SUBMITTED" }
             myVisitsAdapter.updateVisits(pendingVisits)
 
             binding.viewBluePending.visibility = View.VISIBLE
@@ -107,7 +108,8 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
         binding.llCompleted.setOnClickListener {
             mobiliserVisitsViewModel.pendingSelected.value = false
 
-            val completedVisits = visits.filter { projectInfo -> projectInfo.visit_status == "SUBMITTED" }
+            val completedVisits =
+                visits.filter { projectInfo -> projectInfo.visit_status == "SUBMITTED" }
             myVisitsAdapter.updateVisits(completedVisits)
 
             binding.viewBluePending.visibility = View.GONE
@@ -174,7 +176,8 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
                     visits =
                         Gson().fromJson(model.getJSONArray("data").toString(), listType);
 
-                    val pendingVisits = visits.filter { projectInfo -> projectInfo.visit_status != "SUBMITTED" }
+                    val pendingVisits =
+                        visits.filter { projectInfo -> projectInfo.visit_status == "SUBMITTED" }
 
                     myVisitsAdapter =
                         MobiliserVisitsAdapter(pendingVisits, this, requireContext())
@@ -201,6 +204,7 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
     override fun redirectToSchoolActivity(projectInfo: ProjectInfo) {
         val bundle = Bundle()
         bundle.putString("projectInfo", Gson().toJson(projectInfo))
+        bundle.putString("visitList", Gson().toJson(visits))
         findNavController().navigate(
             R.id.action_visits_school_activity,
             bundle

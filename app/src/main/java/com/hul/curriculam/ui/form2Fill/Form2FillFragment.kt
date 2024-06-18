@@ -537,12 +537,12 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
                 visit_image_2 = VisitDetails(value = form2FillViewModel.imageApiUrl2.value),
                 visit_image_3 = VisitDetails(value = form2FillViewModel.imageApiUrl3.value),
                 visit_image_4 = VisitDetails(value = form2FillViewModel.imageApiUrl4.value),
-                school_name = binding.schoolName.text.toString(),
+                school_name = VisitDetails(value =binding.schoolName.text.toString()),
                 name_of_the_school_representative_who_collected_the_books = VisitDetails(value = form2FillViewModel.form1.value.toString()),
                 mobile_number_of_the_school_representative_who_collected_the_books = VisitDetails(value = form2FillViewModel.form2.value.toString()),
                 curriculum_on_track = VisitDetails(value = binding.booleanText.text.toString()),
                 remark = VisitDetails(value = form2FillViewModel.form5.value),
-                u_dice_code = binding.disceCode.text.toString(),
+                u_dice_code = VisitDetails(value =binding.disceCode.text.toString()),
                 visit_id = form2FillViewModel.projectInfo.value!!.visit_id.toString(),
             )
         )
@@ -610,7 +610,7 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
                 )
 
                 // For render purpose only
-                if (form2FillViewModel.visitData.value?.visit_1 != null) {
+                /*if (form2FillViewModel.visitData.value?.visit_1 != null) {
                     form2FillViewModel.visitDataToView.value =
                         form2FillViewModel.visitData.value?.visit_1
                 } else if (form2FillViewModel.visitData.value?.visit_2 != null) {
@@ -619,7 +619,7 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
                 } else if (form2FillViewModel.visitData.value?.visit_3 != null) {
                     form2FillViewModel.visitDataToView.value =
                         form2FillViewModel.visitData.value?.visit_3
-                }
+                }*/
             }
 
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()

@@ -33,7 +33,7 @@ class APIController @Inject constructor(private val mContext: Context) :
         apiId = type
         this.mHandler = handler!!
 
-        when (ApiExtentions.ApiDef.values()[apiId]) {
+        when (ApiExtentions.ApiDef.entries[apiId]) {
             ApiExtentions.ApiDef.SEND_OTP -> retrofit.create(ApiInterface::class.java)
                 .sendOTP(requestModel)
                 .enqueue(this)
@@ -161,7 +161,7 @@ class APIController @Inject constructor(private val mContext: Context) :
         if (response.code() == 200 || response.code() == 201) {
             mHandler.onApiSuccess(response.body()!!.string(), apiId)
         } else if (response.code() == 401) {
-            if (ApiExtentions.ApiDef.values()[apiId] != ApiExtentions.ApiDef.GET_LOGO && ApiExtentions.ApiDef.values()[apiId] != ApiExtentions.ApiDef.GET_BANNER) {
+            if (ApiExtentions.ApiDef.entries.toTypedArray()[apiId] != ApiExtentions.ApiDef.GET_LOGO && ApiExtentions.ApiDef.values()[apiId] != ApiExtentions.ApiDef.GET_BANNER) {
                 mHandler.onApiError(mContext.getString(R.string.session_expire))
             }
         } else {
@@ -170,7 +170,7 @@ class APIController @Inject constructor(private val mContext: Context) :
             try {
                 mHandler.onApiError(response.getJSONArray("error_details").get(0).toString())
             } catch (e: Exception) {
-                if (ApiExtentions.ApiDef.values()[apiId] != ApiExtentions.ApiDef.GET_LOGO && ApiExtentions.ApiDef.values()[apiId] != ApiExtentions.ApiDef.GET_BANNER) {
+                if (ApiExtentions.ApiDef.entries.toTypedArray()[apiId] != ApiExtentions.ApiDef.GET_LOGO && ApiExtentions.ApiDef.values()[apiId] != ApiExtentions.ApiDef.GET_BANNER) {
                     mHandler.onApiError("Something went wrong")
                 }
             }
@@ -183,7 +183,7 @@ class APIController @Inject constructor(private val mContext: Context) :
 
     override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
         Log.i(APIController::class.qualifiedName, "Error : " + t.localizedMessage)
-        Log.d("Errororo", t.localizedMessage)
+        t.localizedMessage?.let { Log.d("Errororo", it) }
         if (t.localizedMessage != null) {
             if (t.localizedMessage.contains("13.126.28.53") || t.localizedMessage.contains("ws.mintwalk.com")) {
                 mHandler.onApiError("Can not establish connection.\nCheck your Internet Connectivity.")

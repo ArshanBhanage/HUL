@@ -135,13 +135,13 @@ class Form2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
                 )
 
                 // For render purpose only
-                if (form2ViewModel.visitData.value?.visit_1 != null) {
+                /*if (form2ViewModel.visitData.value?.visit_1 != null) {
                     form2ViewModel.visitDataToView.value = form2ViewModel.visitData.value?.visit_1
                 } else if (form2ViewModel.visitData.value?.visit_2 != null) {
                     form2ViewModel.visitDataToView.value = form2ViewModel.visitData.value?.visit_2
                 } else if (form2ViewModel.visitData.value?.visit_3 != null) {
                     form2ViewModel.visitDataToView.value = form2ViewModel.visitData.value?.visit_3
-                }
+                }*/
             }
 
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()

@@ -1,4 +1,4 @@
-package com.hul.curriculam.ui.form3Fill
+package com.hul.screens.field_auditor_dashboard.ui.school_activity.form3Fill
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -14,7 +14,6 @@ import android.os.CountDownTimer
 import android.os.Looper
 import android.provider.Settings
 import android.text.InputFilter
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -37,6 +36,7 @@ import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
 import com.hul.camera.CameraActivity
 import com.hul.curriculam.CurriculamComponent
+import com.hul.curriculam.ui.form3Fill.Form3FillViewModel
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
@@ -44,9 +44,10 @@ import com.hul.data.SchoolCode
 import com.hul.data.UploadImageData
 import com.hul.data.VisitData
 import com.hul.data.VisitDetails
-import com.hul.databinding.FragmentForm1FillBinding
 import com.hul.databinding.FragmentForm3FillBinding
 import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDialogFragment
+import com.hul.screens.field_auditor_dashboard.ui.school_activity.form1Fill.AuditorForm1FillFragment
+import com.hul.screens.field_auditor_dashboard.ui.school_activity.form2Fill.AuditorForm2FillFragment
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
@@ -58,7 +59,7 @@ import com.hul.utils.setProgressDialog
 import org.json.JSONObject
 import javax.inject.Inject
 
-class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
+class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
 
     private var _binding: FragmentForm3FillBinding? = null
 
@@ -105,20 +106,6 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                 .create()
         curriculamComponent.inject(this)
 
-        val schoolCode = Gson().fromJson(
-            requireArguments().getString(ARG_CONTENT1),
-            SchoolCode::class.java
-        )
-
-        binding.llGetDirection.visibility =
-            if (schoolCode.lattitude == null) View.GONE else View.VISIBLE
-
-        form3FillViewModel.selectedSchoolCode.value = schoolCode
-
-        form3FillViewModel.projectInfo.value = Gson().fromJson(
-            requireArguments().getString(ARG_CONTENT2),
-            ProjectInfo::class.java
-        )
         binding.viewModel = form3FillViewModel
 
         binding.capture1.setOnClickListener {
@@ -175,8 +162,6 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
             }
         }
 
-        form3FillViewModel.uDiceCode.value = requireArguments().getString(U_DICE_CODE)
-
         if (allPermissionsGranted()) {
             checkLocationSettings()
         } else {
@@ -210,6 +195,13 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                 }
             }
         }
+
+        form3FillViewModel.projectInfo.value = Gson().fromJson(
+            requireArguments().getString(PROJECT_INFO),
+            ProjectInfo::class.java
+        )
+
+        getVisitData()
 
         return root
     }
@@ -314,9 +306,8 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
 
 
     companion object {
-        private const val ARG_CONTENT1 = "content1"
-        private const val ARG_CONTENT2 = "content2"
-        private const val U_DICE_CODE = "uDiceCode"
+        private const val VISIT_LIST = "visitList"
+        private const val PROJECT_INFO = "projectInfo"
 
         private val REQUIRED_PERMISSIONS = arrayOf(
             Manifest.permission.CAMERA,
@@ -324,11 +315,10 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
 
-        fun newInstance(content1: String, content2: String, uDiceCode: String?) = Form3FillFragment().apply {
+        fun newInstance(visitList: String, projectInfo: String) = AuditorForm3FillFragment().apply {
             arguments = Bundle().apply {
-                putString(ARG_CONTENT1, content1)
-                putString(ARG_CONTENT2, content2)
-                putString(U_DICE_CODE, uDiceCode)
+                putString(VISIT_LIST, visitList)
+                putString(PROJECT_INFO, projectInfo)
             }
         }
     }
@@ -358,7 +348,6 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        getVisitData()
     }
 
     // TODO: Step 1.1, Review variables (no changes).
@@ -613,6 +602,8 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                     GetVisitDataResponseData::class.java
                 )
 
+                fillData()
+
                 // For render purpose only
                 /*if (form3FillViewModel.visitData.value?.visit_1 != null) {
                     form3FillViewModel.visitDataToView.value =
@@ -667,36 +658,18 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     private fun startTimer() {
-        if (isTimerStarted) {
-            return
-        }
-
-        isTimerStarted = true
-        //binding.proceed.isEnabled = false
-
-        val totalTime = 20 * 60 * 1000L
-
-        // Set initial time before starting the timer
-        updateTimerText(totalTime)
-        binding.llTimer.visibility = View.VISIBLE
-
-        countDownTimer = object : CountDownTimer(totalTime, 1000L) {
-            override fun onTick(millisUntilFinished: Long) {
-                updateTimerText(millisUntilFinished)
-            }
-
-            override fun onFinish() {
-                binding.llTimer.visibility = View.GONE
-                form3FillViewModel.timerFinished.value = true
-            }
-        }
-
-        countDownTimer.start()
+        form3FillViewModel.timerFinished.value = true
     }
 
-    private fun updateTimerText(millisUntilFinished: Long) {
-        val minutesLeft = millisUntilFinished / 1000 / 60
-        val secondsLeft = (millisUntilFinished / 1000) % 60
-        binding.txtClock.text = String.format("Submit in %d:%02d minutes", minutesLeft, secondsLeft)
+    // ToDo : Need to impl Two way binding, due to current timeline applying manually
+    private fun fillData() {
+        binding.disceCode.setText(form3FillViewModel.visitData.value?.visit_1?.u_dice_code?.value.toString())
+        binding.schoolName.setText(form3FillViewModel.visitData.value?.visit_1?.school_name?.value.toString())
+        binding.noOfBooksHanded.setText(form3FillViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value.toString())
+        binding.form1.setText(form3FillViewModel.visitData.value?.visit_1?.name_of_the_school_representative_who_collected_the_books?.value.toString())
+        binding.form2.setText(form3FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_school_representative_who_collected_the_books?.value.toString())
+        binding.form3.setText(form3FillViewModel.visitData.value?.visit_1?.name_of_the_principal?.value.toString())
+        binding.form4.setText(form3FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_principal?.value.toString())
+        binding.form5.setText(form3FillViewModel.visitData.value?.visit_1?.remark?.value.toString())
     }
 }
