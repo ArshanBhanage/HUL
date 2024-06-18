@@ -11,6 +11,7 @@ data class SchoolCode(
     var external_id1_description: String? = null,
     var external_id2: String? = null,
     var external_id2_description: String? = null,
+    var location_data_field1: String? = null,
     var location_address: String? = null,
     var location_status: String? = null,
     var remarks: String? = null,

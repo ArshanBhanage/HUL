@@ -78,6 +78,10 @@ class APIController @Inject constructor(private val mContext: Context) :
                 .getVisitList()
                 .enqueue(this)
 
+            ApiExtentions.ApiDef.VISIT_LIST_BY_STATUS -> retrofit.create(ApiInterface::class.java)
+                .getVisitListByStatus("SUBMITTED")
+                .enqueue(this)
+
             ApiExtentions.ApiDef.VISIT_LIST_SINGLE -> retrofit.create(ApiInterface::class.java)
                 .getVisitListSingle(requestModel!!.location_id)
                 .enqueue(this)

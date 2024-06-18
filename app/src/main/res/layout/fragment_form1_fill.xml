@@ -115,6 +115,8 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
+
+
                     <LinearLayout
                         android:id="@+id/llGetDirection"
                         android:layout_width="wrap_content"
@@ -144,6 +146,47 @@
                             android:gravity="center_vertical"
                             android:paddingHorizontal="@dimen/_10sdp"/>
                     </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        android:lineHeight="28dp"
+                        android:text="@string/student_no"
+                        android:textColor="#2F2B3D"
+                        android:textFontWeight="400"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        app:errorIconTint="@color/red"
+                        app:errorTextColor="@color/red"
+                        app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+                        app:placeholderText="@string/enter_here"
+                        app:prefixTextColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/student_no"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineHeight="18dp"
+                            android:textColor="@color/black"
+                            android:textFontWeight="400"
+                            android:textSize="16sp"
+                            android:enabled="false"
+                            android:text='@{viewModel.selectedSchoolCode.location_data_field1}'/>
+
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
 
                     <TextView
                         android:layout_width="match_parent"
