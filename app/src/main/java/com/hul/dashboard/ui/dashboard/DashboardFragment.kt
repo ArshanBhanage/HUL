@@ -136,11 +136,6 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             }
         }
 
-    /*@Inject
-    lateinit var syncDataViewModelFactory: SyncDataViewModelFactory
-
-    private val syncDataViewModel: SyncDataViewModel by viewModels { syncDataViewModelFactory }*/
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -189,11 +184,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             selectedSchoolCode = schoolCodes[position]
             binding.llGetDirection.visibility =
                 if (selectedSchoolCode!!.lattitude == null) GONE else VISIBLE
-            if (selectedSchoolCode?.id != -1) {
-                binding.schoolCode.setText(selectedSchoolCode!!.external_id1)
-            } else {
-                binding.schoolCode.setText("")
-            }
+            binding.schoolCode.setText(selectedSchoolCode!!.external_id1)
             schoolCodes[position].id?.let { getSchoolVisits(it) }
             binding.schoolCode.clearFocus()
         }
@@ -252,6 +243,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             requestPermission()
         }
 
+        binding.btnAddNewSchool.setOnClickListener { showAddSchoolDialog() }
+
         return root
     }
 
@@ -261,10 +254,9 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
 
         //visitDataViewModel.insert(VisitDataTable(jsonData = "Nitin", visitNumber = 1, project = "Test", uDiceCode = "retest"))
-        visitDataViewModel.allSyncData.observe(requireActivity(), { visitDataList ->
-
+        visitDataViewModel.allSyncData.observe(requireActivity()) { visitDataList ->
             syncDataList = visitDataList
-        })
+        }
 
     }
 
@@ -387,16 +379,11 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
             //setProgressDialog(requireContext(), "Loading Leads")
-            if (schoolId == -1) {
-                // Add new school
-                showAddSchoolDialog()
-            } else {
-                apiController.getApiResponse(
-                    this,
-                    getSVisitsBySchoolCode(schoolId),
-                    ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE.ordinal
-                )
-            }
+            apiController.getApiResponse(
+                this,
+                getSVisitsBySchoolCode(schoolId),
+                ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE.ordinal
+            )
         } else {
             noInternetDialogue(
                 requireContext(),
@@ -709,7 +696,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     selectedSchoolCode = SchoolCode(id = model.getInt("data"));
                     binding.llGetDirection.visibility = GONE
                     isAddSchoolFlow = true;
-                    getSchoolVisits(model.getInt("data"))
+//                    getSchoolVisits(model.getInt("data")) // Temp remove
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }

@@ -153,14 +153,15 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
             requestPermission()
         }
 
-        val allowOnlyLettersAndSpacesFilter = InputFilter { source, start, end, dest, dstart, dend ->
-            for (i in start until end) {
-                if (!source[i].isLetter() && !source[i].isWhitespace()) {
-                    return@InputFilter ""
+        val allowOnlyLettersAndSpacesFilter =
+            InputFilter { source, start, end, dest, dstart, dend ->
+                for (i in start until end) {
+                    if (!source[i].isLetter() && !source[i].isWhitespace()) {
+                        return@InputFilter ""
+                    }
                 }
+                null
             }
-            null
-        }
 
         binding.form1.filters = arrayOf(allowOnlyLettersAndSpacesFilter)
 
@@ -187,13 +188,16 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.btnPositive.setOnClickListener {
             binding.btnPositive.visibility = View.GONE
             binding.btnNegative.visibility = View.GONE
-            binding.trueIconBooks.visibility = View.VISIBLE
+            binding.tickSuccess.visibility = View.VISIBLE
+            binding.tickFailure.visibility = View.GONE
             form3FillViewModel.isBookDistributionApproved.value = 1;
         }
 
         binding.btnNegative.setOnClickListener {
             binding.btnPositive.visibility = View.GONE
             binding.btnNegative.visibility = View.GONE
+            binding.tickSuccess.visibility = View.GONE
+            binding.tickFailure.visibility = View.VISIBLE
         }
 
         return root
@@ -217,8 +221,8 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
         destinationLng: String
     ) {
 
-        val destLat = TimeUtils.parseCoordinate(destinationLat)
-        val destLng = TimeUtils.parseCoordinate(destinationLng)
+        val destLat = destinationLat
+        val destLng = destinationLng
 
         // Build the URI for the directions request
         val uri =
@@ -670,6 +674,24 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.form1.setText(form3FillViewModel.visitData.value?.visit_3?.name_of_the_school_representative_who_collected_the_books?.value.toString())
         binding.form2.setText(form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_school_representative_who_collected_the_books?.value.toString())
         binding.form5.setText(form3FillViewModel.visitData.value?.visit_3?.remark?.value.toString())
+
+        binding.llGetDirection.visibility =
+            if (form3FillViewModel.visitData.value?.visit_3?.latitude == null) View.GONE else View.VISIBLE
+
+        binding.txtDirections.setOnClickListener {
+            if (currentLocation != null) {
+                form3FillViewModel.visitData.value?.visit_3?.longitude?.value?.let { it1 ->
+                    form3FillViewModel.visitData.value?.visit_3?.latitude?.value?.let { it2 ->
+                        openGoogleMapsForDirections(
+                            currentLocation!!.latitude,
+                            currentLocation!!.longitude,
+                            it2.toString(),
+                            it1.toString()
+                        )
+                    }
+                }
+            }
+        }
     }
 
 }

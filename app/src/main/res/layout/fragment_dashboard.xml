@@ -340,30 +340,31 @@
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"
                                     app:endIconDrawable="@mipmap/search"
-                                    app:placeholderText="@string/enter_school_Code">
+                                    app:placeholderText="@string/enter_number_here"
+                                    android:textSize="@dimen/_6ssp">
 
                                     <AutoCompleteTextView
                                         android:id="@+id/schoolCode"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:inputType="text" />
+                                        android:inputType="text"
+                                        android:textSize="@dimen/_10ssp"/>
 
                                 </com.google.android.material.textfield.TextInputLayout>
 
 
                             </LinearLayout>
                             <com.google.android.material.button.MaterialButton
-                                android:id="@+id/searchButton"
+                                android:id="@+id/btnAddNewSchool"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textSize="13sp"
                                 android:backgroundTint="#dde0f6"
-                                android:fontFamily="@font/publicsans"
-                                android:text="@string/search"
+                                android:fontFamily="@font/public_sans_semi_bold"
+                                android:text="@string/add_new"
                                 android:textAllCaps="false"
                                 android:textColor="#2C41CA"
                                 app:cornerRadius="8dp"
-                                android:textFontWeight="700"
                                 android:layout_gravity="bottom"
                                 android:textStyle="bold" />
                         </LinearLayout>

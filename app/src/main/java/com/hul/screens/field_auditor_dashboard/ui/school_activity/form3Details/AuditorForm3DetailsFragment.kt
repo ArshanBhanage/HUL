@@ -1,9 +1,8 @@
-package com.hul.screens.field_auditor_dashboard.ui.school_activity.form1Details
+package com.hul.screens.field_auditor_dashboard.ui.school_activity.form2Details
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Base64
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,14 +16,11 @@ import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
 import com.hul.curriculam.CurriculamComponent
-import com.hul.curriculam.ui.form1Details.Form1ViewModel
+import com.hul.curriculam.ui.form2Details.Form2ViewModel
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
-import com.hul.data.SchoolCode
-import com.hul.databinding.AuditorFragmentForm1Binding
-import com.hul.databinding.FragmentForm1Binding
-import com.hul.screens.field_auditor_dashboard.ui.school_activity.form1Fill.AuditorForm1FillFragment
+import com.hul.databinding.AuditorFragmentForm3Binding
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
@@ -35,9 +31,9 @@ import com.hul.utils.setProgressDialog
 import org.json.JSONObject
 import javax.inject.Inject
 
-class AuditorForm1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
+class AuditorForm3DetailsFragment : Fragment(), ApiHandler, RetryInterface {
 
-    private var _binding: AuditorFragmentForm1Binding? = null
+    private var _binding: AuditorFragmentForm3Binding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -46,7 +42,7 @@ class AuditorForm1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
     private lateinit var curriculamComponent: CurriculamComponent
 
     @Inject
-    lateinit var form1ViewModel: Form1ViewModel
+    lateinit var form2ViewModel: Form2ViewModel
 
     @Inject
     lateinit var userInfo: UserInfo
@@ -60,7 +56,7 @@ class AuditorForm1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
         savedInstanceState: Bundle?
     ): View {
 
-        _binding = AuditorFragmentForm1Binding.inflate(inflater, container, false)
+        _binding = AuditorFragmentForm3Binding.inflate(inflater, container, false)
         val root: View = binding.root
 
         binding.lifecycleOwner = viewLifecycleOwner
@@ -69,12 +65,12 @@ class AuditorForm1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
                 .create()
         curriculamComponent.inject(this)
 
-        form1ViewModel.projectInfo.value = Gson().fromJson(
+        form2ViewModel.projectInfo.value = Gson().fromJson(
             requireArguments().getString(PROJECT_INFO),
             ProjectInfo::class.java
         )
 
-        binding.viewModel = form1ViewModel
+        binding.viewModel = form2ViewModel
         return root
     }
 
@@ -82,7 +78,7 @@ class AuditorForm1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
         private const val VISIT_LIST = "visitList"
         private const val PROJECT_INFO = "projectInfo"
 
-        fun newInstance(visitList: String, projectInfo: String) = AuditorForm1DetailsFragment().apply {
+        fun newInstance(visitList: String, projectInfo: String) = AuditorForm3DetailsFragment().apply {
             arguments = Bundle().apply {
                 putString(VISIT_LIST, visitList)
                 putString(PROJECT_INFO, projectInfo)
@@ -100,7 +96,7 @@ class AuditorForm1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     private fun visitsDataModel(): RequestModel {
-        return form1ViewModel.projectInfo.value?.visit_id?.let {
+        return form2ViewModel.projectInfo.value?.visit_id?.let {
             RequestModel(
                 project = userInfo.projectName,
                 visitId = it,
@@ -129,45 +125,42 @@ class AuditorForm1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
             ApiExtentions.ApiDef.GET_VISIT_DATA -> {
                 cancelProgressDialog()
                 val model = JSONObject(o.toString())
-                form1ViewModel.visitData.value = Gson().fromJson(
+                form2ViewModel.visitData.value = Gson().fromJson(
                     model.getJSONObject("data").toString(),
                     GetVisitDataResponseData::class.java
                 )
 
-                Log.e("TAG", "onApiSuccess: " + form1ViewModel.visitData )
-
-                /*if (form1ViewModel.visitData.value?.visit_1?.visit_image_1?.value != null) {
+                /*if (form2ViewModel.visitData.value?.visit_1?.visit_image_1?.value != null) {
                     loadImage(
-                        form1ViewModel.visitData.value?.visit_1?.visit_image_1!!.value.toString(),
+                        form2ViewModel.visitData.value?.visit_1?.visit_image_1!!.value.toString(),
                         binding.img1, binding.llImg1)
                 }
 
-                if (form1ViewModel.visitData.value?.visit_1?.visit_image_2?.value != null) {
+                if (form2ViewModel.visitData.value?.visit_1?.visit_image_2?.value != null) {
                     loadImage(
-                        form1ViewModel.visitData.value?.visit_1?.visit_image_2!!.value.toString(),
+                        form2ViewModel.visitData.value?.visit_1?.visit_image_2!!.value.toString(),
                         binding.img2, binding.llImg2)
                 }
 
-                if (form1ViewModel.visitData.value?.visit_1?.visit_image_3?.value != null) {
+                if (form2ViewModel.visitData.value?.visit_1?.visit_image_3?.value != null) {
                     loadImage(
-                        form1ViewModel.visitData.value?.visit_1?.visit_image_3!!.value.toString(),
+                        form2ViewModel.visitData.value?.visit_1?.visit_image_3!!.value.toString(),
                         binding.img3, binding.llImg3)
                 }
 
-                if (form1ViewModel.visitData.value?.visit_1?.visit_image_4?.value != null) {
+                if (form2ViewModel.visitData.value?.visit_1?.visit_image_4?.value != null) {
                     loadImage(
-                        form1ViewModel.visitData.value?.visit_1?.visit_image_4!!.value.toString(),
+                        form2ViewModel.visitData.value?.visit_1?.visit_image_4!!.value.toString(),
                         binding.img4, binding.llImg4)
                 }*/
 
-
                 // For render purpose only
-                /*if (form1ViewModel.visitData.value?.visit_1 != null) {
-                    form1ViewModel.visitDataToView.value = form1ViewModel.visitData.value?.visit_1
-                } else if (form1ViewModel.visitData.value?.visit_2 != null) {
-                    form1ViewModel.visitDataToView.value = form1ViewModel.visitData.value?.visit_2
-                } else if (form1ViewModel.visitData.value?.visit_3 != null) {
-                    form1ViewModel.visitDataToView.value = form1ViewModel.visitData.value?.visit_3
+                /*if (form2ViewModel.visitData.value?.visit_1 != null) {
+                    form2ViewModel.visitDataToView.value = form2ViewModel.visitData.value?.visit_1
+                } else if (form2ViewModel.visitData.value?.visit_2 != null) {
+                    form2ViewModel.visitDataToView.value = form2ViewModel.visitData.value?.visit_2
+                } else if (form2ViewModel.visitData.value?.visit_3 != null) {
+                    form2ViewModel.visitDataToView.value = form2ViewModel.visitData.value?.visit_3
                 }*/
             }
 

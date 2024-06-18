@@ -121,7 +121,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:paddingVertical="@dimen/_5sdp"
-                        android:visibility="visible">
+                        android:visibility="gone">
 
                         <ImageView
                             android:layout_width="@dimen/_25sdp"
@@ -188,15 +188,6 @@
 
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <ImageView
-                            android:id="@+id/trueIconBooks"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@mipmap/circlecheck"
-                            android:layout_gravity="center_vertical"
-                            android:visibility="gone"
-                            android:layout_marginHorizontal="@dimen/_5sdp"/>
-
                         <LinearLayout
                             android:id="@+id/llButtons"
                             android:layout_width="wrap_content"
@@ -222,9 +213,19 @@
                         </LinearLayout>
 
                         <ImageView
+                            android:id="@+id/tickSuccess"
                             android:layout_width="@dimen/_20sdp"
                             android:layout_height="@dimen/_20sdp"
                             android:src="@mipmap/circlecheck"
+                            android:layout_gravity="center_vertical"
+                            android:visibility="gone"/>
+
+                        <ImageView
+                            android:id="@+id/tickFailure"
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp"
+                            android:src="@mipmap/error"
+                            app:tint="@color/red"
                             android:layout_gravity="center_vertical"
                             android:visibility="gone"/>
 

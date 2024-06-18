@@ -30,10 +30,13 @@ import com.hul.databinding.FragmentSchoolFormBinding
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.form1Details.AuditorForm1DetailsFragment
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.form1Fill.AuditorForm1FillFragment
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.form2Details.AuditorForm2DetailsFragment
+import com.hul.screens.field_auditor_dashboard.ui.school_activity.form2Details.AuditorForm3DetailsFragment
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.form2Fill.AuditorForm2FillFragment
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.form3Fill.AuditorForm3FillFragment
 import com.hul.user.UserInfo
 import com.hul.utils.RetryInterface
+import com.hul.utils.SUBMITTED
+import com.hul.utils.SUB_AGENCY_APPROVED
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.redirectionAlertDialogue
 import java.lang.reflect.Type
@@ -105,7 +108,12 @@ class AuditorSchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
 
         // Add fragments dynamically
         for (visit in schoolFormViewModel.visitList.value!!) {
-            if (visit.visit_status.equals("SUBMITTED", ignoreCase = true)
+            if (visit.visit_status.equals(
+                    SUBMITTED,
+                    ignoreCase = true
+                ) || visit.visit_status.equals(
+                    SUB_AGENCY_APPROVED, ignoreCase = true
+                )
             ) {
                 currentVisit = visit
                 when (visit.visit_number) {
@@ -113,7 +121,7 @@ class AuditorSchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                         requireContext().getString(R.string.visit) + visit.visit_number,
                         AuditorForm1FillFragment.newInstance(
                             Gson().toJson(schoolFormViewModel.visitList.value),
-                            Gson().toJson(schoolFormViewModel.projectInfo.value)
+                            Gson().toJson(visit)
                         )
                     )
 
@@ -121,7 +129,7 @@ class AuditorSchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                         requireContext().getString(R.string.visit) + visit.visit_number,
                         AuditorForm2FillFragment.newInstance(
                             Gson().toJson(schoolFormViewModel.visitList.value),
-                            Gson().toJson(schoolFormViewModel.projectInfo.value)
+                            Gson().toJson(visit)
                         )
                     )
 
@@ -129,7 +137,7 @@ class AuditorSchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                         requireContext().getString(R.string.visit) + visit.visit_number,
                         AuditorForm3FillFragment.newInstance(
                             Gson().toJson(schoolFormViewModel.visitList.value),
-                            Gson().toJson(schoolFormViewModel.projectInfo.value)
+                            Gson().toJson(visit)
                         )
                     )
 
@@ -142,7 +150,7 @@ class AuditorSchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                         requireContext().getString(R.string.visit) + visit.visit_number,
                         AuditorForm1DetailsFragment.newInstance(
                             Gson().toJson(schoolFormViewModel.visitList.value),
-                            Gson().toJson(schoolFormViewModel.projectInfo.value)
+                            Gson().toJson(visit)
                         )
                     )
 
@@ -150,7 +158,15 @@ class AuditorSchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                         requireContext().getString(R.string.visit) + visit.visit_number,
                         AuditorForm2DetailsFragment.newInstance(
                             Gson().toJson(schoolFormViewModel.visitList.value),
-                            Gson().toJson(schoolFormViewModel.projectInfo.value)
+                            Gson().toJson(visit)
+                        )
+                    )
+
+                    "3" -> addNewTab(
+                        requireContext().getString(R.string.visit) + visit.visit_number,
+                        AuditorForm3DetailsFragment.newInstance(
+                            Gson().toJson(schoolFormViewModel.visitList.value),
+                            Gson().toJson(visit)
                         )
                     )
 

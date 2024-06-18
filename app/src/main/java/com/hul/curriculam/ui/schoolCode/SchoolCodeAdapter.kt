@@ -59,12 +59,6 @@ class SchoolCodeAdapter(
                     }
                 }
 
-                if (filteredList.isEmpty()) {
-                    val schoolCode: SchoolCode = SchoolCode(-1)
-                    schoolCode.external_id1 = "Add New"
-                    filteredList = listOf(schoolCode)
-                }
-
                 return FilterResults().apply {
                     values = filteredList
                     count = filteredList.size
@@ -76,8 +70,6 @@ class SchoolCodeAdapter(
                 val schoolCodes = results?.values as List<SchoolCode>
                 addAll(schoolCodes)
                 notifyDataSetChanged()
-
-                Log.e("uDice codes : ", Gson().toJson(schoolCodes))
             }
         }
     }

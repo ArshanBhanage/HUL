@@ -81,7 +81,7 @@ class AuditorForm2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
         private const val VISIT_LIST = "visitList"
         private const val PROJECT_INFO = "projectInfo"
 
-        fun newInstance(visitList: String, projectInfo: String) = AuditorForm1DetailsFragment().apply {
+        fun newInstance(visitList: String, projectInfo: String) = AuditorForm2DetailsFragment().apply {
             arguments = Bundle().apply {
                 putString(VISIT_LIST, visitList)
                 putString(PROJECT_INFO, projectInfo)

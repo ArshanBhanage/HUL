@@ -23,8 +23,14 @@ import com.hul.data.RequestModel
 import com.hul.databinding.FragmentVisitsBinding
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
 import com.hul.user.UserInfo
+import com.hul.utils.ASSIGNED
 import com.hul.utils.ConnectionDetector
+import com.hul.utils.INITIATED
+import com.hul.utils.PARTIALLY_SUBMITTED
 import com.hul.utils.RetryInterface
+import com.hul.utils.SUBMITTED
+import com.hul.utils.SUB_AGENCY_APPROVED
+import com.hul.utils.SUB_AGENCY_REJECTED
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectionAlertDialogue
@@ -60,6 +66,8 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
 
     var visits: ArrayList<ProjectInfo> = ArrayList()
 
+    var allVisits: ArrayList<ProjectInfo> = ArrayList()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -94,7 +102,7 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
             mobiliserVisitsViewModel.pendingSelected.value = true
 
             val pendingVisits =
-                visits.filter { projectInfo -> projectInfo.visit_status != "SUBMITTED" }
+                visits.filter { projectInfo -> projectInfo.visit_status == SUBMITTED || projectInfo.visit_status == SUB_AGENCY_APPROVED }
             myVisitsAdapter.updateVisits(pendingVisits)
 
             binding.viewBluePending.visibility = View.VISIBLE
@@ -109,7 +117,7 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
             mobiliserVisitsViewModel.pendingSelected.value = false
 
             val completedVisits =
-                visits.filter { projectInfo -> projectInfo.visit_status == "SUBMITTED" }
+                visits.filter { projectInfo -> projectInfo.visit_status != SUBMITTED && projectInfo.visit_status != SUB_AGENCY_APPROVED }
             myVisitsAdapter.updateVisits(completedVisits)
 
             binding.viewBluePending.visibility = View.GONE
@@ -173,11 +181,23 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     val listType: Type = object : TypeToken<List<ProjectInfo?>?>() {}.type
-                    visits =
+                    allVisits =
                         Gson().fromJson(model.getJSONArray("data").toString(), listType);
 
+                    val listAfterIgnoreStatus = allVisits.filter { projectInfo ->
+                        projectInfo.visit_status != INITIATED
+                                && projectInfo.visit_status != ASSIGNED
+                                && projectInfo.visit_status != PARTIALLY_SUBMITTED
+                                && projectInfo.visit_status != SUB_AGENCY_REJECTED
+                    }
+
+                    visits = listAfterIgnoreStatus as ArrayList<ProjectInfo>;
+
                     val pendingVisits =
-                        visits.filter { projectInfo -> projectInfo.visit_status == "SUBMITTED" }
+                        listAfterIgnoreStatus.filter { projectInfo ->
+                            projectInfo.visit_status == SUBMITTED
+                                    || projectInfo.visit_status == SUB_AGENCY_APPROVED
+                        }
 
                     myVisitsAdapter =
                         MobiliserVisitsAdapter(pendingVisits, this, requireContext())
@@ -203,8 +223,11 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
 
     override fun redirectToSchoolActivity(projectInfo: ProjectInfo) {
         val bundle = Bundle()
+        val associatedVisits = allVisits.filter { it.location_id.equals(projectInfo.location_id) }
+
         bundle.putString("projectInfo", Gson().toJson(projectInfo))
-        bundle.putString("visitList", Gson().toJson(visits))
+        bundle.putString("visitList", Gson().toJson(associatedVisits))
+
         findNavController().navigate(
             R.id.action_visits_school_activity,
             bundle

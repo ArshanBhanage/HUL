@@ -548,6 +548,8 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                 remark = VisitDetails(value = form3FillViewModel.form5.value),
                 u_dice_code = VisitDetails(value =binding.disceCode.text.toString()),
                 visit_id = form3FillViewModel.projectInfo.value!!.visit_id.toString(),
+                latitude = VisitDetails(value =currentLocation?.latitude.toString()),
+                longitude = VisitDetails(value =currentLocation?.longitude.toString())
             )
         )
     }

@@ -11,6 +11,7 @@ data class VisitData(
     var uDiceCode: String? = null,
     var visit_id: String? = null,
     var no_of_teachers_trained: VisitDetails? = null,
+    var no_of_students_as_per_record: VisitDetails? = null,
     var picture_of_school_name: VisitDetails? = null,
     var selfie_with_school_name_or_u_dice_code: VisitDetails? = null,
     var picture_of_acknowledgement_letter: VisitDetails? = null,
@@ -43,4 +44,6 @@ data class VisitData(
     var auditor_visit_image_1: VisitDetails? = null,
     var auditor_visit_image_2: VisitDetails? = null,
     var auditor_visit_image_3: VisitDetails? = null,
+    var latitude: VisitDetails? = null,
+    var longitude: VisitDetails? = null,
 )

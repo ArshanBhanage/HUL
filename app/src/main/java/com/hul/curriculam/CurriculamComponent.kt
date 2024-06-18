@@ -12,6 +12,7 @@ import com.hul.screens.field_auditor_dashboard.ui.school_activity.AuditorSchoolF
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.form1Details.AuditorForm1DetailsFragment
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.form1Fill.AuditorForm1FillFragment
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.form2Details.AuditorForm2DetailsFragment
+import com.hul.screens.field_auditor_dashboard.ui.school_activity.form2Details.AuditorForm3DetailsFragment
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.form2Fill.AuditorForm2FillFragment
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.form3Fill.AuditorForm3FillFragment
 import dagger.Subcomponent
@@ -40,6 +41,7 @@ interface CurriculamComponent {
 
     fun inject(fragment: AuditorForm1DetailsFragment)
     fun inject(fragment: AuditorForm2DetailsFragment)
+    fun inject(fragment: AuditorForm3DetailsFragment)
     fun inject(fragment: AuditorForm1FillFragment)
     fun inject(fragment: AuditorForm2FillFragment)
     fun inject(fragment: AuditorForm3FillFragment)

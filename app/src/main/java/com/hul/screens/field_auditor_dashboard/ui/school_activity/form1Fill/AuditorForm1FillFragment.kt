@@ -47,7 +47,6 @@ import com.hul.data.UploadImageData
 import com.hul.data.VisitData
 import com.hul.data.VisitDetails
 import com.hul.databinding.FragmentForm1FillAuditorBinding
-import com.hul.databinding.FragmentForm1FillBinding
 import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDialogFragment
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.form2Fill.AuditorForm2FillFragment
 import com.hul.user.UserInfo
@@ -186,13 +185,16 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.btnPositive.setOnClickListener {
             binding.btnPositive.visibility = View.GONE
             binding.btnNegative.visibility = View.GONE
-            binding.trueIconBooks.visibility = View.VISIBLE
+            binding.tickSuccess.visibility = View.VISIBLE
+            binding.tickFailure.visibility = View.GONE
             form1FillViewModel.isBookDistributionApproved.value = 1;
         }
 
         binding.btnNegative.setOnClickListener {
             binding.btnPositive.visibility = View.GONE
             binding.btnNegative.visibility = View.GONE
+            binding.tickSuccess.visibility = View.GONE
+            binding.tickFailure.visibility = View.VISIBLE
         }
 
         return root
@@ -210,8 +212,8 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
         destinationLng: String
     ) {
 
-        val destLat = TimeUtils.parseCoordinate(destinationLat)
-        val destLng = TimeUtils.parseCoordinate(destinationLng)
+        val destLat = destinationLat
+        val destLng = destinationLng
 
         // Build the URI for the directions request
         val uri =
@@ -664,6 +666,24 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.form1.setText(form1FillViewModel.visitData.value?.visit_1?.name_of_the_school_representative_who_collected_the_books?.value.toString())
         binding.form2.setText(form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_school_representative_who_collected_the_books?.value.toString())
         binding.form5.setText(form1FillViewModel.visitData.value?.visit_1?.remark?.value.toString())
+
+        binding.llGetDirection.visibility =
+            if (form1FillViewModel.visitData.value?.visit_1?.latitude == null) View.GONE else View.VISIBLE
+
+        binding.txtDirections.setOnClickListener {
+            if(currentLocation != null) {
+                form1FillViewModel.visitData.value?.visit_1?.longitude?.value?.let { it1 ->
+                    form1FillViewModel.visitData.value?.visit_1?.latitude?.value?.let { it2 ->
+                        openGoogleMapsForDirections(
+                            currentLocation!!.latitude,
+                            currentLocation!!.longitude,
+                            it2.toString(),
+                            it1.toString()
+                        )
+                    }
+                }
+            }
+        }
     }
 
 }

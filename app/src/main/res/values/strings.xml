@@ -177,4 +177,6 @@
     <string name="auditor_visit_3_pic_2">Selfie with the school name or U DICE code</string>
     <string name="auditor_visit_3_pic_3">Trackers acknowledgement form</string>
     <string name="were_the_filled_trackers_collected">Were the Filled Trackers Collected?</string>
+    <string name="add_new">Add New</string>
+    <string name="enter_number_here">Search here</string>
 </resources>
