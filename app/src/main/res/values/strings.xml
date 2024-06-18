@@ -17,6 +17,8 @@
     <string name="ward">Ward/Block</string>
     <string name="district">District</string>
     <string name="school_Code">School Code</string>
+    <string name="todays_visit">Today’s Visits</string>
+    <string name="todays_visit_left">2 visits left to sync</string>
     <string name="enter_school_Code">Enter School Code</string>
     <string name="enter_school_name">Enter School name</string>
     <string name="remarks">Remark</string>
@@ -42,6 +44,7 @@
     <string name="proceed">Proceed</string>
     <string name="punch_in">Punch In</string>
     <string name="search">Search</string>
+    <string name="Sync">Sync</string>
     <string name="mark_your_attendance">Mark your attendance</string>
     <string name="status">Status</string>
     <string name="location_name">Location name</string>

@@ -405,7 +405,74 @@
                             android:layout_marginTop="24dp"
                             tools:itemCount="5"
                             tools:listitem="@layout/location_view_design" />
+
+                        <LinearLayout
+                            android:id="@+id/todays_visit_parent"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:orientation="vertical">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_10sdp"
+                            android:orientation="horizontal">
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="20dp"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/public_sans"
+                                    android:text="@string/todays_visit"
+                                    android:textColor="#2F2B3D"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/public_sans"
+                                    android:text="@string/todays_visit_left"
+                                    android:textColor="#2F2B3D"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                            </LinearLayout>
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/syncNow"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="13sp"
+                                android:backgroundTint="#dde0f6"
+                                android:fontFamily="@font/publicsans"
+                                android:text="@string/Sync"
+                                android:textAllCaps="false"
+                                android:textColor="#2C41CA"
+                                app:cornerRadius="8dp"
+                                android:textFontWeight="700"
+                                android:layout_gravity="bottom"
+                                app:icon="@mipmap/recycle"
+                                android:textStyle="bold"
+                                app:iconTint="#2C41CA"/>
+                        </LinearLayout>
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/todaysVisit"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="24dp"
+                            tools:itemCount="5"
+                            tools:listitem="@layout/location_view_design" />
+                        </LinearLayout>
                     </LinearLayout>
+
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView

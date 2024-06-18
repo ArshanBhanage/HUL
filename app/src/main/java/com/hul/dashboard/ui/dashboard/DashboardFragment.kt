@@ -29,6 +29,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -57,6 +58,9 @@ import com.hul.data.SchoolCode
 import com.hul.data.State
 import com.hul.databinding.FragmentDashboardBinding
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.SchoolActivityFragment
+import com.hul.sync.HulDatabase
+import com.hul.sync.VisitDataTable
+import com.hul.sync.VisitDataViewModel
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
@@ -91,6 +95,9 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     lateinit var userInfo: UserInfo
 
     @Inject
+    lateinit var visitDataViewModel: VisitDataViewModel
+
+    @Inject
     lateinit var apiController: APIController
 
     var adapter: SchoolCodeAdapter? = null
@@ -107,6 +114,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     var districtCallBack: ListDialogInterface? = null;
 
     var stateCallBack: ListDialogInterface? = null;
+
+    var syncDataList : List<VisitDataTable> ? = null
 
     private var currentLocation: Location? = null
     private lateinit var locationCallback: LocationCallback
@@ -149,6 +158,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         binding.viewModel = dashboardViewModel
 
         binding.locationToVisit.layoutManager = LinearLayoutManager(context)
+
+        binding.todaysVisit.layoutManager = LinearLayoutManager(context)
 
         binding.myArea.text = userInfo.myArea
 
@@ -244,6 +255,19 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         return root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+
+
+        //visitDataViewModel.insert(VisitDataTable(jsonData = "Nitin", visitNumber = 1, project = "Test", uDiceCode = "retest"))
+        visitDataViewModel.allSyncData.observe(requireActivity(), { visitDataList ->
+
+            syncDataList = visitDataList
+        })
+
+    }
+
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(requireContext(), it) == PackageManager.PERMISSION_GRANTED
     }
@@ -259,6 +283,20 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             this,
             getPerformanceModel(),
             ApiExtentions.ApiDef.GET_PERFORMANCE.ordinal
+        )
+    }
+
+    private fun getTodaysVisitModel(): RequestModel {
+        return RequestModel(
+
+        )
+    }
+
+    private fun getTodaysVisit() {
+        apiController.getApiResponse(
+            this,
+            getTodaysVisitModel(),
+            ApiExtentions.ApiDef.VISIT_LIST_BY_STATUS.ordinal
         )
     }
 
@@ -758,6 +796,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     } catch (_: Exception) {
 
                     }
+
+                    getTodaysVisit()
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -841,6 +881,32 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                             selectedSchoolCode!!.id.toString(),
                             (visitList.size + 1).toString()
                         )
+                    }
+
+                } else {
+                    redirectionAlertDialogue(requireContext(), model.getString("message"))
+                }
+
+            }
+
+            ApiExtentions.ApiDef.VISIT_LIST_BY_STATUS -> {
+                val model = JSONObject(o.toString())
+                if (!model.getBoolean("error")) {
+                    val listType: Type = object : TypeToken<List<ProjectInfo?>?>() {}.type
+                    visitList =
+                        Gson().fromJson(model.getJSONArray("data").toString(), listType);
+                    
+                    if(visitList.size > 0 || syncDataList!!.size > 0) {
+
+                        val myVisitsAdapter = MyVisitsAdapter(visitList, this, requireContext())
+
+                        // Setting the Adapter with the recyclerview
+                        binding.visitNumbers.text =
+                            visitList.size.toString() + " " + requireContext().getString(R.string.visit_number)
+                        binding.todaysVisit.adapter = myVisitsAdapter
+                    }
+                    else{
+                        binding.todaysVisitParent.visibility = View.GONE
                     }
 
                 } else {

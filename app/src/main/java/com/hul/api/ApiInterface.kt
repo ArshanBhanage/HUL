@@ -39,6 +39,11 @@ interface ApiInterface {
     fun getVisitList(): Call<ResponseBody?>
 
     @GET("app/visits/v1/get_list_of_visits/")
+    fun getVisitListByStatus(
+        @Query("status ") status: String?,
+    ): Call<ResponseBody?>
+
+    @GET("app/visits/v1/get_list_of_visits/")
     fun getVisitListSingle(
         @Query("locationId ") locationId: String?,
     ): Call<ResponseBody?>
