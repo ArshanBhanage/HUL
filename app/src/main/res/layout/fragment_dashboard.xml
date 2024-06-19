@@ -32,8 +32,8 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="40dp"
+                    android:layout_width="@dimen/_100sdp"
+                    android:layout_height="@dimen/_60sdp"
                     android:src="@drawable/ic_curriculum_logo"
                     android:textColor="@color/black"
                     android:textSize="20sp"
@@ -519,7 +519,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/public_sans"
-                                    android:text="@string/my_area"
+                                    android:text="@string/my_location"
                                     android:textColor="#2F2B3D"
                                     android:textFontWeight="700"
                                     android:textSize="18sp"
@@ -554,7 +554,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="24dp"
                             android:fontFamily="@font/public_sans"
-                            android:text="@string/my_area"
+                            android:text=""
                             android:textColor="#2C41CA"
                             android:textFontWeight="700"
                             android:textSize="18sp"

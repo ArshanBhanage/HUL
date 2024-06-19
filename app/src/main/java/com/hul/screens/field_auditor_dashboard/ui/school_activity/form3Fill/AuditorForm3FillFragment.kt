@@ -44,12 +44,10 @@ import com.hul.data.UploadImageData
 import com.hul.data.VisitData
 import com.hul.data.VisitDetails
 import com.hul.databinding.FragmentForm3FillAuditorBinding
-import com.hul.databinding.FragmentForm3FillBinding
 import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDialogFragment
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
-import com.hul.utils.TimeUtils
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectionAlertDialogue

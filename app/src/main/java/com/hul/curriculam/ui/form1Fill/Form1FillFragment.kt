@@ -36,7 +36,6 @@ import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
 import com.hul.camera.CameraActivity
 import com.hul.curriculam.CurriculamComponent
-import com.hul.curriculam.ui.form2Fill.Form2FillFragment
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel

@@ -24,7 +24,6 @@ import android.widget.Toast
 import androidx.camera.core.ImageCapture
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
-import com.google.gson.Gson
 import com.hul.HULApplication
 import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler

@@ -20,10 +20,7 @@ import com.hul.curriculam.ui.form2Details.Form2ViewModel
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
-import com.hul.data.SchoolCode
 import com.hul.databinding.AuditorFragmentForm2Binding
-import com.hul.databinding.FragmentForm2Binding
-import com.hul.screens.field_auditor_dashboard.ui.school_activity.form1Details.AuditorForm1DetailsFragment
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface

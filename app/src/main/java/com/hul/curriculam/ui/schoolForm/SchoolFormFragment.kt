@@ -104,9 +104,8 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                 || visit.visit_status.equals("INITIATED", ignoreCase = true)
             ) {
                 currentVisit = visit
-                when(visit.visit_number)
-                {
-                    "1" ->addNewTab(
+                when (visit.visit_number) {
+                    "1" -> addNewTab(
                         requireContext().getString(R.string.visit) + visit.visit_number,
                         Form1FillFragment.newInstance(
                             Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
@@ -114,7 +113,8 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                             uDiceCode
                         )
                     )
-                    "2" ->addNewTab(
+
+                    "2" -> addNewTab(
                         requireContext().getString(R.string.visit) + visit.visit_number,
                         Form2FillFragment.newInstance(
                             Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
@@ -122,7 +122,8 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                             uDiceCode
                         )
                     )
-                    "3" ->addNewTab(
+
+                    "3" -> addNewTab(
                         requireContext().getString(R.string.visit) + visit.visit_number,
                         Form3FillFragment.newInstance(
                             Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
@@ -135,9 +136,8 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
 
             } else {
                 completedVisit = visit
-                when(visit.visit_number)
-                {
-                    "1" ->addNewTab(
+                when (visit.visit_number) {
+                    "1" -> addNewTab(
                         requireContext().getString(R.string.visit) + visit.visit_number,
                         Form1DetailsFragment.newInstance(
                             Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
@@ -145,7 +145,8 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                             uDiceCode
                         )
                     )
-                    "2" ->addNewTab(
+
+                    "2" -> addNewTab(
                         requireContext().getString(R.string.visit) + visit.visit_number,
                         Form2DetailsFragment.newInstance(
                             Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
@@ -207,7 +208,14 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
             }
         })
 
-        // Set the adapter to the AutoCompleteTextView
+        // ToDo : Below code is only changing tabs not the fragment, viewpager impl needs to be changed
+        /*currentVisit = schoolFormViewModel.visitList.value?.firstOrNull {
+            it.visit_status.equals("ASSIGNED", ignoreCase = true)
+                    || it.visit_status.equals("INITIATED", ignoreCase = true)
+        }
+        currentVisit?.visit_number?.toIntOrNull()?.let {
+            binding.viewPager.currentItem = it - 1
+        }*/
 
     }
 

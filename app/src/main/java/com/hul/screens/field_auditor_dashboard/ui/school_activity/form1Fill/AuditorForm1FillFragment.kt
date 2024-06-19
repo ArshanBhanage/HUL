@@ -22,8 +22,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import androidx.navigation.NavOptions
-import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -42,17 +40,14 @@ import com.hul.curriculam.ui.form1Fill.Form1FillViewModel
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
-import com.hul.data.SchoolCode
 import com.hul.data.UploadImageData
 import com.hul.data.VisitData
 import com.hul.data.VisitDetails
 import com.hul.databinding.FragmentForm1FillAuditorBinding
 import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDialogFragment
-import com.hul.screens.field_auditor_dashboard.ui.school_activity.form2Fill.AuditorForm2FillFragment
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
-import com.hul.utils.TimeUtils
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectionAlertDialogue

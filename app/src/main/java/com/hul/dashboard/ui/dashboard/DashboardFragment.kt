@@ -29,7 +29,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -58,7 +57,6 @@ import com.hul.data.SchoolCode
 import com.hul.data.State
 import com.hul.databinding.FragmentDashboardBinding
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.SchoolActivityFragment
-import com.hul.sync.HulDatabase
 import com.hul.sync.VisitDataTable
 import com.hul.sync.VisitDataViewModel
 import com.hul.user.UserInfo
@@ -598,10 +596,10 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     area_id = districtToSubmit!!.area_id.toString(),
                     project_id = userInfo.projectId,
                     location_type = "School",
-                    lattitude = dashboardViewModel.lattitude.value,
-                    longitude = dashboardViewModel.longitude.value,
+                    lattitude = currentLocation?.latitude.toString(),
+                    longitude = currentLocation?.longitude.toString(),
                     external_id1 = schoolCode,
-                    external_id1_description = "U DICE Code",
+                    external_id1_description = "UDISE Code",
                     external_id2 = null,
                     external_id2_description = "Temp Code",
                     location_ward = wardBlock,

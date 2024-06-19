@@ -14,7 +14,6 @@ import android.os.CountDownTimer
 import android.os.Looper
 import android.provider.Settings
 import android.text.InputFilter
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -44,7 +43,6 @@ import com.hul.data.SchoolCode
 import com.hul.data.UploadImageData
 import com.hul.data.VisitData
 import com.hul.data.VisitDetails
-import com.hul.databinding.FragmentForm1FillBinding
 import com.hul.databinding.FragmentForm3FillBinding
 import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDialogFragment
 import com.hul.user.UserInfo

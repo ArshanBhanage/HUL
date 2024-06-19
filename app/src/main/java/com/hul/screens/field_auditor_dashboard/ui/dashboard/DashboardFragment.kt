@@ -1,7 +1,6 @@
 package com.hul.screens.field_auditor_dashboard.ui.dashboard
 
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Base64
@@ -13,7 +12,6 @@ import android.widget.RadioButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,7 +31,6 @@ import com.hul.data.RequestModel
 import com.hul.data.ResponseModel
 import com.hul.data.UserDetails
 import com.hul.databinding.FragmentDashboardAuditorBinding
-import com.hul.loginRegistraion.LoginRegistrationActivity
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector

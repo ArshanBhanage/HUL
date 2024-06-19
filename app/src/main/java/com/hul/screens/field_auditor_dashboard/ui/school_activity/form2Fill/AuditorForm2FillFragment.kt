@@ -48,7 +48,6 @@ import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDial
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
-import com.hul.utils.TimeUtils
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectionAlertDialogue
