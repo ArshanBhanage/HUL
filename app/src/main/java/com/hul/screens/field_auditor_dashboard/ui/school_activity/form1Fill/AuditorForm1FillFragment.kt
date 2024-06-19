@@ -14,8 +14,10 @@ import android.os.CountDownTimer
 import android.os.Looper
 import android.provider.Settings
 import android.text.InputFilter
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -27,6 +29,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.hul.HULApplication
 import com.hul.R
@@ -190,6 +193,19 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
             binding.btnNegative.visibility = View.GONE
             binding.tickSuccess.visibility = View.GONE
             binding.tickFailure.visibility = View.VISIBLE
+        }
+
+        binding.nestedScrollView.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
+                    Log.d("TouchListener", "User scrolled manually")
+                    val currentFocus = activity?.currentFocus
+                    if (currentFocus is TextInputEditText) {
+                        currentFocus.clearFocus()
+                    }
+                }
+            }
+            false
         }
 
         return root

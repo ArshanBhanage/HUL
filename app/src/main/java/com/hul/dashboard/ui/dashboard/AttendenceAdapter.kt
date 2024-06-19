@@ -59,7 +59,7 @@ class AttendenceAdapter(private val context: Context, private val dataSource: Li
 
         }
 
-        if(item.present!!)
+        if(item.present != null)
         {
             viewHolder.imageView.setImageDrawable( context.resources.getDrawable(R.mipmap.present))
         }

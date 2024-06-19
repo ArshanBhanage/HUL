@@ -14,8 +14,10 @@ import android.os.CountDownTimer
 import android.os.Looper
 import android.provider.Settings
 import android.text.InputFilter
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -27,6 +29,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.hul.HULApplication
 import com.hul.R
@@ -198,6 +201,19 @@ class AuditorForm2FillFragment : Fragment(), ApiHandler, RetryInterface {
             binding.btnNegative.visibility = View.GONE
             binding.tickSuccess.visibility = View.GONE
             binding.tickFailure.visibility = View.VISIBLE
+        }
+
+        binding.nestedScrollView.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
+                    Log.d("TouchListener", "User scrolled manually")
+                    val currentFocus = activity?.currentFocus
+                    if (currentFocus is TextInputEditText) {
+                        currentFocus.clearFocus()
+                    }
+                }
+            }
+            false
         }
 
         return root
@@ -677,6 +693,7 @@ class AuditorForm2FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.form2.setText(form2FillViewModel.visitData.value?.visit_2?.mobile_number_of_the_school_representative_who_collected_the_books?.value.toString())
         binding.form5.setText(form2FillViewModel.visitData.value?.visit_2?.remark?.value.toString())
 
+        //Client asked to remove it, so hidden in both results
         binding.llGetDirection.visibility =
             if (form2FillViewModel.visitData.value?.visit_2?.latitude == null) View.GONE else View.VISIBLE
 

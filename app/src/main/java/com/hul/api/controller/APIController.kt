@@ -8,6 +8,9 @@ import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler
 import com.hul.api.ApiInterface
 import com.hul.data.RequestModel
+import com.hul.storage.SharedPreferencesStorage
+import com.hul.storage.Storage
+import com.hul.user.UserInfo
 import okhttp3.ResponseBody
 import org.json.JSONObject
 import retrofit2.Call
@@ -19,8 +22,7 @@ import javax.inject.Inject
 /**
  * Created by Nitin Chorge on 03-12-2020.
  */
-class APIController @Inject constructor(private val mContext: Context) :
-    Callback<ResponseBody?> {
+class APIController @Inject constructor(private val mContext: Context) : Callback<ResponseBody?> {
 
     @Inject
     lateinit var retrofit: Retrofit
@@ -35,91 +37,71 @@ class APIController @Inject constructor(private val mContext: Context) :
 
         when (ApiExtentions.ApiDef.entries[apiId]) {
             ApiExtentions.ApiDef.SEND_OTP -> retrofit.create(ApiInterface::class.java)
-                .sendOTP(requestModel)
-                .enqueue(this)
+                .sendOTP(requestModel).enqueue(this)
 
             ApiExtentions.ApiDef.LOGIN -> retrofit.create(ApiInterface::class.java)
-                .loginUser(requestModel)
-                .enqueue(this)
+                .loginUser(requestModel).enqueue(this)
 
             ApiExtentions.ApiDef.ADD_VISIT -> retrofit.create(ApiInterface::class.java)
-                .addVisit(requestModel)
-                .enqueue(this)
+                .addVisit(requestModel).enqueue(this)
 
             ApiExtentions.ApiDef.GET_LOGO -> retrofit.create(ApiInterface::class.java)
-                .getLogo(requestModel!!.projectId!!)
-                .enqueue(this)
+                .getLogo(requestModel!!.projectId!!).enqueue(this)
 
             ApiExtentions.ApiDef.GET_BANNER -> retrofit.create(ApiInterface::class.java)
-                .getBannerImage(requestModel!!.projectId!!)
-                .enqueue(this)
+                .getBannerImage(requestModel!!.projectId!!).enqueue(this)
 
             ApiExtentions.ApiDef.LOCATION_LIST -> retrofit.create(ApiInterface::class.java)
-                .getLocationList(requestModel!!.projectId)
-                .enqueue(this)
+                .getLocationList(requestModel!!.projectId).enqueue(this)
 
             ApiExtentions.ApiDef.SCHOOL_CODES -> retrofit.create(ApiInterface::class.java)
-                .getSchoolCodes(requestModel!!.projectId, requestModel.externalId)
-                .enqueue(this)
+                .getSchoolCodes(requestModel!!.projectId, requestModel.externalId).enqueue(this)
 
             ApiExtentions.ApiDef.MARK_ATTENDENCE -> retrofit.create(ApiInterface::class.java)
                 .markAttendence(requestModel!!, requestModel.project!!, requestModel.location_id!!)
                 .enqueue(this)
 
             ApiExtentions.ApiDef.GET_ATTENDENCE -> retrofit.create(ApiInterface::class.java)
-                .getAttendence()
-                .enqueue(this)
+                .getAttendence().enqueue(this)
 
             ApiExtentions.ApiDef.ATTENDENCE_FORM -> retrofit.create(ApiInterface::class.java)
-                .getAttendenceForm(requestModel!!.projectId)
-                .enqueue(this)
+                .getAttendenceForm(requestModel!!.projectId).enqueue(this)
 
             ApiExtentions.ApiDef.VISIT_LIST -> retrofit.create(ApiInterface::class.java)
-                .getVisitList()
-                .enqueue(this)
+                .getVisitList().enqueue(this)
 
             ApiExtentions.ApiDef.VISIT_LIST_BY_STATUS -> retrofit.create(ApiInterface::class.java)
-                .getVisitListByStatus("SUBMITTED")
-                .enqueue(this)
+                .getVisitListByStatus("SUBMITTED").enqueue(this)
 
             ApiExtentions.ApiDef.VISIT_LIST_SINGLE -> retrofit.create(ApiInterface::class.java)
-                .getVisitListSingle(requestModel!!.location_id)
-                .enqueue(this)
+                .getVisitListSingle(requestModel!!.location_id).enqueue(this)
 
             ApiExtentions.ApiDef.VISIT_LIST_FIELD_AUDITOR -> if (requestModel != null) {
                 requestModel.mobiliserId?.let {
                     retrofit.create(ApiInterface::class.java)
-                        .getVisitListSingle(requestModel.userType, it)
-                        .enqueue(this)
+                        .getVisitListSingle(requestModel.userType, it).enqueue(this)
                 }
             }
 
             ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE -> requestModel?.schoolId?.let {
-                retrofit.create(ApiInterface::class.java)
-                    .getListOfVisits(it)
-                    .enqueue(this)
+                retrofit.create(ApiInterface::class.java).getListOfVisits(it).enqueue(this)
             }
 
 
             ApiExtentions.ApiDef.LEAD_DETAILS -> retrofit.create(ApiInterface::class.java)
-                .getLeadDetails(requestModel!!.leadId!!)
-                .enqueue(this)
+                .getLeadDetails(requestModel!!.leadId!!).enqueue(this)
 
             ApiExtentions.ApiDef.SUBMIT_LEAD -> retrofit.create(ApiInterface::class.java)
-                .submitLead(requestModel!!.leadId!!, RequestModel())
-                .enqueue(this)
+                .submitLead(requestModel!!.leadId!!, RequestModel()).enqueue(this)
 
             ApiExtentions.ApiDef.UPLOADED_DOCUMENT_LIST -> retrofit.create(ApiInterface::class.java)
-                .getUploadedDocument(requestModel!!.leadId!!)
-                .enqueue(this)
+                .getUploadedDocument(requestModel!!.leadId!!).enqueue(this)
 
             ApiExtentions.ApiDef.GET_USER_DETAILS -> retrofit.create(ApiInterface::class.java)
-                .getUserDetails()
-                .enqueue(this)
+                .getUserDetails().enqueue(this)
 
             ApiExtentions.ApiDef.GET_PERFORMANCE -> retrofit.create(ApiInterface::class.java)
-                .getPerformance()
-                .enqueue(this)
+                .getPerformance().enqueue(this)
 
             ApiExtentions.ApiDef.GET_VISIT_DATA -> if (requestModel != null) {
                 requestModel.loadImages?.let {
@@ -130,28 +112,21 @@ class APIController @Inject constructor(private val mContext: Context) :
             }
 
             ApiExtentions.ApiDef.VISIT_DATA -> retrofit.create(ApiInterface::class.java)
-                .visitData(requestModel!!)
-                .enqueue(this)
+                .visitData(requestModel!!).enqueue(this)
 
             ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA -> retrofit.create(ApiInterface::class.java)
-                .visitData(requestModel!!)
-                .enqueue(this)
+                .visitData(requestModel!!).enqueue(this)
 
             ApiExtentions.ApiDef.GET_DISTRICTS -> requestModel?.projectId?.let {
-                retrofit.create(ApiInterface::class.java)
-                    .getDistricts(it)
-                    .enqueue(this)
+                retrofit.create(ApiInterface::class.java).getDistricts(it).enqueue(this)
             }
 
             ApiExtentions.ApiDef.GET_STATES -> requestModel?.projectId?.let {
-                retrofit.create(ApiInterface::class.java)
-                    .getStates(it)
-                    .enqueue(this)
+                retrofit.create(ApiInterface::class.java).getStates(it).enqueue(this)
             }
 
             ApiExtentions.ApiDef.ADD_NEW_SCHOOL -> retrofit.create(ApiInterface::class.java)
-                .addSchool(requestModel!!)
-                .enqueue(this)
+                .addSchool(requestModel!!).enqueue(this)
 
             else -> Toast.makeText(mContext, "API NOT INTEGRATED", Toast.LENGTH_LONG).show()
         }
@@ -159,12 +134,14 @@ class APIController @Inject constructor(private val mContext: Context) :
     }
 
     override fun onResponse(
-        call: Call<ResponseBody?>,
-        response: Response<ResponseBody?>
+        call: Call<ResponseBody?>, response: Response<ResponseBody?>
     ) {
         if (response.code() == 200 || response.code() == 201) {
             mHandler.onApiSuccess(response.body()!!.string(), apiId)
         } else if (response.code() == 401) {
+            val prefs: SharedPreferencesStorage = SharedPreferencesStorage(mContext)
+            val userInfo = UserInfo(storage = prefs)
+            userInfo.authToken = ""
             if (ApiExtentions.ApiDef.entries.toTypedArray()[apiId] != ApiExtentions.ApiDef.GET_LOGO && ApiExtentions.ApiDef.values()[apiId] != ApiExtentions.ApiDef.GET_BANNER) {
                 mHandler.onApiError(mContext.getString(R.string.session_expire))
             }

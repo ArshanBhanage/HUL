@@ -10,6 +10,7 @@
     </data>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#f8f9fa">
@@ -21,6 +22,45 @@
             android:paddingHorizontal="16dp"
             android:layout_marginTop="24dp"
             android:paddingBottom="56dp">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:layout_marginVertical="16dp"
+                android:background="@color/white"
+                app:cardCornerRadius="8dp">
+
+                <LinearLayout
+                    android:id="@+id/llVisitUnSuccessToast"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_horizontal"
+                    android:paddingVertical="@dimen/_6sdp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="@dimen/_20sdp"
+                        android:layout_height="@dimen/_20sdp"
+                        android:src="@drawable/ic_cancel_toast"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/couldn_t_submit_visit_details"
+                        android:textColor="#444050"
+                        android:textSize="@dimen/_12ssp"
+                        android:fontFamily="@font/public_sans_regular"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/dayToday"
+                        android:layout_marginStart="@dimen/_10sdp"/>
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -123,7 +163,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:paddingVertical="@dimen/_5sdp"
-                        android:visibility="visible">
+                        android:visibility="gone">
 
                         <ImageView
                             android:layout_width="@dimen/_25sdp"

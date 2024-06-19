@@ -180,4 +180,6 @@
     <string name="were_the_filled_trackers_collected">Were the Filled Trackers Collected?</string>
     <string name="add_new">Add New</string>
     <string name="enter_number_here">Search here</string>
+    <string name="successfully_captured_visit_details">Successfully captured visit details.</string>
+    <string name="couldn_t_submit_visit_details">Couldn\'t submit visit details</string>
 </resources>

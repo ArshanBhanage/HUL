@@ -14,8 +14,10 @@ import android.os.CountDownTimer
 import android.os.Looper
 import android.provider.Settings
 import android.text.InputFilter
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -27,6 +29,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.hul.HULApplication
 import com.hul.R
@@ -36,6 +39,7 @@ import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
 import com.hul.camera.CameraActivity
 import com.hul.curriculam.CurriculamComponent
+import com.hul.dashboard.Dashboard
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
@@ -103,11 +107,25 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                 .create()
         curriculamComponent.inject(this)
 
+        binding.nestedScrollView.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
+                    Log.d("TouchListener", "User scrolled manually")
+                    val currentFocus = activity?.currentFocus
+                    if (currentFocus is TextInputEditText) {
+                        currentFocus.clearFocus()
+                    }
+                }
+            }
+            false
+        }
+
         val schoolCode = Gson().fromJson(
             requireArguments().getString(ARG_CONTENT1),
             SchoolCode::class.java
         )
 
+        //Client asked to remove it, so hidden in both results
         binding.llGetDirection.visibility =
             if (schoolCode.lattitude == null) View.GONE else View.VISIBLE
 
@@ -225,8 +243,8 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
         destinationLng: String
     ) {
 
-        val destLat = TimeUtils.parseCoordinate(destinationLat)
-        val destLng = TimeUtils.parseCoordinate(destinationLng)
+        val destLat = destinationLat
+        val destLng = destinationLng
 
         // Build the URI for the directions request
         val uri =
@@ -569,12 +587,11 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                 cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Visit data submitted successfully",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    requireActivity().onBackPressed()
+                    userInfo.didUserSubmitNewVisit = true
+                    val intent = Intent(activity, Dashboard::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                    requireActivity().finish()
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }

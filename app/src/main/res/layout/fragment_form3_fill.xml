@@ -12,7 +12,8 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#f8f9fa">
+        android:background="#f8f9fa"
+        android:id="@+id/nestedScrollView">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -121,7 +122,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:paddingVertical="@dimen/_5sdp"
-                        android:visibility="visible">
+                        android:visibility="gone">
 
                         <ImageView
                             android:layout_width="@dimen/_25sdp"

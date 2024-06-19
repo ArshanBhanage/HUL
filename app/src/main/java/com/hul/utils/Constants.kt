@@ -114,6 +114,7 @@ val languages = arrayListOf("English", "हिंदी", "ಕನ್ನಡ", "�
 
 const val USER_TYPE = "userType"
 const val MY_AREA = "myArea"
+const val IS_NEW_VISIT_SUBMITTED = "isNewVisitSubmitted"
 
 const val INITIATED = "INITIATED"
 const val ASSIGNED = "ASSIGNED"
