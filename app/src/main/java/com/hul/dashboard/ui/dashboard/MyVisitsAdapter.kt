@@ -8,6 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hul.R
 import com.hul.data.ProjectInfo
 import com.hul.databinding.LocationViewDesignBinding
+import com.hul.utils.ASSIGNED
+import com.hul.utils.INITIATED
+import com.hul.utils.PARTIALLY_SUBMITTED
 
 /**
  * Created by Nitin Chorge on 03-04-2024.
@@ -42,15 +45,15 @@ class MyVisitsAdapter(
                 binding.locationPosition.text =
                     mContext.getString(R.string.visit) + " " + mList[position].visit_number + " | " + mList[position].location_name + if (mList[position].is_revisit == 1) "(Revisit)" else ""
                 binding.visit.text =
-                    if (mList[position].visit_status.equals("SUBMITTED", ignoreCase = true)
-                        || mList[position].visit_status.equals("INITIATED", ignoreCase = true)
-                        || mList[position].visit_status.equals("PARTIALLY_SUBMITTED", ignoreCase = true)
+                    if (mList[position].visit_status.equals(ASSIGNED, ignoreCase = true)
+                        || mList[position].visit_status.equals(INITIATED, ignoreCase = true)
+                        || mList[position].visit_status.equals(PARTIALLY_SUBMITTED, ignoreCase = true)
                     ) "Pending" else "Completed"
                 binding.visit.setTextColor(
                     Color.parseColor(
-                        if (mList[position].visit_status.equals("SUBMITTED", ignoreCase = true)
-                            || mList[position].visit_status.equals("INITIATED", ignoreCase = true)
-                            || mList[position].visit_status.equals("PARTIALLY_SUBMITTED", ignoreCase = true)
+                        if (mList[position].visit_status.equals(ASSIGNED, ignoreCase = true)
+                            || mList[position].visit_status.equals(INITIATED, ignoreCase = true)
+                            || mList[position].visit_status.equals(PARTIALLY_SUBMITTED, ignoreCase = true)
                         ) "#FF9F43" else "#53D28C"
                     )
                 )

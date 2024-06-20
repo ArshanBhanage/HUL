@@ -679,7 +679,7 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.form5.setText(form1FillViewModel.visitData.value?.visit_1?.remark?.value.toString())
 
         binding.llGetDirection.visibility =
-            if (form1FillViewModel.visitData.value?.visit_1?.latitude == null) View.GONE else View.VISIBLE
+            if (form1FillViewModel.visitData.value?.visit_1?.latitude == null) View.GONE else View.GONE
 
         binding.txtDirections.setOnClickListener {
             if(currentLocation != null) {

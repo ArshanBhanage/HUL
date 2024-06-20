@@ -133,7 +133,7 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
 
         //Client asked to remove it, so hidden in both results
         binding.llGetDirection.visibility =
-            if (schoolCode.lattitude == null) View.GONE else View.VISIBLE
+            if (schoolCode.lattitude == null) View.GONE else View.GONE
 
         form3FillViewModel.selectedSchoolCode.value = schoolCode
 
@@ -664,37 +664,26 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.schoolName.setText(form3FillViewModel.selectedSchoolCode.value?.location_name)
         binding.noOfBooksHanded.setText(form3FillViewModel.projectInfo.value?.number_of_books_distributed)
 
-        binding.form1.setText(form3FillViewModel.visitData.value?.visit_3?.name_of_the_school_representative_who_collected_the_books?.value.toString())
-        binding.form2.setText(form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_school_representative_who_collected_the_books?.value.toString())
-        binding.form3.setText(form3FillViewModel.visitData.value?.visit_3?.name_of_the_principal?.value.toString())
-        binding.form4.setText(form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_principal?.value.toString())
-
         binding.switchRevisit.isChecked =
             if (form3FillViewModel.visitData.value?.visit_3?.revisit_applicable?.value == 1) true else false
-        binding.form5.setText(form3FillViewModel.visitData.value?.visit_3?.remark?.value.toString())
-    }
 
-//    override fun onApiSuccess(o: String?, objectType: Int) {
-//
-//        cancelProgressDialog()
-//        when (ApiExtentions.ApiDef.values()[objectType]) {
-//
-//            ApiExtentions.ApiDef.SUBMIT_SCHOOL_FORM -> {
-//                val model = JSONObject(o.toString())
-//                if (!model.getBoolean("error")) {
-//
-//
-//                    // Set the adapter to the AutoCompleteTextView
-//                } else {
-//                    redirectionAlertDialogue(requireContext(), model.getString("message"))
-//                }
-//
-//            }
-//
-//
-//            else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
-//        }
-//    }
+        binding.form1.setText(
+            form3FillViewModel.visitData.value?.visit_3?.name_of_the_school_representative_who_collected_the_books?.value?.toString() ?: ""
+        )
+        binding.form2.setText(
+            form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_school_representative_who_collected_the_books?.value?.toString() ?: ""
+        )
+        binding.form3.setText(
+            form3FillViewModel.visitData.value?.visit_3?.name_of_the_principal?.value?.toString() ?: ""
+        )
+        binding.form4.setText(
+            form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_principal?.value?.toString() ?: ""
+        )
+        binding.form5.setText(
+            form3FillViewModel.visitData.value?.visit_3?.remark?.value?.toString() ?: ""
+        )
+
+    }
 
     override fun onApiError(message: String?) {
         cancelProgressDialog()

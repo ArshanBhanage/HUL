@@ -115,7 +115,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
         )
 
         binding.llGetDirection.visibility =
-            if (schoolCode?.lattitude == null) View.GONE else View.VISIBLE
+            if (schoolCode?.lattitude == null) View.GONE else View.GONE
 
         form1FillViewModel.selectedSchoolCode.value = schoolCode
 
@@ -668,14 +668,31 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.schoolName.setText(form1FillViewModel.selectedSchoolCode.value?.location_name)
         binding.studentNo.setText(form1FillViewModel.selectedSchoolCode.value?.location_data_field1)
         binding.switchSchoolClosed.isChecked = form1FillViewModel.visitData.value?.visit_1?.school_closed?.value == 1
-        binding.noOfBooksHanded.setText(form1FillViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value.toString())
-        binding.teachersTrained.setText(form1FillViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.value.toString())
-        binding.form1.setText(form1FillViewModel.visitData.value?.visit_1?.name_of_the_school_representative_who_collected_the_books?.value.toString())
-        binding.form2.setText(form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_school_representative_who_collected_the_books?.value.toString())
-        binding.form3.setText(form1FillViewModel.visitData.value?.visit_1?.name_of_the_principal?.value.toString())
-        binding.form4.setText(form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_principal?.value.toString())
+        binding.noOfBooksHanded.setText(
+            form1FillViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value?.toString() ?: ""
+        )
+        binding.noOfBooksHanded.setText(
+            form1FillViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value?.toString() ?: ""
+        )
+        binding.teachersTrained.setText(
+            form1FillViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.value?.toString() ?: ""
+        )
+        binding.form1.setText(
+            form1FillViewModel.visitData.value?.visit_1?.name_of_the_school_representative_who_collected_the_books?.value?.toString() ?: ""
+        )
+        binding.form2.setText(
+            form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_school_representative_who_collected_the_books?.value?.toString() ?: ""
+        )
+        binding.form3.setText(
+            form1FillViewModel.visitData.value?.visit_1?.name_of_the_principal?.value?.toString() ?: ""
+        )
+        binding.form4.setText(
+            form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_principal?.value?.toString() ?: ""
+        )
         binding.switchRevisit.isChecked = if (form1FillViewModel.visitData.value?.visit_1?.revisit_applicable?.value == 1) true else false
-        binding.form5.setText(form1FillViewModel.visitData.value?.visit_1?.remark?.value.toString())
+        binding.form5.setText(
+            form1FillViewModel.visitData.value?.visit_1?.remark?.value?.toString() ?: ""
+        )
     }
 
 //    override fun onApiSuccess(o: String?, objectType: Int) {

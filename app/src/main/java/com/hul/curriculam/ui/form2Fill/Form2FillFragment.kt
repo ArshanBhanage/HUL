@@ -125,7 +125,7 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
 
         //Client asked to remove it, so hidden in both results
         binding.llGetDirection.visibility =
-            if (schoolCode.lattitude == null) View.GONE else View.VISIBLE
+            if (schoolCode.lattitude == null) View.GONE else View.GONE
 
         form2FillViewModel.selectedSchoolCode.value = schoolCode
 

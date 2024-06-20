@@ -1,11 +1,17 @@
 package com.hul.curriculam.ui.form1Details
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.hul.HULApplication
 import com.hul.api.ApiExtentions
@@ -23,7 +29,12 @@ import com.hul.utils.RetryInterface
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectionAlertDialogue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
 class Form1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
@@ -81,13 +92,14 @@ class Form1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
         private const val ARG_CONTENT2 = "content2"
         private const val U_DICE_CODE = "uDiceCode"
 
-        fun newInstance(content1: String, content2: String, uDiceCode: String?) = Form1DetailsFragment().apply {
-            arguments = Bundle().apply {
-                putString(ARG_CONTENT1, content1)
-                putString(ARG_CONTENT2, content2)
-                putString(U_DICE_CODE, uDiceCode)
+        fun newInstance(content1: String, content2: String, uDiceCode: String?) =
+            Form1DetailsFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_CONTENT1, content1)
+                    putString(ARG_CONTENT2, content2)
+                    putString(U_DICE_CODE, uDiceCode)
+                }
             }
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -104,7 +116,7 @@ class Form1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
             RequestModel(
                 project = userInfo.projectName,
                 visitId = it,
-                loadImages = false
+                loadImages = true
             )
         }!!
     }
@@ -133,14 +145,33 @@ class Form1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
                     GetVisitDataResponseData::class.java
                 )
 
-                // For render purpose only
-                /*if (form1ViewModel.visitData.value?.visit_1 != null) {
-                    form1ViewModel.visitDataToView.value = form1ViewModel.visitData.value?.visit_1
-                } else if (form1ViewModel.visitData.value?.visit_2 != null) {
-                    form1ViewModel.visitDataToView.value = form1ViewModel.visitData.value?.visit_2
-                } else if (form1ViewModel.visitData.value?.visit_3 != null) {
-                    form1ViewModel.visitDataToView.value = form1ViewModel.visitData.value?.visit_3
-                }*/
+                if (form1ViewModel.visitData.value?.visit_1?.visit_image_1?.value != null) {
+                    loadImage(
+                        form1ViewModel.visitData.value?.visit_1?.visit_image_1!!.value.toString(),
+                        binding.img1, binding.llImg1
+                    )
+                }
+
+                if (form1ViewModel.visitData.value?.visit_1?.visit_image_2?.value != null) {
+                    loadImage(
+                        form1ViewModel.visitData.value?.visit_1?.visit_image_2!!.value.toString(),
+                        binding.img2, binding.llImg2
+                    )
+                }
+
+                if (form1ViewModel.visitData.value?.visit_1?.visit_image_3?.value != null) {
+                    loadImage(
+                        form1ViewModel.visitData.value?.visit_1?.visit_image_3!!.value.toString(),
+                        binding.img3, binding.llImg3
+                    )
+                }
+
+                if (form1ViewModel.visitData.value?.visit_1?.visit_image_4?.value != null) {
+                    loadImage(
+                        form1ViewModel.visitData.value?.visit_1?.visit_image_4!!.value.toString(),
+                        binding.img4, binding.llImg4
+                    )
+                }
             }
 
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
@@ -156,5 +187,33 @@ class Form1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
         when (ApiExtentions.ApiDef.entries[type]) {
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun loadImage(base64: String, imgId: ImageView, llId: LinearLayout) {
+
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val decodedByte = withContext(Dispatchers.IO) {
+                    val decodedString = Base64.decode(base64, Base64.DEFAULT)
+                    BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                }
+
+                Glide.with(imgId.context)
+                    .load(decodedByte)
+                    .into(imgId)
+
+                llId.visibility = View.VISIBLE
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.img1.setImageBitmap(null)
+        binding.img2.setImageBitmap(null)
+        binding.img3.setImageBitmap(null)
+        binding.img4.setImageBitmap(null)
     }
 }

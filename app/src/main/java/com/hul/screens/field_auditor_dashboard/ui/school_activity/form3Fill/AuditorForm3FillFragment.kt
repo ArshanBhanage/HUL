@@ -691,7 +691,7 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
 
         //Client asked to remove it, so hidden in both results
         binding.llGetDirection.visibility =
-            if (form3FillViewModel.visitData.value?.visit_3?.latitude == null) View.GONE else View.VISIBLE
+            if (form3FillViewModel.visitData.value?.visit_3?.latitude == null) View.GONE else View.GONE
 
         binding.txtDirections.setOnClickListener {
             if (currentLocation != null) {

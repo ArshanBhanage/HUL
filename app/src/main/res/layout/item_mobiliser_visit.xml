@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/headLayout"
+<LinearLayout android:id="@+id/headLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:background="@color/white"
     android:paddingVertical="5dp"
     android:paddingHorizontal="@dimen/_10sdp"
@@ -14,19 +14,18 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@mipmap/locationicon"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_gravity="center_vertical"
         />
+
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
+        android:paddingHorizontal="@dimen/_12sdp"
         app:layout_constraintStart_toEndOf="@+id/location"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/chevron"
-        android:layout_marginRight="20dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_weight="1">
         <TextView
             android:id="@+id/txtSchoolName"
             android:layout_width="wrap_content"
@@ -36,17 +35,6 @@
             android:textColor="#2F2B3D"
             android:textFontWeight="700"
             android:textSize="15sp"
-            android:textStyle="bold"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/public_sans"
-            android:text="Visit School Location"
-            android:textColor="#2036C7"
-            android:textFontWeight="700"
-            android:textSize="@dimen/_10ssp"
             android:textStyle="bold"
             />
 
@@ -61,15 +49,41 @@
             android:textSize="13sp"
             android:textStyle="bold"
             />
+
+        <LinearLayout
+            android:id="@+id/llDirection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/_16sdp"
+                android:layout_height="@dimen/_16sdp"
+                android:src="@drawable/gps"
+                android:gravity="center_vertical"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/public_sans"
+                android:text="@string/get_directions"
+                android:textColor="#2036C7"
+                android:textSize="@dimen/_10ssp"
+                android:textStyle="bold"
+                android:paddingHorizontal="@dimen/_5sdp"
+                />
+        </LinearLayout>
+
     </LinearLayout>
+
     <ImageView
         android:id="@+id/chevron"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:src="@mipmap/chevron"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        android:layout_gravity="center_vertical"
+        />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
 

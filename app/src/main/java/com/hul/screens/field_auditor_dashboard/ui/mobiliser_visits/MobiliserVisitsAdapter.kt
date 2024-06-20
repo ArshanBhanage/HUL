@@ -41,8 +41,11 @@ class MobiliserVisitsAdapter(private var mList: List<ProjectInfo>, private val c
                binding.txtSchoolName.text = mContext.getString(R.string.visit)+" "+mList[position].visit_number+" | "+ mList[position].location_name + if(mList[position].is_revisit==1) "(Revisit)" else ""
                 binding.txtVisitStatus.text = if(mList[position].visit_status.equals("ASSIGNED", ignoreCase = true)) "Pending" else "Completed"
                 binding.txtVisitStatus.setTextColor(Color.parseColor(if(mList[position].visit_status.equals("ASSIGNED", ignoreCase = true)) "#FF9F43" else "#53D28C"))
-                binding.root.setOnClickListener{
+                binding.chevron.setOnClickListener{
                     callback.redirectToSchoolActivity(this)
+                }
+                binding.llDirection.setOnClickListener{
+                    callback.goToMap(this)
                 }
             }
         }

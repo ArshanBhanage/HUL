@@ -61,7 +61,10 @@ import com.hul.screens.field_auditor_dashboard.ui.school_activity.SchoolActivity
 import com.hul.sync.VisitDataTable
 import com.hul.sync.VisitDataViewModel
 import com.hul.user.UserInfo
+import com.hul.utils.ASSIGNED
 import com.hul.utils.ConnectionDetector
+import com.hul.utils.INITIATED
+import com.hul.utils.PARTIALLY_SUBMITTED
 import com.hul.utils.RetryInterface
 import com.hul.utils.TimeUtils.parseCoordinate
 import com.hul.utils.cancelProgressDialog
@@ -854,22 +857,14 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     var flag = true
 
                     for (project in visitList) {
-                        if (project.visit_status.equals("SUBMITTED", ignoreCase = true)
-                            || project.visit_status.equals("INITIATED", ignoreCase = true)
-                            || project.visit_status.equals("PARTIALLY_SUBMITTED", ignoreCase = true)
+                        if (project.visit_status.equals(ASSIGNED, ignoreCase = true)
+                            || project.visit_status.equals(INITIATED, ignoreCase = true)
+                            || project.visit_status.equals(PARTIALLY_SUBMITTED, ignoreCase = true)
                         ) {
                             flag = false
                             project.let { pendingVisits.add(it) }
                         }
                     }
-
-                    val myVisitsAdapter = MyVisitsAdapter(pendingVisits, this, requireContext())
-
-                    // Setting the Adapter with the recyclerview
-                    binding.locationToVisit.adapter = myVisitsAdapter
-
-                    binding.visitNumbers.text =
-                        visitList.size.toString() + " " + requireContext().getString(R.string.visit_number)
 
                     if (isAddSchoolFlow && visitList.size > 0) {
                         isAddSchoolFlow = false
@@ -881,6 +876,16 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                         )
                     }
 
+                    val sortedList = visitList.sortedBy { it.visit_number }
+
+                    val listToShowInAdapter: ArrayList<ProjectInfo> = ArrayList();
+                    if(sortedList.isNotEmpty()) {
+                        listToShowInAdapter.add(sortedList.last())
+                    }
+
+                    val myVisitsAdapter = MyVisitsAdapter(listToShowInAdapter, this, requireContext())
+                    // Setting the Adapter with the recyclerview
+                    binding.locationToVisit.adapter = myVisitsAdapter
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -896,11 +901,10 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
                     if (visitListFromBE.size > 0 || syncDataList!!.size > 0) {
 
-                        val myVisitsAdapter = MyVisitsAdapter(visitListFromBE, this, requireContext())
+                        val myVisitsAdapter =
+                            MyVisitsAdapter(visitListFromBE, this, requireContext())
 
                         // Setting the Adapter with the recyclerview
-                        binding.visitNumbers.text =
-                            visitListFromBE.size.toString() + " " + requireContext().getString(R.string.visit_number)
                         binding.todaysVisit.adapter = myVisitsAdapter
                     } else {
                         binding.todaysVisitParent.visibility = View.GONE

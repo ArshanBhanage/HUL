@@ -1,14 +1,32 @@
 package com.hul.screens.field_auditor_dashboard.ui.mobiliser_visits
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.location.Location
+import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
+import android.os.Looper
+import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.hul.HULApplication
@@ -17,6 +35,7 @@ import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
+import com.hul.curriculam.ui.form1Fill.Form1FillFragment
 import com.hul.data.MappedUser
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
@@ -129,8 +148,168 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
             binding.txtPending.setTextColor(Color.parseColor("#2F2B3DE5"))
         }
 
+        if (allPermissionsGranted()) {
+            checkLocationSettings()
+        } else {
+            requestPermission()
+        }
+
         return root
     }
+
+    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+        ContextCompat.checkSelfPermission(requireContext(), it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun checkLocationSettings() {
+        val locationManager =
+            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        if (!isGpsEnabled) {
+            //Toast.makeText(this, "GPS is not enabled", Toast.LENGTH_SHORT).show()
+            requestLocation()
+        } else {
+            requestLocationUpdates()
+            // Location services are enabled
+            //Toast.makeText(this, "Location services are enabled", Toast.LENGTH_SHORT).show()
+            // Proceed with location-related operations
+        }
+    }
+
+    // TODO: Step 1.1, Review variables (no changes).
+// FusedLocationProviderClient - Main class for receiving location updates.
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+
+    // LocationRequest - Requirements for the location updates, i.e., how often you
+// should receive updates, the priority, etc.
+    private lateinit var locationRequest: LocationRequest
+
+    // LocationCallback - Called when FusedLocationProviderClient has a new Location.
+    private lateinit var locationCallback: LocationCallback
+
+    // Used only for local storage of the last known location. Usually, this would be saved to your
+// database, but because this is a simplified sample without a full database, we only need the
+// last location to create a Notification if the user navigates away from the app.
+    private var currentLocation: Location? = null
+
+    private val requestPermission =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val granted = permissions.entries.all {
+                it.value == true
+            }
+            if (granted) {
+                checkLocationSettings()
+            } else {
+                requestPermission()
+            }
+        }
+
+    private val requestLocation =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { permissions ->
+            checkLocationSettings()
+        }
+
+    fun requestPermission() {
+        requestPermission.launch(REQUIRED_PERMISSIONS)
+    }
+
+    fun requestLocation() {
+        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        requestLocation.launch(intent)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun requestLocationUpdates() {
+
+        // Initialize FusedLocationProviderClient
+        fusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(requireActivity())
+
+
+        locationRequest = LocationRequest.create().apply {
+            // Sets the desired interval for active location updates. This interval is inexact. You
+            // may not receive updates at all if no location sources are available, or you may
+            // receive them less frequently than requested. You may also receive updates more
+            // frequently than requested if other applications are requesting location at a more
+            // frequent interval.
+            //
+            // IMPORTANT NOTE: Apps running on Android 8.0 and higher devices (regardless of
+            // targetSdkVersion) may receive updates less frequently than this interval when the app
+            // is no longer in the foreground.
+            interval = 60
+
+            // Sets the fastest rate for active location updates. This interval is exact, and your
+            // application will never receive updates more frequently than this value.
+            fastestInterval = 30
+
+            // Sets the maximum time when batched location updates are delivered. Updates may be
+            // delivered sooner than this interval.
+            maxWaitTime = 10
+
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                super.onLocationResult(locationResult)
+
+                // Normally, you want to save a new location to a database. We are simplifying
+                // things a bit and just saving it as a local variable, as we only need it again
+                // if a Notification is created (when the user navigates away from app).
+                currentLocation = locationResult.lastLocation
+
+                //attendenceViewModel.longitude.value = currentLocation!!.longitude.toString()
+                //attendenceViewModel.lattitude.value = currentLocation!!.latitude.toString()
+                fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+
+            }
+        }
+
+        fusedLocationProviderClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+
+//        locationCallback = object : LocationCallback() {
+//            //This callback is where we get "streaming" location updates. We can check things like accuracy to determine whether
+//            //this latest update should replace our previous estimate.
+//            override fun onLocationResult(locationResult: LocationResult) {
+//
+//                if (locationResult == null) {
+//                    Log.d(TAG, "locationResult null")
+//                    return
+//                }
+//                Log.d(TAG, "received " + locationResult.locations.size + " locations")
+//                for (loc in locationResult.locations) {
+//                    cameraPreviewViewModel.longitude.value = loc.longitude.toString()
+//                    cameraPreviewViewModel.lattitude.value = loc.latitude.toString()
+//                    if (cameraPreviewViewModel.uri.value != null) {
+//                        cancelProgressDialog()
+//                        redurectToImagePreview(cameraPreviewViewModel.uri.value!!)
+//                    }
+//                }
+//            }
+//
+//            override fun onLocationAvailability(locationAvailability: LocationAvailability) {
+//                Log.d(TAG, "locationAvailability is " + locationAvailability.isLocationAvailable)
+//                super.onLocationAvailability(locationAvailability)
+//            }
+//        }
+
+//        val locationRequest = LocationRequest.create().apply {
+//            interval = 100 // Update interval in milliseconds
+//            fastestInterval = 500 // Fastest update interval in milliseconds
+//            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+//        }
+//
+//        fusedLocationClient.requestLocationUpdates(
+//            locationRequest,
+//            locationCallback,
+//            null /* Looper */
+//        )
+    }
+
 
     override fun onResume() {
         super.onResume()
@@ -234,5 +413,45 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
         )
     }
 
+    override fun goToMap(projectInfo: ProjectInfo) {
+        if (currentLocation != null) {
+            projectInfo.longitude?.let { it1 ->
+                projectInfo.lattitude?.let { it2 ->
+                    openGoogleMapsForDirections(
+                        currentLocation!!.latitude,
+                        currentLocation!!.longitude,
+                        it2,
+                        it1
+                    )
+                }
+            }
+        }
+    }
+
+    private fun openGoogleMapsForDirections(
+        lat: Double,
+        lng: Double,
+        destinationLat: String,
+        destinationLng: String
+    ) {
+
+        val destLat = destinationLat
+        val destLng = destinationLng
+
+        // Build the URI for the directions request
+        val uri =
+            Uri.parse("http://maps.google.com/maps?saddr=$lat,$lng&daddr=$destLat,$destLng")
+
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        startActivity(intent)
+    }
+
+    companion object {
+        private val REQUIRED_PERMISSIONS = arrayOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+    }
 
 }

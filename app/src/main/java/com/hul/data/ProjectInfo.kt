@@ -9,5 +9,7 @@ data class ProjectInfo(
     var project_name: String? = null,
     var is_revisit: Int? = null,
     var visit_status: String? = null,
-    var number_of_books_distributed: String? = null
+    var number_of_books_distributed: String? = null,
+    var lattitude: String? = null,
+    var longitude: String? = null,
 )

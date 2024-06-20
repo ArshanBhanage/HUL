@@ -328,7 +328,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     override fun retry(type: Int) {
 
-        when (ApiExtentions.ApiDef.values()[type]) {
+        when (ApiExtentions.ApiDef.entries[type]) {
             ApiExtentions.ApiDef.GET_USER_DETAILS -> getMobilisers()
             ApiExtentions.ApiDef.GET_ATTENDENCE -> getAttendance()
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()

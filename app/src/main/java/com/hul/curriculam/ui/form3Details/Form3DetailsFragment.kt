@@ -1,4 +1,4 @@
-package com.hul.curriculam.ui.form2Details
+package com.hul.curriculam.ui.form3Details
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -21,7 +21,7 @@ import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.data.SchoolCode
-import com.hul.databinding.FragmentForm2Binding
+import com.hul.databinding.FragmentForm3Binding
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
@@ -35,9 +35,9 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import javax.inject.Inject
 
-class Form2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
+class Form3DetailsFragment : Fragment(), ApiHandler, RetryInterface {
 
-    private var _binding: FragmentForm2Binding? = null
+    private var _binding: FragmentForm3Binding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -46,7 +46,7 @@ class Form2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
     private lateinit var curriculamComponent: CurriculamComponent
 
     @Inject
-    lateinit var form2ViewModel: Form2ViewModel
+    lateinit var form3ViewModel: Form3ViewModel
 
     @Inject
     lateinit var userInfo: UserInfo
@@ -60,7 +60,7 @@ class Form2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
         savedInstanceState: Bundle?
     ): View {
 
-        _binding = FragmentForm2Binding.inflate(inflater, container, false)
+        _binding = FragmentForm3Binding.inflate(inflater, container, false)
         val root: View = binding.root
 
         binding.lifecycleOwner = viewLifecycleOwner
@@ -69,19 +69,19 @@ class Form2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
                 .create()
         curriculamComponent.inject(this)
 
-        form2ViewModel.selectedSchoolCode.value = Gson().fromJson(
+        form3ViewModel.selectedSchoolCode.value = Gson().fromJson(
             requireArguments().getString(ARG_CONTENT1),
             SchoolCode::class.java
         )
 
-        form2ViewModel.projectInfo.value = Gson().fromJson(
+        form3ViewModel.projectInfo.value = Gson().fromJson(
             requireArguments().getString(ARG_CONTENT2),
             ProjectInfo::class.java
         )
 
-        form2ViewModel.uDiceCode.value = requireArguments().getString(U_DICE_CODE)
+        form3ViewModel.uDiceCode.value = requireArguments().getString(U_DICE_CODE)
 
-        binding.viewModel = form2ViewModel
+        binding.viewModel = form3ViewModel
         return root
     }
 
@@ -91,7 +91,7 @@ class Form2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
         private const val U_DICE_CODE = "uDiceCode"
 
         fun newInstance(content1: String, content2: String, uDiceCode: String?) =
-            Form2DetailsFragment().apply {
+            Form3DetailsFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_CONTENT1, content1)
                     putString(ARG_CONTENT2, content2)
@@ -110,7 +110,7 @@ class Form2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     private fun visitsDataModel(): RequestModel {
-        return form2ViewModel.projectInfo.value?.visit_id?.let {
+        return form3ViewModel.projectInfo.value?.visit_id?.let {
             RequestModel(
                 project = userInfo.projectName,
                 visitId = it,
@@ -138,49 +138,42 @@ class Form2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
             ApiExtentions.ApiDef.GET_VISIT_DATA -> {
                 cancelProgressDialog()
                 val model = JSONObject(o.toString())
-                form2ViewModel.visitData.value = Gson().fromJson(
+                form3ViewModel.visitData.value = Gson().fromJson(
                     model.getJSONObject("data").toString(),
                     GetVisitDataResponseData::class.java
                 )
 
                 fillData()
 
-                if (form2ViewModel.visitData.value?.visit_2?.visit_image_1?.value != null) {
+                if (form3ViewModel.visitData.value?.visit_3?.visit_image_1?.value != null) {
                     loadImage(
-                        form2ViewModel.visitData.value?.visit_2?.visit_image_1!!.value.toString(),
+                        form3ViewModel.visitData.value?.visit_3?.visit_image_1!!.value.toString(),
                         binding.img1, binding.llImg1
                     )
                 }
 
-                if (form2ViewModel.visitData.value?.visit_2?.visit_image_2?.value != null) {
+                if (form3ViewModel.visitData.value?.visit_3?.visit_image_2?.value != null) {
                     loadImage(
-                        form2ViewModel.visitData.value?.visit_2?.visit_image_2!!.value.toString(),
+                        form3ViewModel.visitData.value?.visit_3?.visit_image_2!!.value.toString(),
                         binding.img2, binding.llImg2
                     )
                 }
 
-                if (form2ViewModel.visitData.value?.visit_2?.visit_image_3?.value != null) {
+                if (form3ViewModel.visitData.value?.visit_3?.visit_image_3?.value != null) {
                     loadImage(
-                        form2ViewModel.visitData.value?.visit_2?.visit_image_3!!.value.toString(),
+                        form3ViewModel.visitData.value?.visit_3?.visit_image_3!!.value.toString(),
                         binding.img3, binding.llImg3
                     )
                 }
 
-                if (form2ViewModel.visitData.value?.visit_2?.visit_image_4?.value != null) {
+                if (form3ViewModel.visitData.value?.visit_3?.visit_image_4?.value != null) {
                     loadImage(
-                        form2ViewModel.visitData.value?.visit_2?.visit_image_4!!.value.toString(),
+                        form3ViewModel.visitData.value?.visit_3?.visit_image_4!!.value.toString(),
                         binding.img4, binding.llImg4
                     )
                 }
 
-                // For render purpose only
-                /*if (form2ViewModel.visitData.value?.visit_1 != null) {
-                    form2ViewModel.visitDataToView.value = form2ViewModel.visitData.value?.visit_1
-                } else if (form2ViewModel.visitData.value?.visit_2 != null) {
-                    form2ViewModel.visitDataToView.value = form2ViewModel.visitData.value?.visit_2
-                } else if (form2ViewModel.visitData.value?.visit_3 != null) {
-                    form2ViewModel.visitDataToView.value = form2ViewModel.visitData.value?.visit_3
-                }*/
+
             }
 
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
@@ -199,24 +192,16 @@ class Form2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     private fun fillData() {
-        binding.txtUdiceCode.text = form2ViewModel.uDiceCode.value
-        binding.txtSchoolName.text = form2ViewModel.selectedSchoolCode.value?.location_name
-        binding.txtNoOfBooksGiven.text =
-            form2ViewModel.projectInfo.value?.number_of_books_distributed.toString()
-        binding.txtCurriculamOnTrack.text =
-            if (form2ViewModel.visitData.value?.visit_2?.mobile_number_of_the_school_representative_who_collected_the_books?.value == 1) "Yes" else "No"
+        binding.txtUdiceCode.text = form3ViewModel.uDiceCode.value
+        binding.txtSchoolName.text = form3ViewModel.selectedSchoolCode.value?.location_name
         binding.txtNameOfSchoolRepresentative.text =
-            form2ViewModel.visitData.value?.visit_2?.name_of_the_school_representative_who_collected_the_books?.value?.toString() ?: ""
-
+            form3ViewModel.visitData.value?.visit_3?.name_of_the_school_representative_who_collected_the_books?.value.toString()
         binding.txtNumberOfSchoolRepresentative.text =
-            form2ViewModel.visitData.value?.visit_2?.mobile_number_of_the_school_representative_who_collected_the_books?.value?.toString() ?: ""
-
+            form3ViewModel.visitData.value?.visit_3?.mobile_number_of_the_school_representative_who_collected_the_books?.value.toString()
+        binding.txtCurriculamOnTrack.text =
+            if (form3ViewModel.visitData.value?.visit_3?.mobile_number_of_the_school_representative_who_collected_the_books?.value == 1) "Yes" else "No"
         binding.txtRemark.text =
-            form2ViewModel.visitData.value?.visit_2?.remark?.value?.toString() ?: ""
-
-        binding.txtNoOfBooksGiven.text =
-            form2ViewModel.projectInfo.value?.number_of_books_distributed ?: ""
-
+            form3ViewModel.visitData.value?.visit_3?.remark?.value.toString()
     }
 
     private fun loadImage(base64: String, imgId: ImageView, llId: LinearLayout) {
