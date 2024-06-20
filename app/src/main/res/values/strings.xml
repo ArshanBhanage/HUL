@@ -182,4 +182,6 @@
     <string name="enter_number_here">Search here</string>
     <string name="successfully_captured_visit_details">Successfully captured visit details.</string>
     <string name="couldn_t_submit_visit_details">Couldn\'t submit visit details</string>
+    <string name="school_closed_merged">School Closed/Merged</string>
+    <string name="school_asked_to_revisit_for_more_tracker_collection">School asked to Revisit for more tracker collection</string>
 </resources>

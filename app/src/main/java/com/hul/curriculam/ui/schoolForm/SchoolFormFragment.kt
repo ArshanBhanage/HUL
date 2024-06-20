@@ -98,6 +98,14 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
         var currentVisit: ProjectInfo? = null;
         var completedVisit: ProjectInfo? = null;
 
+        var firstVisit: ProjectInfo? = null
+
+        for (visit in schoolFormViewModel.visitList.value!!) {
+            if (visit.visit_number == "1") {
+                firstVisit = visit
+            }
+        }
+
         // Add fragments dynamically
         for (visit in schoolFormViewModel.visitList.value!!) {
             if (visit.visit_status.equals("SUBMITTED", ignoreCase = true)
@@ -105,6 +113,7 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                 || visit.visit_status.equals("PARTIALLY_SUBMITTED", ignoreCase = true)
             ) {
                 currentVisit = visit
+                visit.number_of_books_distributed = firstVisit?.number_of_books_distributed
                 when (visit.visit_number) {
                     "1" -> addNewTab(
                         requireContext().getString(R.string.visit) + visit.visit_number,

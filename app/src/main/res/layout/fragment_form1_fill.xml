@@ -110,8 +110,7 @@
                             android:textColor="@color/black"
                             android:textFontWeight="400"
                             android:textSize="16sp"
-                            android:enabled="false"
-                            android:text='@{viewModel.uDiceCode}'/>
+                            android:enabled="false" />
 
 
                     </com.google.android.material.textfield.TextInputLayout>
@@ -149,8 +148,7 @@
                             android:textColor="@color/black"
                             android:textFontWeight="400"
                             android:textSize="16sp"
-                            android:enabled="false"
-                            android:text='@{viewModel.selectedSchoolCode.location_name}'/>
+                            android:enabled="false"/>
 
 
                     </com.google.android.material.textfield.TextInputLayout>
@@ -222,10 +220,36 @@
                             android:textFontWeight="400"
                             android:textSize="16sp"
                             android:enabled="false"
-                            android:text='@{viewModel.selectedSchoolCode.location_data_field1}'/>
+                            />
 
 
                     </com.google.android.material.textfield.TextInputLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginBottom="@dimen/_10sdp">
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switchSchoolClosed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/SCBSwitch"
+                            android:layout_marginRight="10dp"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/public_sans"
+                            android:text="@string/school_closed_merged"
+                            android:textColor="#2F2B3D"
+                            android:textFontWeight="400"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:layout_gravity="center"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </LinearLayout>
 
 
                     <TextView
@@ -724,9 +748,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
                         <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switchRevisit"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="@={viewModel.form6}"
                             android:layout_marginTop="10dp"
                             android:theme="@style/SCBSwitch"
                             android:layout_marginRight="10dp"
