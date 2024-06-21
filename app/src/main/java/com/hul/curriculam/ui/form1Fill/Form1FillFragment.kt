@@ -51,6 +51,8 @@ import com.hul.data.VisitData
 import com.hul.data.VisitDetails
 import com.hul.databinding.FragmentForm1FillBinding
 import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDialogFragment
+import com.hul.sync.VisitDataTable
+import com.hul.sync.VisitDataViewModel
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
@@ -85,6 +87,9 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
 
     @Inject
     lateinit var uploadFileController: UploadFileController
+
+    @Inject
+    lateinit var visitDataViewModel: VisitDataViewModel
 
     var imageIndex: Int = 0
 
@@ -147,6 +152,8 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
             if (imageIndex == 0) {
                 setProgressDialog(requireContext(), "Uploading")
                 uploadImage(form1FillViewModel.imageUrl1.value?.toUri()!!)
+//                val visitDataTable = VisitDataTable(jsonData= Gson().toJson(submitModel()), visitNumber = form1FillViewModel.projectInfo.value!!.visit_number!!.toInt(),locationName = form1FillViewModel.projectInfo.value!!.location_name!!, uDiceCode = form1FillViewModel.selectedSchoolCode.value!!.external_id1!!)
+//                visitDataViewModel.insert(visitDataTable)
             }
         }
 

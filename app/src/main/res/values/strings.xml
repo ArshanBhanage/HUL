@@ -65,7 +65,7 @@
     <string name="date">Date </string>
     <string name="start_new_project">Start new projects </string>
     <string name="otp_info">Make your project management easy!</string>
-    <string name="terms_condition">I agree to <a href="http://somesite.com/" style="color:#2C41CA">privacy policy &amp; terms</a></string>
+    <string name="terms_condition">I agree to <a style="color:#2C41CA" href="http://somesite.com/">privacy policy &amp; terms</a></string>
     <string name="otp_sub_info1">Enter the verification code from the mobile no </string>
     <string name="otp_sub_info2"> in the field below.</string>
     <string name="visit">Visit</string>
@@ -124,13 +124,13 @@
     <string name="principal_name">Name of the Principal</string>
     <string name="principal_number">Mobile number of the Principal</string>
     <string name="revisit_applicable">Revisit Applicable</string>
-    
+
     <string name="school_pic1">Picture of the school name</string>
     <string name="school_pic2">Selfie with the school name or UDISE code</string>
     <string name="school_pic3">Image of students showing the filled trackers in books</string>
     <string name="school_pic4">Image of teachers handing over the trackers</string>
     <string name="school_pic5">Acknowledgement letter picture</string>
-    
+
     <string name="form1">Name of the school representative who collected the books</string>
     <string name="form2">Mobile Number of the school representative who collected the books</string>
     <string name="form3">Name of the Principal</string>

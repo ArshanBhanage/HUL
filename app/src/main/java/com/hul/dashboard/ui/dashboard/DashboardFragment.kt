@@ -205,7 +205,9 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
             override fun afterTextChanged(s: Editable?) {
                 // Code to execute after the text is changed
-                if (binding.schoolCode.text.isNotEmpty() && s.toString().length < 10) {
+
+                val check = schoolCodes.filter { it.external_id1.equals(s.toString()) }
+                if (binding.schoolCode.text.isNotEmpty() && check.size == 0 && s.toString().length < 20) {
                     getSchoolCodes(binding.schoolCode.text.toString())
                 }
             }
@@ -764,7 +766,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                         )
                     }
 
-                    if (currentObject.present != null) {
+                    if (currentObject.present != null && currentObject.present!!) {
                         binding.punchInButton.visibility = GONE
                         binding.punchInButtonDisabled.visibility = VISIBLE
                         binding.punchInButton.isEnabled = false

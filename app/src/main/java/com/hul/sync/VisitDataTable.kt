@@ -8,7 +8,7 @@ data class VisitDataTable(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val jsonData: String,
     val visitNumber: Int, // Only values 1, 2, or 3,
-    val project: String,
+    val locationName: String,
     val uDiceCode : String,
 )
 
