@@ -31,12 +31,12 @@ data class RequestModel(
     val userType: String? = null,
     val mobiliserId: Int? = null,
     val visitId: Int? = null,
-    val loadImages: Boolean? = null,
+    val loadImages: Boolean = false,
     val projectName: String? = null,
     val uploadFor: String? = null,
     val filename: String? = null,
 
-    val collected_by: String? = null,
+    val collected_by: String = "MOBILISER",
     val schoolVisitData: SchoolVisitData? = null,
     val schoolId: Int? = null,
 

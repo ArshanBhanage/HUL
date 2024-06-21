@@ -123,6 +123,9 @@ const val SUB_AGENCY_REJECTED = "SUB_AGENCY_REJECTED"
 const val SUBMITTED = "SUBMITTED"
 const val SUB_AGENCY_APPROVED = "SUB_AGENCY_APPROVED"
 
+const val FIELD_AUDITOR_APPROVED = "FIELD_AUDITOR_APPROVED"
+const val FIELD_AUDITOR_REJECTED = "FIELD_AUDITOR_REJECTED"
+
 fun getScreenOrientation(mContext: AppCompatActivity): String {
     val getOrient = mContext.windowManager.defaultDisplay
     var orientation = Configuration.ORIENTATION_UNDEFINED

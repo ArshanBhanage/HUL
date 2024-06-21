@@ -116,6 +116,7 @@
     <string name="teacher_no">No. of teachers trained</string>
     <string name="student_no">No. of students as per record</string>
     <string name="books_no">No. of books handed over to school</string>
+    <string name="number_of_books_given">No. of books given to school</string>
     <string name="tracker_no">No. of filled trackers collected</string>
     <string name="more_tracker">School asked to revisit for more tracker collection</string>
     <string name="teachers_trained">No. of teachers trained</string>

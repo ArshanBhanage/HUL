@@ -67,13 +67,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_12sdp"
-                    android:fontFamily="@font/public_sans"
-                    android:lineHeight="@dimen/_28sdp"
-                    android:text='@{"Hi, " + viewModel.userName}'
+                    android:fontFamily="@font/public_sans_semi_bold"
                     android:textColor="#2F2B3D"
-                    android:textFontWeight="700"
-                    android:textSize="@dimen/_18ssp"
-                    android:textStyle="bold" />
+                    android:textSize="@dimen/_16ssp"
+                    android:text="Hi, "
+                    android:textStyle="bold"
+                    android:id="@+id/txtProfileName"/>
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"

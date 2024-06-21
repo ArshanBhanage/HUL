@@ -184,8 +184,7 @@
                                 android:inputType="number"
                                 android:textColor="@color/black"
                                 android:textSize="16sp"
-                                android:enabled="false"
-                                android:text='@{viewModel.visitData != null ? viewModel.visitData.visit_1.number_of_books_distributed.value : ""}'/>
+                                android:enabled="false" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -245,7 +244,6 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <com.google.android.material.textfield.TextInputLayout
-
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

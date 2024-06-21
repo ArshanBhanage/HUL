@@ -34,6 +34,8 @@ import com.hul.screens.field_auditor_dashboard.ui.school_activity.form2Details.A
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.form2Fill.AuditorForm2FillFragment
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.form3Fill.AuditorForm3FillFragment
 import com.hul.user.UserInfo
+import com.hul.utils.FIELD_AUDITOR_APPROVED
+import com.hul.utils.FIELD_AUDITOR_REJECTED
 import com.hul.utils.RetryInterface
 import com.hul.utils.SUBMITTED
 import com.hul.utils.SUB_AGENCY_APPROVED
@@ -106,16 +108,26 @@ class AuditorSchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
         var currentVisit: ProjectInfo? = null;
         var completedVisit: ProjectInfo? = null;
 
+        var firstVisit: ProjectInfo? = null
+
+        for (visit in schoolFormViewModel.visitList.value!!) {
+            if (visit.visit_number == "1") {
+                firstVisit = visit
+            }
+        }
+
         // Add fragments dynamically
         for (visit in schoolFormViewModel.visitList.value!!) {
-            if (visit.visit_status.equals(
+            if ((visit.visit_status.equals(
                     SUBMITTED,
                     ignoreCase = true
-                ) || visit.visit_status.equals(
-                    SUB_AGENCY_APPROVED, ignoreCase = true
                 )
+                || visit.visit_status.equals(
+                    SUB_AGENCY_APPROVED, ignoreCase = true
+                ))
             ) {
                 currentVisit = visit
+                visit.number_of_books_distributed = firstVisit?.number_of_books_distributed
                 when (visit.visit_number) {
                     "1" -> addNewTab(
                         requireContext().getString(R.string.visit) + visit.visit_number,
@@ -145,6 +157,7 @@ class AuditorSchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
 
             } else {
                 completedVisit = visit
+                visit.number_of_books_distributed = firstVisit?.number_of_books_distributed
                 when (visit.visit_number) {
                     "1" -> addNewTab(
                         requireContext().getString(R.string.visit) + visit.visit_number,
@@ -187,11 +200,11 @@ class AuditorSchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
             "Visit " + schoolFormViewModel.visitList.value!![0].visit_number + " School Activity"
         binding.visitSubTitle.text =
             if (schoolFormViewModel.visitList.value!![0].visit_status.equals(
-                    "ASSIGNED",
+                    FIELD_AUDITOR_APPROVED,
                     ignoreCase = true
                 )
                 || schoolFormViewModel.visitList.value!![0].visit_status.equals(
-                    "INITIATED",
+                    FIELD_AUDITOR_REJECTED,
                     ignoreCase = true
                 )
             )
@@ -203,11 +216,11 @@ class AuditorSchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                     "Visit " + schoolFormViewModel.visitList.value!![tab.position].visit_number + " School Activity"
                 binding.visitSubTitle.text =
                     if (schoolFormViewModel.visitList.value!![tab.position].visit_status.equals(
-                            "ASSIGNED",
+                            FIELD_AUDITOR_APPROVED,
                             ignoreCase = true
                         )
                         || schoolFormViewModel.visitList.value!![tab.position].visit_status.equals(
-                            "INITIATED",
+                            FIELD_AUDITOR_REJECTED,
                             ignoreCase = true
                         )
                     )

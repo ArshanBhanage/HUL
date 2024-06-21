@@ -46,4 +46,8 @@ data class VisitData(
     var auditor_visit_image_3: VisitDetails? = null,
     var latitude: VisitDetails? = null,
     var longitude: VisitDetails? = null,
+    var name_of_the_school_representative_who_mobiliser_met: VisitDetails? = null,
+    var number_of_the_school_representative_who_mobiliser_met: VisitDetails? = null,
+    var name_of_the_school_principal_auditor: VisitDetails? = null,
+    var number_of_the_school_principal_auditor: VisitDetails? = null
 )

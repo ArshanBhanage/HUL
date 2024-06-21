@@ -185,7 +185,7 @@
                                 android:textColor="@color/black"
                                 android:textSize="16sp"
                                 android:enabled="false"
-                                android:text='@{viewModel.visitData != null ? viewModel.visitData.visit_1.number_of_books_distributed.value : ""}'/>
+                                />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -507,7 +507,8 @@
                             android:maxLength="10"
                             android:textColor="@color/black"
                             android:textFontWeight="400"
-                            android:textSize="16sp"/>
+                            android:textSize="16sp"
+                            android:enabled="false"/>
 
 
                     </com.google.android.material.textfield.TextInputLayout>

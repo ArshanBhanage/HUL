@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import com.hul.HULApplication
 import com.hul.api.ApiExtentions
@@ -28,6 +29,10 @@ import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectionAlertDialogue
 import com.hul.utils.setProgressDialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -100,7 +105,8 @@ class AuditorForm2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
             RequestModel(
                 project = userInfo.projectName,
                 visitId = it,
-                loadImages = false
+                loadImages = true,
+                collected_by = "FIELD_AUDITOR"
             )
         }!!
     }
@@ -130,38 +136,24 @@ class AuditorForm2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
                     GetVisitDataResponseData::class.java
                 )
 
-                /*if (form2ViewModel.visitData.value?.visit_1?.visit_image_1?.value != null) {
+                if (form2ViewModel.visitData.value?.visit_2?.auditor_visit_image_1?.value != null) {
                     loadImage(
-                        form2ViewModel.visitData.value?.visit_1?.visit_image_1!!.value.toString(),
+                        form2ViewModel.visitData.value?.visit_2?.auditor_visit_image_1!!.value.toString(),
                         binding.img1, binding.llImg1)
                 }
 
-                if (form2ViewModel.visitData.value?.visit_1?.visit_image_2?.value != null) {
+                if (form2ViewModel.visitData.value?.visit_2?.auditor_visit_image_2?.value != null) {
                     loadImage(
-                        form2ViewModel.visitData.value?.visit_1?.visit_image_2!!.value.toString(),
+                        form2ViewModel.visitData.value?.visit_2?.auditor_visit_image_2!!.value.toString(),
                         binding.img2, binding.llImg2)
                 }
 
-                if (form2ViewModel.visitData.value?.visit_1?.visit_image_3?.value != null) {
+                if (form2ViewModel.visitData.value?.visit_2?.auditor_visit_image_3?.value != null) {
                     loadImage(
-                        form2ViewModel.visitData.value?.visit_1?.visit_image_3!!.value.toString(),
+                        form2ViewModel.visitData.value?.visit_2?.auditor_visit_image_3!!.value.toString(),
                         binding.img3, binding.llImg3)
                 }
 
-                if (form2ViewModel.visitData.value?.visit_1?.visit_image_4?.value != null) {
-                    loadImage(
-                        form2ViewModel.visitData.value?.visit_1?.visit_image_4!!.value.toString(),
-                        binding.img4, binding.llImg4)
-                }*/
-
-                // For render purpose only
-                /*if (form2ViewModel.visitData.value?.visit_1 != null) {
-                    form2ViewModel.visitDataToView.value = form2ViewModel.visitData.value?.visit_1
-                } else if (form2ViewModel.visitData.value?.visit_2 != null) {
-                    form2ViewModel.visitDataToView.value = form2ViewModel.visitData.value?.visit_2
-                } else if (form2ViewModel.visitData.value?.visit_3 != null) {
-                    form2ViewModel.visitDataToView.value = form2ViewModel.visitData.value?.visit_3
-                }*/
             }
 
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
@@ -180,9 +172,31 @@ class AuditorForm2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     private fun loadImage(base64: String, imgId: ImageView, llId: LinearLayout) {
-        val decodedString = Base64.decode(base64, Base64.DEFAULT)
-        val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-        imgId.setImageBitmap(decodedByte)
-        llId.visibility = View.VISIBLE
+
+        binding.llImages.visibility = View.VISIBLE
+
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val decodedByte = withContext(Dispatchers.IO) {
+                    val decodedString = Base64.decode(base64, Base64.DEFAULT)
+                    BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                }
+
+                Glide.with(imgId.context)
+                    .load(decodedByte)
+                    .into(imgId)
+
+                llId.visibility = View.VISIBLE
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.img1.setImageBitmap(null)
+        binding.img2.setImageBitmap(null)
+        binding.img3.setImageBitmap(null)
     }
 }
