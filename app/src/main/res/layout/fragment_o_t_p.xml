@@ -33,14 +33,13 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:paddingTop="56dp"
-                android:paddingBottom="32dp"
+                android:paddingVertical="@dimen/_20sdp"
                 android:paddingHorizontal="16dp"
                 android:background="#d7dcf2">
                 <ImageView
                     android:id="@+id/logoimage"
-                    android:layout_width="@dimen/_100sdp"
-                    android:layout_height="@dimen/_60sdp"
+                    android:layout_width="@dimen/_120sdp"
+                    android:layout_height="@dimen/_80sdp"
                     android:src="@drawable/ic_curriculum_logo"
                     android:textColor="@color/black"
                     android:textSize="20sp"
@@ -48,8 +47,8 @@
 
                     />
                 <ImageView
-                    android:layout_width="@dimen/_100sdp"
-                    android:layout_height="@dimen/_60sdp"
+                    android:layout_width="@dimen/_120sdp"
+                    android:layout_height="@dimen/_80sdp"
                     android:src="@mipmap/hullogo"
                     android:textColor="@color/black"
                     android:textSize="20sp"
