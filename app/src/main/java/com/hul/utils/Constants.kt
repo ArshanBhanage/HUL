@@ -114,8 +114,14 @@ val languages = arrayListOf("English", "हिंदी", "ಕನ್ನಡ", "�
 
 const val USER_TYPE = "userType"
 const val MY_AREA = "myArea"
+const val IS_NEW_VISIT_SUBMITTED = "isNewVisitSubmitted"
 
-
+const val INITIATED = "INITIATED"
+const val ASSIGNED = "ASSIGNED"
+const val PARTIALLY_SUBMITTED = "PARTIALLY_SUBMITTED"
+const val SUB_AGENCY_REJECTED = "SUB_AGENCY_REJECTED"
+const val SUBMITTED = "SUBMITTED"
+const val SUB_AGENCY_APPROVED = "SUB_AGENCY_APPROVED"
 
 fun getScreenOrientation(mContext: AppCompatActivity): String {
     val getOrient = mContext.windowManager.defaultDisplay

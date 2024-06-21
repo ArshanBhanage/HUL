@@ -25,7 +25,6 @@ import com.hul.databinding.FragmentOTPBinding
 import com.hul.loginRegistraion.LoginRegisterComponent
 import com.hul.loginRegistraion.LoginRegistrationInterface
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboard
-import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface

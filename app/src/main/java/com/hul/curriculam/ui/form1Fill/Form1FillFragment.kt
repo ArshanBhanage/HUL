@@ -11,13 +11,17 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.text.InputFilter
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -27,6 +31,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.hul.HULApplication
 import com.hul.R
@@ -36,7 +41,7 @@ import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
 import com.hul.camera.CameraActivity
 import com.hul.curriculam.CurriculamComponent
-import com.hul.curriculam.ui.form2Fill.Form2FillFragment
+import com.hul.dashboard.Dashboard
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
@@ -46,6 +51,8 @@ import com.hul.data.VisitData
 import com.hul.data.VisitDetails
 import com.hul.databinding.FragmentForm1FillBinding
 import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDialogFragment
+import com.hul.sync.VisitDataTable
+import com.hul.sync.VisitDataViewModel
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
@@ -81,11 +88,16 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
     @Inject
     lateinit var uploadFileController: UploadFileController
 
+    @Inject
+    lateinit var visitDataViewModel: VisitDataViewModel
+
     var imageIndex: Int = 0
 
     private lateinit var countDownTimer: CountDownTimer
 
     var isTimerStarted = false;
+
+    private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -108,7 +120,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
         )
 
         binding.llGetDirection.visibility =
-            if (schoolCode.lattitude == null) View.GONE else View.VISIBLE
+            if (schoolCode?.lattitude == null) View.GONE else View.GONE
 
         form1FillViewModel.selectedSchoolCode.value = schoolCode
 
@@ -140,6 +152,8 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
             if (imageIndex == 0) {
                 setProgressDialog(requireContext(), "Uploading")
                 uploadImage(form1FillViewModel.imageUrl1.value?.toUri()!!)
+//                val visitDataTable = VisitDataTable(jsonData= Gson().toJson(submitModel()), visitNumber = form1FillViewModel.projectInfo.value!!.visit_number!!.toInt(),locationName = form1FillViewModel.projectInfo.value!!.location_name!!, uDiceCode = form1FillViewModel.selectedSchoolCode.value!!.external_id1!!)
+//                visitDataViewModel.insert(visitDataTable)
             }
         }
 
@@ -181,14 +195,15 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
             requestPermission()
         }
 
-        val allowOnlyLettersAndSpacesFilter = InputFilter { source, start, end, dest, dstart, dend ->
-            for (i in start until end) {
-                if (!source[i].isLetter() && !source[i].isWhitespace()) {
-                    return@InputFilter ""
+        val allowOnlyLettersAndSpacesFilter =
+            InputFilter { source, start, end, dest, dstart, dend ->
+                for (i in start until end) {
+                    if (!source[i].isLetter() && !source[i].isWhitespace()) {
+                        return@InputFilter ""
+                    }
                 }
+                null
             }
-            null
-        }
 
         binding.form1.filters = arrayOf(allowOnlyLettersAndSpacesFilter)
 
@@ -197,7 +212,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.studentNo.setText(schoolCode.location_data_field1)
 
         binding.txtDirections.setOnClickListener {
-            if(currentLocation != null) {
+            if (currentLocation != null) {
                 form1FillViewModel.selectedSchoolCode.value?.longitude?.let { it1 ->
                     form1FillViewModel.selectedSchoolCode.value?.lattitude?.let { it2 ->
                         openGoogleMapsForDirections(
@@ -211,6 +226,19 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
             }
         }
 
+        binding.nestedScrollView.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
+                    Log.d("TouchListener", "User scrolled manually")
+                    val currentFocus = activity?.currentFocus
+                    if (currentFocus is TextInputEditText) {
+                        currentFocus.clearFocus()
+                    }
+                }
+            }
+            false
+        }
+
         return root
     }
 
@@ -221,8 +249,8 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
         destinationLng: String
     ) {
 
-        val destLat = TimeUtils.parseCoordinate(destinationLat)
-        val destLng = TimeUtils.parseCoordinate(destinationLng)
+        val destLat = destinationLat
+        val destLng = destinationLng
 
         // Build the URI for the directions request
         val uri =
@@ -324,13 +352,14 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
 
-        fun newInstance(content1: String, content2: String, uDiceCode: String?) = Form1FillFragment().apply {
-            arguments = Bundle().apply {
-                putString(ARG_CONTENT1, content1)
-                putString(ARG_CONTENT2, content2)
-                putString(U_DICE_CODE, uDiceCode)
+        fun newInstance(content1: String, content2: String, uDiceCode: String?) =
+            Form1FillFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_CONTENT1, content1)
+                    putString(ARG_CONTENT2, content2)
+                    putString(U_DICE_CODE, uDiceCode)
+                }
             }
-        }
     }
 
     private fun visitsDataModel(): RequestModel {
@@ -535,22 +564,29 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
             project = userInfo.projectName,
             visit_id = form1FillViewModel.projectInfo.value!!.visit_id.toString(),
             visitData = VisitData(
-                no_of_teachers_trained = VisitDetails(value = form1FillViewModel.teachersTrained.value),
+                u_dice_code = VisitDetails(value = binding.disceCode.text.toString()),
+                school_name = VisitDetails(value = binding.schoolName.text.toString()),
                 no_of_students_as_per_record = VisitDetails(value = binding.studentNo.text.toString()),
+                school_closed = VisitDetails(value = if (binding.switchSchoolClosed.isChecked) 1 else 0),
                 number_of_books_distributed = VisitDetails(value = form1FillViewModel.noOfBooksHandedOver.value),
+                no_of_teachers_trained = VisitDetails(value = form1FillViewModel.teachersTrained.value),
+
                 visit_image_1 = VisitDetails(value = form1FillViewModel.imageApiUrl1.value),
                 visit_image_2 = VisitDetails(value = form1FillViewModel.imageApiUrl2.value),
                 visit_image_3 = VisitDetails(value = form1FillViewModel.imageApiUrl3.value),
                 visit_image_4 = VisitDetails(value = form1FillViewModel.imageApiUrl4.value),
-                school_name = binding.schoolName.text.toString(),
+
                 name_of_the_school_representative_who_collected_the_books = VisitDetails(value = form1FillViewModel.form1.value.toString()),
-                mobile_number_of_the_school_representative_who_collected_the_books = VisitDetails(value = form1FillViewModel.form2.value.toString()),
+                mobile_number_of_the_school_representative_who_collected_the_books = VisitDetails(
+                    value = form1FillViewModel.form2.value.toString()
+                ),
                 name_of_the_principal = VisitDetails(value = form1FillViewModel.form3.value.toString()),
                 mobile_number_of_the_principal = VisitDetails(value = form1FillViewModel.form4.value.toString()),
-                revisit_applicable = VisitDetails(value = if(form1FillViewModel.form6.value!!) "Yes" else "No"),
+                revisit_applicable = VisitDetails(value = if (binding.switchRevisit.isChecked) 1 else 0),
                 remark = VisitDetails(value = form1FillViewModel.form5.value),
-                u_dice_code = binding.disceCode.text.toString(),
                 visit_id = form1FillViewModel.projectInfo.value!!.visit_id.toString(),
+                latitude = VisitDetails(value = currentLocation?.latitude.toString()),
+                longitude = VisitDetails(value = currentLocation?.longitude.toString())
             )
         )
     }
@@ -572,12 +608,11 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Visit data submitted successfully",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    requireActivity().onBackPressed()
+                    userInfo.didUserSubmitNewVisit = true
+                    val intent = Intent(activity, Dashboard::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                    requireActivity().finish()
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -616,8 +651,10 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
                     GetVisitDataResponseData::class.java
                 )
 
+                fillData()
+
                 // For render purpose only
-                if (form1FillViewModel.visitData.value?.visit_1 != null) {
+                /*if (form1FillViewModel.visitData.value?.visit_1 != null) {
                     form1FillViewModel.visitDataToView.value =
                         form1FillViewModel.visitData.value?.visit_1
                 } else if (form1FillViewModel.visitData.value?.visit_2 != null) {
@@ -626,11 +663,43 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 } else if (form1FillViewModel.visitData.value?.visit_3 != null) {
                     form1FillViewModel.visitDataToView.value =
                         form1FillViewModel.visitData.value?.visit_3
-                }
+                }*/
             }
 
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun fillData() {
+        binding.disceCode.setText(form1FillViewModel.uDiceCode.value)
+        binding.schoolName.setText(form1FillViewModel.selectedSchoolCode.value?.location_name)
+        binding.studentNo.setText(form1FillViewModel.selectedSchoolCode.value?.location_data_field1)
+        binding.switchSchoolClosed.isChecked = form1FillViewModel.visitData.value?.visit_1?.school_closed?.value == 1
+        binding.noOfBooksHanded.setText(
+            form1FillViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value?.toString() ?: ""
+        )
+        binding.noOfBooksHanded.setText(
+            form1FillViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value?.toString() ?: ""
+        )
+        binding.teachersTrained.setText(
+            form1FillViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.value?.toString() ?: ""
+        )
+        binding.form1.setText(
+            form1FillViewModel.visitData.value?.visit_1?.name_of_the_school_representative_who_collected_the_books?.value?.toString() ?: ""
+        )
+        binding.form2.setText(
+            form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_school_representative_who_collected_the_books?.value?.toString() ?: ""
+        )
+        binding.form3.setText(
+            form1FillViewModel.visitData.value?.visit_1?.name_of_the_principal?.value?.toString() ?: ""
+        )
+        binding.form4.setText(
+            form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_principal?.value?.toString() ?: ""
+        )
+        binding.switchRevisit.isChecked = if (form1FillViewModel.visitData.value?.visit_1?.revisit_applicable?.value == 1) true else false
+        binding.form5.setText(
+            form1FillViewModel.visitData.value?.visit_1?.remark?.value?.toString() ?: ""
+        )
     }
 
 //    override fun onApiSuccess(o: String?, objectType: Int) {
@@ -701,5 +770,17 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
         val minutesLeft = millisUntilFinished / 1000 / 60
         val secondsLeft = (millisUntilFinished / 1000) % 60
         binding.txtClock.text = String.format("Submit in %d:%02d minutes", minutesLeft, secondsLeft)
+    }
+
+    fun showViewTemporarily(view: View, duration: Long) {
+        view.visibility = View.VISIBLE
+        handler.postDelayed({
+            view.visibility = View.GONE
+        }, duration)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        handler.removeCallbacksAndMessages(null)
     }
 }

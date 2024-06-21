@@ -21,12 +21,8 @@
         android:label="AttendenceFragment" />
     <fragment
         android:id="@+id/schoolActivityFragment"
-        android:name="com.hul.screens.field_auditor_dashboard.ui.school_activity.SchoolActivityFragment"
+        android:name="com.hul.screens.field_auditor_dashboard.ui.school_activity.AuditorSchoolFormFragment"
         android:label="SchoolActivityFragment">
-        <argument
-            android:name="projectInfo"
-            app:argType="string"
-            app:nullable="false" />
         <action
             android:id="@+id/action_reset_to_dashboard"
             app:destination="@id/dashboardFragment" />
@@ -43,6 +39,8 @@
         <action
             android:id="@+id/action_visits_school_activity"
             app:destination="@id/schoolActivityFragment" />
+
     </fragment>
+
 
 </navigation>

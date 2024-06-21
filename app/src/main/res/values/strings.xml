@@ -13,7 +13,7 @@
     <string name="school_name">School Name</string>
     <string name="name_of_school_representative">Name of the school representative whom mobiliser met</string>
     <string name="mobile_number_of_school_representative">Mobile Number of the school representative whom mobiliser met</string>
-    <string name="u_dise_code">U DISE Code</string>
+    <string name="u_dise_code">UDISE Code</string>
     <string name="ward">Ward/Block</string>
     <string name="district">District</string>
     <string name="school_Code">School Code</string>
@@ -33,7 +33,7 @@
     <string name="selfie_at_school">Selfie at first school</string>
     <string name="picture_school_name">Picture of the school name</string>
     <string name="material_info">Full image of mobiliser with curriculum material</string>
-    <string name="selfie_with_school_name">Selfie with the school name or U DISE code</string>
+    <string name="selfie_with_school_name">Selfie with the school name or UDISE code</string>
 
     <string name="ack_letter_picture">Acknowledgement letter picture</string>
     <string name="or_select_location">Or select from below</string>
@@ -50,6 +50,7 @@
     <string name="location_name">Location name</string>
     <string name="my_visits">My Visits</string>
     <string name="my_area">My Area</string>
+    <string name="my_location">My Location</string>
     <string name="my_performance">My Performance</string>
     <string name="visit_number">Visits today</string>
     <string name="punch_time">Punch in time </string>
@@ -110,8 +111,8 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
-
-    <string name="disce_code">U DISE Code</string>
+    
+    <string name="disce_code">UDISE Code</string>
     <string name="teacher_no">No. of teachers trained</string>
     <string name="student_no">No. of students as per record</string>
     <string name="books_no">No. of books handed over to school</string>
@@ -125,7 +126,7 @@
     <string name="revisit_applicable">Revisit Applicable</string>
 
     <string name="school_pic1">Picture of the school name</string>
-    <string name="school_pic2">Selfie with the school name or U DISE code</string>
+    <string name="school_pic2">Selfie with the school name or UDISE code</string>
     <string name="school_pic3">Image of students showing the filled trackers in books</string>
     <string name="school_pic4">Image of teachers handing over the trackers</string>
     <string name="school_pic5">Acknowledgement letter picture</string>
@@ -166,4 +167,21 @@
     <string name="btnClose">Close</string>
     <string name="select_district">Select District</string>
     <string name="get_directions">Get Directions</string>
+    <string name="auditor_visit_1_pic_1">Selfie with the school name or UDISE code</string>
+    <string name="auditor_visit_1_pic_2">Acknowledgement letter picture</string>
+
+    <string name="auditor_visit_2_pic_1">Picture of the school name</string>
+    <string name="auditor_visit_2_pic_2">Selfie with the school name or UDISE code</string>
+    <string name="auditor_visit_2_pic_3">Acknowledgement letter picture</string>
+
+    <string name="auditor_visit_3_pic_1">Picture of the school name</string>
+    <string name="auditor_visit_3_pic_2">Selfie with the school name or UDISE code</string>
+    <string name="auditor_visit_3_pic_3">Trackers acknowledgement form</string>
+    <string name="were_the_filled_trackers_collected">Were the Filled Trackers Collected?</string>
+    <string name="add_new">Add New</string>
+    <string name="enter_number_here">Search here</string>
+    <string name="successfully_captured_visit_details">Successfully captured visit details.</string>
+    <string name="couldn_t_submit_visit_details">Couldn\'t submit visit details</string>
+    <string name="school_closed_merged">School Closed/Merged</string>
+    <string name="school_asked_to_revisit_for_more_tracker_collection">School asked to Revisit for more tracker collection</string>
 </resources>

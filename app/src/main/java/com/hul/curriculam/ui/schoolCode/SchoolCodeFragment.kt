@@ -1,6 +1,5 @@
 package com.hul.curriculam.ui.schoolCode
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -17,12 +16,7 @@ import com.hul.R
 import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
-import com.hul.curriculam.Curriculam
 import com.hul.curriculam.CurriculamComponent
-import com.hul.dashboard.ui.dashboard.AttendenceAdapter
-import com.hul.dashboard.ui.dashboard.MyVisitsAdapter
-import com.hul.data.Attendencemodel
-import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.data.SchoolCode
 import com.hul.databinding.FragmentSchoolCodeBinding
@@ -32,7 +26,6 @@ import com.hul.utils.RetryInterface
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectionAlertDialogue
-import com.hul.utils.setProgressDialog
 import org.json.JSONObject
 import java.lang.reflect.Type
 import java.util.Collections

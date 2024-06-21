@@ -6,4 +6,6 @@ import com.hul.data.ProjectInfo
 interface MobiliserVisitsFragmentInterface {
 
     fun redirectToSchoolActivity(projectInfo: ProjectInfo)
+
+    fun goToMap(projectInfo: ProjectInfo)
 }

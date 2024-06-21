@@ -1,0 +1,571 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.hul.curriculam.ui.form1Fill.Form1FillViewModel" />
+    </data>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#f8f9fa"
+        android:id="@+id/nestedScrollView">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:layout_marginTop="24dp"
+            android:paddingBottom="56dp">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:layout_marginVertical="16dp"
+                android:background="@color/white"
+                app:cardCornerRadius="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        android:lineHeight="28dp"
+                        android:text="@string/disce_code"
+                        android:textColor="#2F2B3D"
+                        android:textFontWeight="400"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        app:errorIconTint="@color/red"
+                        app:errorTextColor="@color/red"
+                        app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+                        app:placeholderText="@string/enter_here"
+                        app:prefixTextColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/disce_code"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineHeight="18dp"
+                            android:textColor="@color/black"
+                            android:textFontWeight="400"
+                            android:textSize="16sp"
+                            android:enabled="false"
+                            android:text='@{viewModel.uDiceCode}'/>
+
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        android:lineHeight="28dp"
+                        android:text="@string/school_name"
+                        android:textColor="#2F2B3D"
+                        android:textFontWeight="400"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        app:errorIconTint="@color/red"
+                        app:errorTextColor="@color/red"
+                        app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+                        app:placeholderText="@string/enter_here"
+                        app:prefixTextColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/schoolName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineHeight="18dp"
+                            android:textColor="@color/black"
+                            android:textFontWeight="400"
+                            android:textSize="16sp"
+                            android:enabled="false"
+                            android:text='@{viewModel.selectedSchoolCode.location_name}'/>
+
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llGetDirection"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="@dimen/_5sdp"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:layout_width="@dimen/_25sdp"
+                            android:layout_height="@dimen/_25sdp"
+                            android:src="@drawable/gps"
+                            android:gravity="center_vertical"
+                            />
+
+                        <TextView
+                            android:id="@+id/txtDirections"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/_25sdp"
+                            android:fontFamily="@font/public_sans_regular"
+                            android:maxLines="1"
+                            android:text="@string/get_directions"
+                            android:textColor="@color/purple_700"
+                            android:textSize="@dimen/_12ssp"
+                            android:textStyle="bold"
+                            android:visibility="visible"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="@dimen/_10sdp"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        android:lineHeight="28dp"
+                        android:text="@string/books_no"
+                        android:textColor="#2F2B3D"
+                        android:textFontWeight="400"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/public_sans"
+                            app:boxStrokeErrorColor="@color/red"
+                            app:errorEnabled="true"
+                            app:errorIconTint="@color/red"
+                            app:errorTextColor="@color/red"
+                            app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+                            app:placeholderText="@string/enter_here"
+                            app:prefixTextColor="@color/black">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edtNoOfBooksHandedOver"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="number"
+                                android:textColor="@color/black"
+                                android:textSize="16sp"
+                                android:enabled="false"
+                                android:text='@{viewModel.visitData != null ? viewModel.visitData.visit_1.number_of_books_distributed.value : ""}'/>
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <LinearLayout
+                            android:id="@+id/llButtons"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginBottom="@dimen/_7sdp">
+
+                            <ImageView
+                                android:id="@+id/btnNegative"
+                                android:layout_width="@dimen/_40sdp"
+                                android:layout_height="@dimen/_40sdp"
+                                android:src="@drawable/ic_negative"
+                                android:layout_gravity="center_vertical"/>
+
+                            <ImageView
+                                android:id="@+id/btnPositive"
+                                android:layout_width="@dimen/_40sdp"
+                                android:layout_height="@dimen/_40sdp"
+                                android:src="@drawable/ic_positive"
+                                android:layout_gravity="center_vertical"/>
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/tickSuccess"
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp"
+                            android:src="@mipmap/circlecheck"
+                            android:layout_gravity="center_vertical"
+                            android:visibility="gone"/>
+
+                        <ImageView
+                            android:id="@+id/tickFailure"
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp"
+                            android:src="@mipmap/error"
+                            app:tint="@color/red"
+                            android:layout_gravity="center_vertical"
+                            android:visibility="gone"/>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        android:lineHeight="28dp"
+                        android:text="@string/no_of_books_given"
+                        android:textColor="#2F2B3D"
+                        android:textFontWeight="400"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+                        app:placeholderText="@string/enter_here"
+                        app:prefixTextColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtNoOfBooksGiven"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineHeight="18dp"
+                            android:inputType="number"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/image1Description"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/public_sans"
+                            android:text="@string/auditor_visit_1_pic_1"
+                            android:textColor="#6d6b77"
+                            android:textFontWeight="400"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:layout_weight="1"
+                            />
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:visibility="@{viewModel.captured1Visibility}"
+                            android:layout_gravity="center_vertical">
+
+                            <ImageView
+                                android:id="@+id/view1"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginRight="10dp"
+                                android:src="@mipmap/view" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@mipmap/circlecheck" />
+
+                        </LinearLayout>
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/capture1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="35dp"
+                            android:layout_gravity="center_vertical"
+                            android:background="#dde0f6"
+                            android:fontFamily="@font/publicsans"
+                            android:paddingHorizontal="20dp"
+                            android:text="@string/capture"
+                            android:textAllCaps="false"
+                            android:textColor="@color/purple_500"
+                            android:textFontWeight="700"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:visibility="@{viewModel.capture1Visibility}"/>
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="@dimen/_10sdp">
+
+                        <TextView
+                            android:id="@+id/image2Description"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/public_sans"
+                            android:text="@string/auditor_visit_1_pic_2"
+                            android:textColor="#6d6b77"
+                            android:textFontWeight="400"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:layout_weight="1"
+                            />
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:visibility="@{viewModel.captured2Visibility}"
+                            android:layout_gravity="center_vertical">
+
+                            <ImageView
+                                android:id="@+id/view2"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginRight="10dp"
+                                android:src="@mipmap/view" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@mipmap/circlecheck" />
+
+                        </LinearLayout>
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/capture2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="35dp"
+                            android:layout_gravity="center_vertical"
+                            android:background="#dde0f6"
+                            android:fontFamily="@font/publicsans"
+                            android:paddingHorizontal="20dp"
+                            android:text="@string/capture"
+                            android:textAllCaps="false"
+                            android:textColor="@color/purple_500"
+                            android:textFontWeight="700"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:visibility="@{viewModel.capture2Visibility}"/>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        android:lineHeight="28dp"
+                        android:text="@string/name_of_school_representative"
+                        android:textColor="#2F2B3D"
+                        android:textFontWeight="400"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="24dp"
+                        app:layout_constraintTop_toTopOf="parent" />
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        app:error="@{viewModel.form1Error}"
+                        app:errorIconTint="@color/red"
+                        app:errorTextColor="@color/red"
+                        app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+                        app:placeholderText="@string/username_placeholder"
+                        app:prefixTextColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/form1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineHeight="18dp"
+                            android:inputType="text"
+                            android:text="@={viewModel.form1}"
+                            android:textColor="@color/black"
+                            android:textFontWeight="400"
+                            android:textSize="16sp"
+                            android:enabled="false"/>
+
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        android:lineHeight="28dp"
+                        android:text="@string/mobile_number_of_school_representative"
+                        android:textColor="#2F2B3D"
+                        android:textFontWeight="400"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent" />
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        app:error="@{viewModel.form2Error}"
+                        app:errorIconTint="@color/red"
+                        app:errorTextColor="@color/red"
+                        app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+                        app:placeholderText="@string/username_placeholder"
+                        app:prefixTextColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/form2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineHeight="18dp"
+                            android:inputType="number"
+                            android:maxLength="10"
+                            android:text="@={viewModel.form2}"
+                            android:textColor="@color/black"
+                            android:textFontWeight="400"
+                            android:textSize="16sp"
+                            android:enabled="false"/>
+
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:theme="@style/SCBSwitch"
+                            android:layout_marginRight="10dp"
+                            android:id="@+id/switchBookDistribution"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/public_sans"
+                            android:lineHeight="28dp"
+                            android:text="@string/have_the_books_distribution_to_students_done"
+                            android:textColor="#2F2B3D"
+                            android:textFontWeight="400"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:layout_gravity="center"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_10sdp">
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:theme="@style/SCBSwitch"
+                            android:layout_marginRight="10dp"
+                            android:id="@+id/switchVideoShared"
+                            />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/public_sans"
+                            android:lineHeight="28dp"
+                            android:text="@string/was_video_shared_with_teacher"
+                            android:textColor="#2F2B3D"
+                            android:textFontWeight="400"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:layout_gravity="center"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        android:lineHeight="28dp"
+                        android:layout_marginTop="24dp"
+                        android:text="@string/remarks"
+                        android:textColor="#2F2B3D"
+                        android:textFontWeight="400"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent" />
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:errorEnabled="true"
+                        app:errorIconTint="@color/red"
+                        app:errorTextColor="@color/red"
+                        app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+                        app:placeholderText="@string/username_placeholder"
+                        app:prefixTextColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/form5"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineHeight="18dp"
+                            android:text="@={viewModel.form5}"
+                            android:textColor="@color/black"
+                            android:textFontWeight="400"
+                            android:textSize="16sp"
+                            android:enabled="true"/>
+
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/proceed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/button_background_blue"
+                        android:fontFamily="@font/publicsans"
+                        android:text="@string/submit"
+                        android:textColor="@color/white"
+                        android:textFontWeight="700"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</layout>

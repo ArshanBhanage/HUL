@@ -18,7 +18,5 @@ class Form1ViewModel @Inject constructor(
 
     var visitData = MutableLiveData<GetVisitDataResponseData>(null)
 
-    var visitDataToView = MutableLiveData<Visit1>(null)
-
     var uDiceCode = MutableLiveData<String>(null)
 }

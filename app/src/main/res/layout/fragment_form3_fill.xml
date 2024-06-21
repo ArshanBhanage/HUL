@@ -12,7 +12,8 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#f8f9fa">
+        android:background="#f8f9fa"
+        android:id="@+id/nestedScrollView">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -115,13 +116,49 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        android:lineHeight="28dp"
+                        android:text="@string/books_no"
+                        android:textColor="#2F2B3D"
+                        android:textFontWeight="400"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/public_sans"
+                        app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+                        app:placeholderText="@string/enter_here"
+                        app:prefixTextColor="@color/black">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/noOfBooksHanded"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineHeight="18dp"
+                            android:inputType="number"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:enabled="false"
+                            android:text="@={viewModel.projectInfo.number_of_books_distributed}"/>
+
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
                     <LinearLayout
                         android:id="@+id/llGetDirection"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:paddingVertical="@dimen/_5sdp"
-                        android:visibility="visible">
+                        android:visibility="gone">
 
                         <ImageView
                             android:layout_width="@dimen/_25sdp"
@@ -403,7 +440,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/public_sans"
                         android:lineHeight="28dp"
-                        android:text="@string/form1"
+                        android:text="@string/name_of_school_representative"
                         android:textColor="#2F2B3D"
                         android:textFontWeight="400"
                         android:textSize="15sp"
@@ -443,7 +480,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/public_sans"
                         android:lineHeight="28dp"
-                        android:text="@string/form2"
+                        android:text="@string/mobile_number_of_school_representative"
                         android:textColor="#2F2B3D"
                         android:textFontWeight="400"
                         android:textSize="15sp"
@@ -577,7 +614,6 @@
                         android:fontFamily="@font/public_sans"
                         app:boxStrokeErrorColor="@color/red"
                         app:errorEnabled="true"
-                        app:error="@{viewModel.noOfBooksHandedOverError}"
                         app:errorIconTint="@color/red"
                         app:errorTextColor="@color/red"
                         app:layout_constraintTop_toBottomOf="@+id/loginHeader"
@@ -585,7 +621,7 @@
                         app:prefixTextColor="@color/black">
 
                         <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/noOfBooksHanded"
+                            android:id="@+id/noOfFilledTrackersCollected"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:lineHeight="18dp"
@@ -601,7 +637,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/public_sans"
                         android:lineHeight="28dp"
-                        android:text="@string/tracker_no"
+                        android:text="@string/school_asked_to_revisit_for_more_tracker_collection"
                         android:textColor="#2F2B3D"
                         android:textFontWeight="400"
                         android:textSize="15sp"
@@ -611,9 +647,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
                         <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switchRevisit"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="@={viewModel.form6}"
                             android:layout_marginTop="10dp"
                             android:theme="@style/SCBSwitch"
                             android:layout_marginRight="10dp"

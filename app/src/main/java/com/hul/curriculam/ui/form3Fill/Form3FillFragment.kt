@@ -17,6 +17,7 @@ import android.text.InputFilter
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -28,6 +29,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.hul.HULApplication
 import com.hul.R
@@ -37,6 +39,8 @@ import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
 import com.hul.camera.CameraActivity
 import com.hul.curriculam.CurriculamComponent
+import com.hul.curriculam.ui.form2Fill.Form2FillFragment
+import com.hul.dashboard.Dashboard
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
@@ -44,7 +48,6 @@ import com.hul.data.SchoolCode
 import com.hul.data.UploadImageData
 import com.hul.data.VisitData
 import com.hul.data.VisitDetails
-import com.hul.databinding.FragmentForm1FillBinding
 import com.hul.databinding.FragmentForm3FillBinding
 import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDialogFragment
 import com.hul.user.UserInfo
@@ -105,13 +108,32 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                 .create()
         curriculamComponent.inject(this)
 
+        binding.nestedScrollView.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
+                    Log.d("TouchListener", "User scrolled manually")
+                    val currentFocus = activity?.currentFocus
+                    if (currentFocus is TextInputEditText) {
+                        currentFocus.clearFocus()
+                    }
+                }
+            }
+            false
+        }
+
         val schoolCode = Gson().fromJson(
             requireArguments().getString(ARG_CONTENT1),
             SchoolCode::class.java
         )
 
+        form3FillViewModel.projectInfo.value = Gson().fromJson(
+            requireArguments().getString(ARG_CONTENT2),
+            ProjectInfo::class.java
+        )
+
+        //Client asked to remove it, so hidden in both results
         binding.llGetDirection.visibility =
-            if (schoolCode.lattitude == null) View.GONE else View.VISIBLE
+            if (schoolCode.lattitude == null) View.GONE else View.GONE
 
         form3FillViewModel.selectedSchoolCode.value = schoolCode
 
@@ -183,21 +205,22 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
             requestPermission()
         }
 
-        val allowOnlyLettersAndSpacesFilter = InputFilter { source, start, end, dest, dstart, dend ->
-            for (i in start until end) {
-                if (!source[i].isLetter() && !source[i].isWhitespace()) {
-                    return@InputFilter ""
+        val allowOnlyLettersAndSpacesFilter =
+            InputFilter { source, start, end, dest, dstart, dend ->
+                for (i in start until end) {
+                    if (!source[i].isLetter() && !source[i].isWhitespace()) {
+                        return@InputFilter ""
+                    }
                 }
+                null
             }
-            null
-        }
 
         binding.form1.filters = arrayOf(allowOnlyLettersAndSpacesFilter)
 
         binding.form3.filters = arrayOf(allowOnlyLettersAndSpacesFilter)
 
         binding.llGetDirection.setOnClickListener {
-            if(currentLocation != null) {
+            if (currentLocation != null) {
                 form3FillViewModel.selectedSchoolCode.value?.longitude?.let { it1 ->
                     form3FillViewModel.selectedSchoolCode.value?.lattitude?.let { it2 ->
                         openGoogleMapsForDirections(
@@ -227,8 +250,8 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
         destinationLng: String
     ) {
 
-        val destLat = TimeUtils.parseCoordinate(destinationLat)
-        val destLng = TimeUtils.parseCoordinate(destinationLng)
+        val destLat = destinationLat
+        val destLng = destinationLng
 
         // Build the URI for the directions request
         val uri =
@@ -324,13 +347,14 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
 
-        fun newInstance(content1: String, content2: String, uDiceCode: String?) = Form3FillFragment().apply {
-            arguments = Bundle().apply {
-                putString(ARG_CONTENT1, content1)
-                putString(ARG_CONTENT2, content2)
-                putString(U_DICE_CODE, uDiceCode)
+        fun newInstance(content1: String, content2: String, uDiceCode: String?) =
+            Form3FillFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_CONTENT1, content1)
+                    putString(ARG_CONTENT2, content2)
+                    putString(U_DICE_CODE, uDiceCode)
+                }
             }
-        }
     }
 
     private fun visitsDataModel(): RequestModel {
@@ -534,20 +558,24 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
             project = userInfo.projectName,
             visit_id = form3FillViewModel.projectInfo.value!!.visit_id.toString(),
             visitData = VisitData(
-                no_of_filled_trackers_collected = VisitDetails(value = form3FillViewModel.noOfFilledTrackersCollected.value),
+                u_dice_code = VisitDetails(value = binding.disceCode.text.toString()),
+                school_name = VisitDetails(value = binding.schoolName.text.toString()),
+                number_of_books_distributed = VisitDetails(value = binding.noOfBooksHanded.text.toString()),
                 visit_image_1 = VisitDetails(value = form3FillViewModel.imageApiUrl1.value),
                 visit_image_2 = VisitDetails(value = form3FillViewModel.imageApiUrl2.value),
                 visit_image_3 = VisitDetails(value = form3FillViewModel.imageApiUrl3.value),
                 visit_image_4 = VisitDetails(value = form3FillViewModel.imageApiUrl4.value),
-                school_name = binding.schoolName.text.toString(),
-                name_of_the_school_representative_who_collected_the_books = VisitDetails(value = form3FillViewModel.form1.value.toString()),
-                mobile_number_of_the_school_representative_who_collected_the_books = VisitDetails(value = form3FillViewModel.form2.value.toString()),
-                name_of_the_principal = VisitDetails(value = form3FillViewModel.form3.value.toString()),
-                mobile_number_of_the_principal = VisitDetails(value = form3FillViewModel.form4.value.toString()),
-                revisit_applicable = VisitDetails(value = if(form3FillViewModel.form6.value!!) "Yes" else "No"),
+                name_of_the_school_representative_who_collected_the_books = VisitDetails(value = binding.form1.text.toString()),
+                mobile_number_of_the_school_representative_who_collected_the_books = VisitDetails(
+                    value = binding.form2.text.toString()
+                ),
+                name_of_the_principal = VisitDetails(value = binding.form3.text.toString()),
+                mobile_number_of_the_principal = VisitDetails(value = binding.form4.text.toString()),
+                revisit_applicable = VisitDetails(value = if (binding.switchRevisit.isChecked) 1 else 0),
                 remark = VisitDetails(value = form3FillViewModel.form5.value),
-                u_dice_code = binding.disceCode.text.toString(),
                 visit_id = form3FillViewModel.projectInfo.value!!.visit_id.toString(),
+                latitude = VisitDetails(value = currentLocation?.latitude.toString()),
+                longitude = VisitDetails(value = currentLocation?.longitude.toString())
             )
         )
     }
@@ -569,12 +597,11 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                 cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Visit data submitted successfully",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    requireActivity().onBackPressed()
+                    userInfo.didUserSubmitNewVisit = true
+                    val intent = Intent(activity, Dashboard::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                    requireActivity().finish()
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -613,8 +640,10 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                     GetVisitDataResponseData::class.java
                 )
 
+                fillData()
+
                 // For render purpose only
-                if (form3FillViewModel.visitData.value?.visit_1 != null) {
+                /*if (form3FillViewModel.visitData.value?.visit_1 != null) {
                     form3FillViewModel.visitDataToView.value =
                         form3FillViewModel.visitData.value?.visit_1
                 } else if (form3FillViewModel.visitData.value?.visit_2 != null) {
@@ -623,34 +652,38 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                 } else if (form3FillViewModel.visitData.value?.visit_3 != null) {
                     form3FillViewModel.visitDataToView.value =
                         form3FillViewModel.visitData.value?.visit_3
-                }
+                }*/
             }
 
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
         }
     }
 
-//    override fun onApiSuccess(o: String?, objectType: Int) {
-//
-//        cancelProgressDialog()
-//        when (ApiExtentions.ApiDef.values()[objectType]) {
-//
-//            ApiExtentions.ApiDef.SUBMIT_SCHOOL_FORM -> {
-//                val model = JSONObject(o.toString())
-//                if (!model.getBoolean("error")) {
-//
-//
-//                    // Set the adapter to the AutoCompleteTextView
-//                } else {
-//                    redirectionAlertDialogue(requireContext(), model.getString("message"))
-//                }
-//
-//            }
-//
-//
-//            else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
-//        }
-//    }
+    private fun fillData() {
+        binding.disceCode.setText(form3FillViewModel.uDiceCode.value)
+        binding.schoolName.setText(form3FillViewModel.selectedSchoolCode.value?.location_name)
+        binding.noOfBooksHanded.setText(form3FillViewModel.projectInfo.value?.number_of_books_distributed)
+
+        binding.switchRevisit.isChecked =
+            if (form3FillViewModel.visitData.value?.visit_3?.revisit_applicable?.value == 1) true else false
+
+        binding.form1.setText(
+            form3FillViewModel.visitData.value?.visit_3?.name_of_the_school_representative_who_collected_the_books?.value?.toString() ?: ""
+        )
+        binding.form2.setText(
+            form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_school_representative_who_collected_the_books?.value?.toString() ?: ""
+        )
+        binding.form3.setText(
+            form3FillViewModel.visitData.value?.visit_3?.name_of_the_principal?.value?.toString() ?: ""
+        )
+        binding.form4.setText(
+            form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_principal?.value?.toString() ?: ""
+        )
+        binding.form5.setText(
+            form3FillViewModel.visitData.value?.visit_3?.remark?.value?.toString() ?: ""
+        )
+
+    }
 
     override fun onApiError(message: String?) {
         cancelProgressDialog()

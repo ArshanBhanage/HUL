@@ -54,6 +54,11 @@ class Form3FillViewModel @Inject constructor(
     
     val form4Text = MediatorLiveData<String>("Yes")
 
+    val isBookDistributionApproved = MutableLiveData<Int>(0)
+    var noOfBooksGivenToSchool = MutableLiveData(0)
+
+    var noOfTrackersCollected = MutableLiveData(0)
+
     init {
 
         form4Text.addSource(form6) { value ->

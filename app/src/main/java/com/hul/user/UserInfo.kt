@@ -5,6 +5,7 @@ package com.hul.user
  */
 import com.hul.storage.Storage
 import com.hul.utils.AUTH_TOKEN
+import com.hul.utils.IS_NEW_VISIT_SUBMITTED
 import com.hul.utils.LOGIN_ID
 import com.hul.utils.MY_AREA
 import com.hul.utils.PENDING_LEAD_DETAIL
@@ -58,4 +59,8 @@ class UserInfo @Inject constructor(private val storage: Storage) {
     var userType: String
         get() = storage.getString(USER_TYPE)
         set(value) = storage.setString(USER_TYPE, value)
+
+    var didUserSubmitNewVisit: Boolean
+        get() = storage.getBoolean(IS_NEW_VISIT_SUBMITTED)
+        set(value) = storage.setBoolean(IS_NEW_VISIT_SUBMITTED, value)
 }

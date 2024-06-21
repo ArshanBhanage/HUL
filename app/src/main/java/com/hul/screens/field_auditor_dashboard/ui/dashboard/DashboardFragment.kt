@@ -1,7 +1,6 @@
 package com.hul.screens.field_auditor_dashboard.ui.dashboard
 
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Base64
@@ -13,7 +12,6 @@ import android.widget.RadioButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,7 +31,6 @@ import com.hul.data.RequestModel
 import com.hul.data.ResponseModel
 import com.hul.data.UserDetails
 import com.hul.databinding.FragmentDashboardAuditorBinding
-import com.hul.loginRegistraion.LoginRegistrationActivity
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
@@ -305,7 +302,9 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     val imageBytes =
                         Base64.decode(model.data!!.get("logo").toString(), Base64.DEFAULT)
                     val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                    binding.imgLogo.setImageBitmap(decodedImage)
+
+                    // Currently disabling dynamic logo, as static logo set already
+                    // binding.imgLogo.setImageBitmap(decodedImage)
 
                     // Get Mobilisers
                     getMobilisers()
@@ -329,7 +328,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     override fun retry(type: Int) {
 
-        when (ApiExtentions.ApiDef.values()[type]) {
+        when (ApiExtentions.ApiDef.entries[type]) {
             ApiExtentions.ApiDef.GET_USER_DETAILS -> getMobilisers()
             ApiExtentions.ApiDef.GET_ATTENDENCE -> getAttendance()
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()

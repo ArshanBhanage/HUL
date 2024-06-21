@@ -32,8 +32,8 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="40dp"
+                    android:layout_width="@dimen/_100sdp"
+                    android:layout_height="@dimen/_60sdp"
                     android:src="@drawable/ic_curriculum_logo"
                     android:textColor="@color/black"
                     android:textSize="20sp"
@@ -69,6 +69,7 @@
                 android:paddingBottom="56dp">
 
                 <TextView
+                    android:id="@+id/txtProfileName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
@@ -79,6 +80,45 @@
                     android:textFontWeight="700"
                     android:textSize="18sp"
                     android:textStyle="bold" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_marginVertical="16dp"
+                    android:background="@color/white"
+                    app:cardCornerRadius="8dp">
+
+                    <LinearLayout
+                        android:id="@+id/llVisitSuccessToast"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_horizontal"
+                        android:paddingVertical="@dimen/_6sdp"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp"
+                            android:src="@drawable/ic_check_toast"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:text="@string/successfully_captured_visit_details"
+                            android:textColor="#444050"
+                            android:textSize="@dimen/_12ssp"
+                            android:fontFamily="@font/public_sans_regular"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/dayToday"
+                            android:layout_marginStart="@dimen/_10sdp"/>
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
@@ -264,7 +304,8 @@
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="@dimen/_40sdp"
+                            >
 
                             <ImageView
                                 android:id="@+id/stats"
@@ -274,16 +315,15 @@
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
-
                                 />
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="match_parent"
                                 android:layout_marginLeft="12dp"
-                                android:orientation="vertical"
                                 app:layout_constraintStart_toEndOf="@+id/stats"
-                                app:layout_constraintTop_toTopOf="parent">
+                                app:layout_constraintTop_toTopOf="parent"
+                                >
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -293,19 +333,10 @@
                                     android:maxLines="1"
                                     android:text="@string/my_visits"
                                     android:textColor="#2F2B3D"
-                                    android:textFontWeight="700"
                                     android:textSize="18sp"
-                                    android:textStyle="bold" />
+                                    android:textStyle="bold"
+                                    android:layout_gravity="center_vertical"/>
 
-                                <TextView
-                                    android:id="@+id/visitNumbers"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/public_sans"
-                                    android:textColor="#6d6b77"
-                                    android:textFontWeight="400"
-                                    android:textSize="15sp"
-                                    android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -340,30 +371,31 @@
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"
                                     app:endIconDrawable="@mipmap/search"
-                                    app:placeholderText="@string/enter_school_Code">
+                                    app:placeholderText="@string/enter_number_here"
+                                    android:textSize="@dimen/_6ssp">
 
                                     <AutoCompleteTextView
                                         android:id="@+id/schoolCode"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:inputType="text" />
+                                        android:inputType="text"
+                                        android:textSize="@dimen/_10ssp"/>
 
                                 </com.google.android.material.textfield.TextInputLayout>
 
 
                             </LinearLayout>
                             <com.google.android.material.button.MaterialButton
-                                android:id="@+id/searchButton"
+                                android:id="@+id/btnAddNewSchool"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textSize="13sp"
                                 android:backgroundTint="#dde0f6"
-                                android:fontFamily="@font/publicsans"
-                                android:text="@string/search"
+                                android:fontFamily="@font/public_sans_semi_bold"
+                                android:text="@string/add_new"
                                 android:textAllCaps="false"
                                 android:textColor="#2C41CA"
                                 app:cornerRadius="8dp"
-                                android:textFontWeight="700"
                                 android:layout_gravity="bottom"
                                 android:textStyle="bold" />
                         </LinearLayout>
@@ -469,7 +501,8 @@
                             android:layout_height="match_parent"
                             android:layout_marginTop="24dp"
                             tools:itemCount="5"
-                            tools:listitem="@layout/location_view_design" />
+                            tools:listitem="@layout/location_view_design"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
                         </LinearLayout>
                     </LinearLayout>
 
@@ -518,7 +551,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/public_sans"
-                                    android:text="@string/my_area"
+                                    android:text="@string/my_location"
                                     android:textColor="#2F2B3D"
                                     android:textFontWeight="700"
                                     android:textSize="18sp"
@@ -553,7 +586,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="24dp"
                             android:fontFamily="@font/public_sans"
-                            android:text="@string/my_area"
+                            android:text=""
                             android:textColor="#2C41CA"
                             android:textFontWeight="700"
                             android:textSize="18sp"

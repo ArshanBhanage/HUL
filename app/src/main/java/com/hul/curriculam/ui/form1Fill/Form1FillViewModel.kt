@@ -56,6 +56,10 @@ class Form1FillViewModel @Inject constructor(
 
     val form4Text = MediatorLiveData<String>("Yes")
 
+    val isBookDistributionApproved = MutableLiveData<Int>(0)
+
+    var noOfBooksGivenToSchool = MutableLiveData(0)
+
     init {
 
 //        form4Text.addSource(form4) { value ->
@@ -107,7 +111,7 @@ class Form1FillViewModel @Inject constructor(
     val capture1Visibility: LiveData<Int> = imageUrl1.map {
         if(it.length>0)
         {
-            View.INVISIBLE
+            View.GONE
         }
         else{
             View.VISIBLE
@@ -117,7 +121,7 @@ class Form1FillViewModel @Inject constructor(
     val capture2Visibility: LiveData<Int> = imageUrl2.map {
         if(it.length>0)
         {
-            View.INVISIBLE
+            View.GONE
         }
         else{
             View.VISIBLE
@@ -127,7 +131,7 @@ class Form1FillViewModel @Inject constructor(
     val capture3Visibility: LiveData<Int> = imageUrl3.map {
         if(it.length>0)
         {
-            View.INVISIBLE
+            View.GONE
         }
         else{
             View.VISIBLE
@@ -137,7 +141,7 @@ class Form1FillViewModel @Inject constructor(
     val capture4Visibility: LiveData<Int> = imageUrl4.map {
         if(it.length>0)
         {
-            View.INVISIBLE
+            View.GONE
         }
         else{
             View.VISIBLE
@@ -145,7 +149,7 @@ class Form1FillViewModel @Inject constructor(
     }
 
     val captured1Visibility: LiveData<Int> = capture1Visibility.map {
-        if(it == View.INVISIBLE)
+        if(it == View.GONE)
         {
             View.VISIBLE
         }
@@ -155,7 +159,7 @@ class Form1FillViewModel @Inject constructor(
     }
 
     val captured2Visibility: LiveData<Int> = capture2Visibility.map {
-        if(it == View.INVISIBLE)
+        if(it == View.GONE)
         {
             View.VISIBLE
         }
@@ -165,7 +169,7 @@ class Form1FillViewModel @Inject constructor(
     }
 
     val captured3Visibility: LiveData<Int> = capture3Visibility.map {
-        if(it == View.INVISIBLE)
+        if(it == View.GONE)
         {
             View.VISIBLE
         }
@@ -175,7 +179,7 @@ class Form1FillViewModel @Inject constructor(
     }
 
     val captured4Visibility: LiveData<Int> = capture4Visibility.map {
-        if(it == View.INVISIBLE)
+        if(it == View.GONE)
         {
             View.VISIBLE
         }

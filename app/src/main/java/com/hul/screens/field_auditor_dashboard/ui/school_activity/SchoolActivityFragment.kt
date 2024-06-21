@@ -216,7 +216,7 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         binding.pictureOfSchoolNameCapture.setOnClickListener {
             schoolActivityViewModel.visitData.value
                 ?.visit_1?.picture_of_school_with_name_visible
-                ?.let { it1 -> prefs.setString("previewImage", it1.value) }
+                ?.let { it1 -> prefs.setString("previewImage", it1) }
             redirectToCamera(
                 0,
                 schoolActivityViewModel.imageType1.value!!,
@@ -377,7 +377,7 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
             collected_by = userInfo.userType,
             visitData = VisitData(
                 no_of_teachers_trained = VisitDetails(
-                    value = schoolActivityViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.value?.toInt(),
+                    value = schoolActivityViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.value,
                     is_approved = schoolActivityViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.is_approved,
                     rejection_reason = schoolActivityViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.rejection_reason
                 ),
@@ -391,14 +391,14 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
                     value = schoolActivityViewModel.imageUrl3API.value
                 ),
                 number_of_students_as_per_record = VisitDetails(
-                    value = schoolActivityViewModel.visitData.value?.visit_1?.number_of_students_as_per_record?.value?.toInt()
+                    value = schoolActivityViewModel.visitData.value?.visit_1?.number_of_students_as_per_record?.value
                 ),
                 number_of_books_distributed = VisitDetails(
-                    value = schoolActivityViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value?.toInt(),
+                    value = schoolActivityViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value,
                     is_approved = schoolActivityViewModel.isBookDistributionApproved.value
                 ),
                 school_closed = VisitDetails(
-                    value = schoolActivityViewModel.visitData.value?.visit_1?.school_closed?.value?.toBoolean()
+                    value = schoolActivityViewModel.visitData.value?.visit_1?.school_closed?.value
                 ),
                 school_representative_who_collected_the_books = VisitDetails(
                     value = schoolActivityViewModel.visitData.value?.visit_1?.school_representative_who_collected_the_books?.value
