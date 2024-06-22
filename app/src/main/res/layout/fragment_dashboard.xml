@@ -25,15 +25,14 @@
                 android:layout_height="wrap_content"
                 android:background="#d7dcf2"
                 android:paddingHorizontal="16dp"
-                android:paddingTop="56dp"
-                android:paddingBottom="32dp"
+                android:paddingVertical="@dimen/_20sdp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:layout_width="@dimen/_100sdp"
-                    android:layout_height="@dimen/_60sdp"
+                    android:layout_width="@dimen/_120sdp"
+                    android:layout_height="@dimen/_80sdp"
                     android:src="@drawable/ic_curriculum_logo"
                     android:textColor="@color/black"
                     android:textSize="20sp"
@@ -46,14 +45,14 @@
                     android:layout_height="45dp"
                     android:layout_alignParentEnd="true"
                     android:layout_margin="3dp"
+                    android:layout_centerVertical="true"
                     android:background="@drawable/circle_shape">
 
                     <TextView
                         android:id="@+id/txtLatter"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:text="E"
+                        android:text=""
                         android:textColor="@color/teal_200"
                         android:textSize="20sp"
                         android:textStyle="bold" />
@@ -73,12 +72,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:fontFamily="@font/public_sans"
-                    android:lineHeight="28dp"
-                    android:text="Hi, Profile Name"
+                    android:fontFamily="@font/public_sans_semi_bold"
+                    android:text="Hi, "
                     android:textColor="#2F2B3D"
-                    android:textFontWeight="700"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/_16ssp"
                     android:textStyle="bold" />
 
                 <androidx.cardview.widget.CardView

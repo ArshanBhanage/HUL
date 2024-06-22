@@ -25,19 +25,13 @@
                 android:layout_height="wrap_content"
                 android:background="#d7dcf2"
                 android:paddingHorizontal="@dimen/_16sdp"
-                android:paddingTop="@dimen/_56sdp"
-                android:paddingBottom="@dimen/_32sdp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:paddingVertical="@dimen/_20sdp"
+                >
 
                 <ImageView
-                    android:layout_width="@dimen/_100sdp"
-                    android:layout_height="@dimen/_60sdp"
+                    android:layout_width="@dimen/_120sdp"
+                    android:layout_height="@dimen/_80sdp"
                     android:src="@drawable/ic_curriculum_logo"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_20ssp"
-                    android:textStyle="bold"
                     android:id="@+id/imgLogo"
                     />
 
@@ -47,14 +41,15 @@
                     android:layout_height="45dp"
                     android:layout_alignParentEnd="true"
                     android:layout_margin="3dp"
-                    android:background="@drawable/circle_shape">
+                    android:background="@drawable/circle_shape"
+                    android:layout_centerVertical="true">
 
                     <TextView
                         android:id="@+id/txtLatter"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
-                        android:text="E"
+                        android:text=""
                         android:textStyle="bold"
                         android:textColor="@color/teal_200"
                         android:textSize="20sp" />
@@ -72,13 +67,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_12sdp"
-                    android:fontFamily="@font/public_sans"
-                    android:lineHeight="@dimen/_28sdp"
-                    android:text='@{"Hi, " + viewModel.userName}'
+                    android:fontFamily="@font/public_sans_semi_bold"
                     android:textColor="#2F2B3D"
-                    android:textFontWeight="700"
-                    android:textSize="@dimen/_18ssp"
-                    android:textStyle="bold" />
+                    android:textSize="@dimen/_16ssp"
+                    android:text="Hi, "
+                    android:textStyle="bold"
+                    android:id="@+id/txtProfileName"/>
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"

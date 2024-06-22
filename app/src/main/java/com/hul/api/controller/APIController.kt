@@ -104,11 +104,9 @@ class APIController @Inject constructor(private val mContext: Context) : Callbac
                 .getPerformance().enqueue(this)
 
             ApiExtentions.ApiDef.GET_VISIT_DATA -> if (requestModel != null) {
-                requestModel.loadImages?.let {
-                    retrofit.create(ApiInterface::class.java)
-                        .getVisitData(requestModel.visitId!!, requestModel.project, it)
-                        .enqueue(this)
-                }
+                retrofit.create(ApiInterface::class.java)
+                    .getVisitData(requestModel.visitId!!, requestModel.project, requestModel.collected_by, requestModel.loadImages)
+                    .enqueue(this)
             }
 
             ApiExtentions.ApiDef.VISIT_DATA -> retrofit.create(ApiInterface::class.java)

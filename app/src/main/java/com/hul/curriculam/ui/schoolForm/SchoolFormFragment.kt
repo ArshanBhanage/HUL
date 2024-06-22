@@ -113,7 +113,7 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
 
         // Add fragments dynamically
         for (visit in schoolFormViewModel.visitList.value!!) {
-            if ( (visit.visit_status.equals(ASSIGNED, ignoreCase = true)
+            if ((visit.visit_status.equals(ASSIGNED, ignoreCase = true)
                 || visit.visit_status.equals(INITIATED, ignoreCase = true)
                 || visit.visit_status.equals(PARTIALLY_SUBMITTED, ignoreCase = true))
             ) {

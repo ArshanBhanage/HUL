@@ -232,6 +232,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                         MobilisersAdapter(ArrayList(mobiliserUsers), this, requireContext())
                     binding.recyclerViewMobilisers.adapter = mobilisersAdapter
 
+                    binding.txtProfileName.setText("Hi, " + userDetails.user_fullname)
+
                     getPerformance()
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))

@@ -94,7 +94,8 @@ interface ApiInterface {
     fun getVisitData(
         @Query("visitId") visitId: Int,
         @Query("project") project: String?,
-        @Query("loadImages") loadImages: Boolean
+        @Query("collectedBy") collectedBy: String,
+        @Query("loadImages") loadImages: Boolean,
     ): Call<ResponseBody?>
 
     @POST("app/users/v1/verify_otp")

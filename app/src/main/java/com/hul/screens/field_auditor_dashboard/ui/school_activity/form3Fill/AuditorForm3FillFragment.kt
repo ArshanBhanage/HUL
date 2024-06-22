@@ -192,6 +192,8 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
             binding.tickSuccess.visibility = View.VISIBLE
             binding.tickFailure.visibility = View.GONE
             form3FillViewModel.isBookDistributionApproved.value = 1;
+            binding.edtNoOfBooksGiven.isEnabled = false
+            binding.edtNoOfBooksGiven.setText(form3FillViewModel.projectInfo.value?.number_of_books_distributed)
         }
 
         binding.btnNegative.setOnClickListener {
@@ -548,6 +550,8 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
                     is_approved = form3FillViewModel.isBookDistributionApproved.value
                 ),
                 number_of_books_given_school = VisitDetails(value = form3FillViewModel.noOfBooksGivenToSchool.value),
+                name_of_the_school_representative_who_mobiliser_met = VisitDetails(value = binding.form1.text.toString()),
+                number_of_the_school_representative_who_mobiliser_met = VisitDetails(value = binding.form2.text.toString()),
                 auditor_visit_image_1 = VisitDetails(value = form3FillViewModel.imageApiUrl1.value),
                 auditor_visit_image_2 = VisitDetails(value = form3FillViewModel.imageApiUrl2.value),
                 auditor_visit_image_3 = VisitDetails(value = form3FillViewModel.imageApiUrl3.value),
@@ -688,6 +692,7 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.form1.setText(form3FillViewModel.visitData.value?.visit_3?.name_of_the_school_representative_who_collected_the_books?.value.toString())
         binding.form2.setText(form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_school_representative_who_collected_the_books?.value.toString())
         binding.form5.setText(form3FillViewModel.visitData.value?.visit_3?.remark?.value.toString())
+        binding.edtNoOfBooksHandedOver.setText(form3FillViewModel.projectInfo.value?.number_of_books_distributed)
 
         //Client asked to remove it, so hidden in both results
         binding.llGetDirection.visibility =

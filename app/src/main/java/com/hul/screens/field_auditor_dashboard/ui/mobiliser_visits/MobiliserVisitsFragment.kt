@@ -36,6 +36,7 @@ import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
 import com.hul.curriculam.ui.form1Fill.Form1FillFragment
+import com.hul.dashboard.ui.dashboard.MyVisitsAdapter
 import com.hul.data.MappedUser
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
@@ -44,6 +45,8 @@ import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
 import com.hul.user.UserInfo
 import com.hul.utils.ASSIGNED
 import com.hul.utils.ConnectionDetector
+import com.hul.utils.FIELD_AUDITOR_APPROVED
+import com.hul.utils.FIELD_AUDITOR_REJECTED
 import com.hul.utils.INITIATED
 import com.hul.utils.PARTIALLY_SUBMITTED
 import com.hul.utils.RetryInterface
@@ -87,10 +90,10 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
 
     var allVisits: ArrayList<ProjectInfo> = ArrayList()
 
+    var projectInfoForRedirect: ProjectInfo? = null
+
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
 
         _binding = FragmentVisitsBinding.inflate(inflater, container, false)
@@ -104,6 +107,8 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
         binding.viewModel = mobiliserVisitsViewModel
 
         binding.recyclerViewVisits.layoutManager = LinearLayoutManager(context)
+        myVisitsAdapter = MobiliserVisitsAdapter(ArrayList(), this, requireContext())
+        binding.recyclerViewVisits.adapter = myVisitsAdapter
 
         binding.stats.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
@@ -136,7 +141,7 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
             mobiliserVisitsViewModel.pendingSelected.value = false
 
             val completedVisits =
-                visits.filter { projectInfo -> projectInfo.visit_status != SUBMITTED && projectInfo.visit_status != SUB_AGENCY_APPROVED }
+                visits.filter { projectInfo -> projectInfo.visit_status == FIELD_AUDITOR_APPROVED || projectInfo.visit_status == FIELD_AUDITOR_REJECTED }
             myVisitsAdapter.updateVisits(completedVisits)
 
             binding.viewBluePending.visibility = View.GONE
@@ -153,6 +158,8 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
         } else {
             requestPermission()
         }
+
+        getVisits()
 
         return root
     }
@@ -266,9 +273,7 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
         }
 
         fusedLocationProviderClient.requestLocationUpdates(
-            locationRequest,
-            locationCallback,
-            Looper.getMainLooper()
+            locationRequest, locationCallback, Looper.getMainLooper()
         )
 
 //        locationCallback = object : LocationCallback() {
@@ -313,13 +318,11 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
 
     override fun onResume() {
         super.onResume()
-        getVisits()
     }
 
     private fun getVisitListModel(userType: String, mobiliserId: Int): RequestModel {
         return RequestModel(
-            userType = userType,
-            mobiliserId = mobiliserId
+            userType = userType, mobiliserId = mobiliserId
         )
     }
 
@@ -328,24 +331,47 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
         mobiliserVisitsViewModel.mobiliserUser.value =
             Gson().fromJson(requireArguments().getString("mobiliserData"), MappedUser::class.java)
 
+        binding.txtMobiliserName.text = mobiliserVisitsViewModel.mobiliserUser.value?.user_fullname
+
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
 
             mobiliserVisitsViewModel.mobiliserUser.value?.let {
                 apiController.getApiResponse(
-                    this,
-                    mobiliserVisitsViewModel.mobiliserUser.value?.let {
+                    this, mobiliserVisitsViewModel.mobiliserUser.value?.let {
                         getVisitListModel(
-                            userInfo.userType,
-                            it.user_id
+                            userInfo.userType, it.user_id
                         )
-                    },
-                    ApiExtentions.ApiDef.VISIT_LIST_FIELD_AUDITOR.ordinal
+                    }, ApiExtentions.ApiDef.VISIT_LIST_FIELD_AUDITOR.ordinal
                 )
             }
         } else {
             noInternetDialogue(
+                requireContext(), ApiExtentions.ApiDef.VISIT_LIST_FIELD_AUDITOR.ordinal, this
+            )
+        }
+
+    }
+
+    private fun getVisitsBySchoolCode(id: Int): RequestModel {
+        return RequestModel(
+            schoolId = id,
+        )
+    }
+
+
+    fun getSchoolVisits(schoolId: Int) {
+
+        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+            //setProgressDialog(requireContext(), "Loading Leads")
+            apiController.getApiResponse(
+                this,
+                getVisitsBySchoolCode(schoolId),
+                ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE.ordinal
+            )
+        } else {
+            noInternetDialogue(
                 requireContext(),
-                ApiExtentions.ApiDef.VISIT_LIST_FIELD_AUDITOR.ordinal,
+                ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE.ordinal,
                 this
             )
         }
@@ -356,12 +382,24 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
         cancelProgressDialog()
         when (ApiExtentions.ApiDef.entries[objectType]) {
 
+            ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE -> {
+                val model = JSONObject(o.toString())
+
+                if (!model.getBoolean("error")) {
+                    val listType: Type = object : TypeToken<List<ProjectInfo?>?>() {}.type
+
+                    val visitList: ArrayList<ProjectInfo> =
+                        Gson().fromJson(model.getJSONArray("data").toString(), listType);
+
+                    projectInfoForRedirect?.let { redirectToSchoolActivity(it, visitList) }
+                }
+            }
+
             ApiExtentions.ApiDef.VISIT_LIST_FIELD_AUDITOR -> {
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     val listType: Type = object : TypeToken<List<ProjectInfo?>?>() {}.type
-                    allVisits =
-                        Gson().fromJson(model.getJSONArray("data").toString(), listType);
+                    allVisits = Gson().fromJson(model.getJSONArray("data").toString(), listType);
 
                     val listAfterIgnoreStatus = allVisits.filter { projectInfo ->
                         projectInfo.visit_status != INITIATED
@@ -372,16 +410,11 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
 
                     visits = listAfterIgnoreStatus as ArrayList<ProjectInfo>;
 
-                    val pendingVisits =
-                        listAfterIgnoreStatus.filter { projectInfo ->
-                            projectInfo.visit_status == SUBMITTED
-                                    || projectInfo.visit_status == SUB_AGENCY_APPROVED
-                        }
+                    val pendingVisits = listAfterIgnoreStatus.filter { projectInfo ->
+                        projectInfo.visit_status == SUBMITTED || projectInfo.visit_status == SUB_AGENCY_APPROVED
+                    }
 
-                    myVisitsAdapter =
-                        MobiliserVisitsAdapter(pendingVisits, this, requireContext())
-                    binding.recyclerViewVisits.adapter = myVisitsAdapter
-
+                    myVisitsAdapter.updateVisits(pendingVisits)
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -400,17 +433,23 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
 
     }
 
-    override fun redirectToSchoolActivity(projectInfo: ProjectInfo) {
-        val bundle = Bundle()
-        val associatedVisits = allVisits.filter { it.location_id.equals(projectInfo.location_id) }
+    override fun redirectToSchoolActivity(
+        projectInfo: ProjectInfo,
+        visitsForSchoolId: ArrayList<ProjectInfo>
+    ) {
+        if (!visitsForSchoolId.isEmpty()) {
+            val bundle = Bundle()
 
-        bundle.putString("projectInfo", Gson().toJson(projectInfo))
-        bundle.putString("visitList", Gson().toJson(associatedVisits))
+            bundle.putString("projectInfo", Gson().toJson(projectInfoForRedirect))
+            bundle.putString("visitList", Gson().toJson(visitsForSchoolId))
 
-        findNavController().navigate(
-            R.id.action_visits_school_activity,
-            bundle
-        )
+            findNavController().navigate(
+                R.id.action_visits_school_activity, bundle
+            )
+        }else{
+            projectInfoForRedirect = projectInfo
+            projectInfo.location_id?.toInt()?.let { getSchoolVisits(it) }
+        }
     }
 
     override fun goToMap(projectInfo: ProjectInfo) {
@@ -418,10 +457,7 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
             projectInfo.longitude?.let { it1 ->
                 projectInfo.lattitude?.let { it2 ->
                     openGoogleMapsForDirections(
-                        currentLocation!!.latitude,
-                        currentLocation!!.longitude,
-                        it2,
-                        it1
+                        currentLocation!!.latitude, currentLocation!!.longitude, it2, it1
                     )
                 }
             }
@@ -429,18 +465,14 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
     }
 
     private fun openGoogleMapsForDirections(
-        lat: Double,
-        lng: Double,
-        destinationLat: String,
-        destinationLng: String
+        lat: Double, lng: Double, destinationLat: String, destinationLng: String
     ) {
 
         val destLat = destinationLat
         val destLng = destinationLng
 
         // Build the URI for the directions request
-        val uri =
-            Uri.parse("http://maps.google.com/maps?saddr=$lat,$lng&daddr=$destLat,$destLng")
+        val uri = Uri.parse("http://maps.google.com/maps?saddr=$lat,$lng&daddr=$destLat,$destLng")
 
         val intent = Intent(Intent.ACTION_VIEW, uri)
         startActivity(intent)

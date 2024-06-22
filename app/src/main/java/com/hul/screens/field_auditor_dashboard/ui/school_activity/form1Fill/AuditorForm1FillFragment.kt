@@ -86,8 +86,6 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
 
     private lateinit var countDownTimer: CountDownTimer
 
-    var isBookDistributionApproved = false;
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -186,6 +184,8 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
             binding.tickSuccess.visibility = View.VISIBLE
             binding.tickFailure.visibility = View.GONE
             form1FillViewModel.isBookDistributionApproved.value = 1;
+            binding.edtNoOfBooksGiven.isEnabled = false
+            binding.edtNoOfBooksGiven.setText(form1FillViewModel.projectInfo.value?.number_of_books_distributed)
         }
 
         binding.btnNegative.setOnClickListener {
@@ -521,7 +521,11 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA.ordinal
             )
         } else {
-            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA.ordinal, this)
+            noInternetDialogue(
+                requireContext(),
+                ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA.ordinal,
+                this
+            )
         }
 
     }
@@ -539,13 +543,17 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
                     value = binding.edtNoOfBooksHandedOver.text.toString(),
                     is_approved = form1FillViewModel.isBookDistributionApproved.value
                 ),
-                number_of_books_given_school = VisitDetails(value = form1FillViewModel.noOfBooksGivenToSchool.value),
+                number_of_books_given_school = VisitDetails(value = binding.edtNoOfBooksHandedOver.text.toString()),
                 auditor_visit_image_1 = VisitDetails(value = form1FillViewModel.imageApiUrl1.value),
                 auditor_visit_image_2 = VisitDetails(value = form1FillViewModel.imageApiUrl2.value),
+                name_of_the_school_representative_who_mobiliser_met = VisitDetails(value = binding.form1.text.toString()),
+                number_of_the_school_representative_who_mobiliser_met = VisitDetails(value = binding.form2.text.toString()),
                 visit_id = form1FillViewModel.projectInfo.value!!.visit_id.toString(),
                 have_book_distribution_to_students_done = VisitDetails(value = binding.switchBookDistribution.isChecked),
                 was_video_shared_with_teachers = VisitDetails(value = binding.switchVideoShared.isChecked),
-                remark = VisitDetails(value = binding.form5.text.toString())
+                remark = VisitDetails(value = binding.form5.text.toString()),
+                /*name_of_the_school_principal_auditor = VisitDetails(value = form1FillViewModel.visitData.value?.visit_1?.name_of_the_principal),
+                number_of_the_school_principal_auditor = VisitDetails(value = form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_principal),*/
             )
         )
     }
@@ -673,7 +681,7 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
     private fun fillData() {
         binding.disceCode.setText(form1FillViewModel.visitData.value?.visit_1?.u_dice_code?.value.toString())
         binding.schoolName.setText(form1FillViewModel.visitData.value?.visit_1?.school_name?.value.toString())
-        binding.edtNoOfBooksHandedOver.setText(form1FillViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value.toString())
+        binding.edtNoOfBooksHandedOver.setText(form1FillViewModel.projectInfo.value?.number_of_books_distributed)
         binding.form1.setText(form1FillViewModel.visitData.value?.visit_1?.name_of_the_school_representative_who_collected_the_books?.value.toString())
         binding.form2.setText(form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_school_representative_who_collected_the_books?.value.toString())
         binding.form5.setText(form1FillViewModel.visitData.value?.visit_1?.remark?.value.toString())
@@ -682,7 +690,7 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
             if (form1FillViewModel.visitData.value?.visit_1?.latitude == null) View.GONE else View.GONE
 
         binding.txtDirections.setOnClickListener {
-            if(currentLocation != null) {
+            if (currentLocation != null) {
                 form1FillViewModel.visitData.value?.visit_1?.longitude?.value?.let { it1 ->
                     form1FillViewModel.visitData.value?.visit_1?.latitude?.value?.let { it2 ->
                         openGoogleMapsForDirections(
