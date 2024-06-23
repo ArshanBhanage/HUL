@@ -49,6 +49,8 @@ import com.hul.data.VisitData
 import com.hul.data.VisitDetails
 import com.hul.databinding.FragmentForm2FillBinding
 import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDialogFragment
+import com.hul.sync.VisitDataTable
+import com.hul.sync.VisitDataViewModel
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
@@ -83,6 +85,9 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
 
     @Inject
     lateinit var uploadFileController: UploadFileController
+
+    @Inject
+    lateinit var visitDataViewModel: VisitDataViewModel
 
     var imageIndex: Int = 0
 
@@ -154,20 +159,23 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
         binding.proceed.setOnClickListener {
-            if (form2FillViewModel.imageUrl1.value?.isEmpty() == true
-                || form2FillViewModel.imageUrl2.value?.isEmpty() == true
-                || form2FillViewModel.imageUrl3.value?.isEmpty() == true
-                || form2FillViewModel.imageUrl4.value?.isEmpty() == true
-            ) {
-                Toast.makeText(requireContext(), "Please fill all data", Toast.LENGTH_LONG)
-                    .show()
-            } else {
-                if (imageIndex == 0) {
-                    setProgressDialog(requireContext(), "Uploading")
-                    uploadImage(form2FillViewModel.imageUrl1.value?.toUri()!!)
-                }
+            if (imageIndex == 0) {
+                val visitDataTable = VisitDataTable(jsonData= Gson().toJson(submitModel()), visitNumber = form2FillViewModel.projectInfo.value!!.visit_number!!.toInt(),locationName = form2FillViewModel.projectInfo.value!!.location_name!!, uDiceCode = form2FillViewModel.selectedSchoolCode.value!!.external_id1!!)
+                visitDataViewModel.insert(visitDataTable)
+
+                val intent = Intent(activity, Dashboard::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                startActivity(intent)
+                requireActivity().finish()
             }
         }
+
+//        binding.proceed.setOnClickListener {
+//            if (imageIndex == 0) {
+//                setProgressDialog(requireContext(), "Uploading")
+//                uploadImage(form2FillViewModel.imageUrl1.value?.toUri()!!)
+//            }
+//        }
 
         binding.view1.setOnClickListener {
             form2FillViewModel.imageUrl1.value?.let { it1 ->

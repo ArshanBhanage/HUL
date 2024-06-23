@@ -29,6 +29,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -46,8 +47,10 @@ import com.hul.R
 import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
+import com.hul.api.controller.UploadFileController
 import com.hul.curriculam.Curriculam
 import com.hul.curriculam.ui.schoolCode.SchoolCodeAdapter
+import com.hul.dashboard.Dashboard
 import com.hul.dashboard.DashboardComponent
 import com.hul.data.Attendencemodel
 import com.hul.data.District
@@ -56,6 +59,7 @@ import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.data.SchoolCode
 import com.hul.data.State
+import com.hul.data.UploadImageData
 import com.hul.databinding.FragmentDashboardBinding
 import com.hul.screens.field_auditor_dashboard.ui.school_activity.SchoolActivityFragment
 import com.hul.sync.VisitDataTable
@@ -71,6 +75,7 @@ import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectToLogin
 import com.hul.utils.redirectionAlertDialogue
+import com.hul.utils.setProgressDialog
 import org.json.JSONObject
 import java.lang.reflect.Type
 import java.text.SimpleDateFormat
@@ -102,6 +107,17 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     @Inject
     lateinit var apiController: APIController
 
+    private var imageIndex: Int = 0
+
+    private var isSyncing: Boolean = false
+
+    private var visitDataTableUploading: VisitDataTable? = null
+
+    private var requestModel: RequestModel? = null
+
+    @Inject
+    lateinit var uploadFileController: UploadFileController
+
     var adapter: SchoolCodeAdapter? = null
 
     var schoolCodes: ArrayList<SchoolCode> = ArrayList()
@@ -110,14 +126,14 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     var visitList: ArrayList<ProjectInfo> = ArrayList()
 
-    var districtList: ArrayList<District> = ArrayList()
-    var stateList: ArrayList<State> = ArrayList()
+    private var districtList: ArrayList<District> = ArrayList()
+    private var stateList: ArrayList<State> = ArrayList()
 
     var districtCallBack: ListDialogInterface? = null;
 
     var stateCallBack: ListDialogInterface? = null;
 
-    var syncDataList: List<VisitDataTable>? = null
+    private var syncDataList: List<VisitDataTable>? = null
 
     private var currentLocation: Location? = null
     private lateinit var locationCallback: LocationCallback
@@ -126,7 +142,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     private val handler = Handler(Looper.getMainLooper())
 
-    var isAddSchoolFlow = false
+    private var isAddSchoolFlow = false
 
     private val requestPermission =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -259,8 +275,99 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
 
         //visitDataViewModel.insert(VisitDataTable(jsonData = "Nitin", visitNumber = 1, project = "Test", uDiceCode = "retest"))
+
+        binding.syncNow.setOnClickListener {
+            if (syncDataList!!.size > 0) {
+                setProgressDialog(requireContext(), "Syncing Data")
+                startSync(syncDataList!!.get(syncDataList!!.size-1))
+            }
+        }
+
+    }
+
+    private fun fetchVisitData(){
         visitDataViewModel.allSyncData.observe(requireActivity()) { visitDataList ->
             syncDataList = visitDataList
+            if(isSyncing)
+            {
+                if(syncDataList!!.isNotEmpty()) {
+                    startSync(syncDataList!!.get(syncDataList!!.size-1))
+                }
+                else{
+                    isSyncing = false
+                    showViewTemporarily(binding.llVisitSuccessToast, 2000)
+                    cancelProgressDialog()
+                    getTodaysVisit()
+                }
+            }
+        }
+    }
+
+    private fun startSync(visitDataTable: VisitDataTable)
+    {
+        imageIndex = 0
+        isSyncing = true
+        visitDataTableUploading = visitDataTable
+        requestModel = Gson().fromJson(visitDataTable.jsonData, RequestModel::class.java)
+        uploadImage(requestModel!!.visitData!!.visit_image_1!!.value.toString().toUri())
+    }
+
+    private fun uploadImage(imageUri: Uri) {
+        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+            uploadFileController.getApiResponse(
+                this,
+                imageUri,
+                uploadImageModel(),
+                ApiExtentions.ApiDef.UPLOAD_IMAGE.ordinal
+            )
+        } else {
+            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.UPLOAD_IMAGE.ordinal, this)
+        }
+    }
+
+    private fun uploadImageModel(): RequestModel {
+        var fileName: String = ""
+        val visitPrefix = "project_" + userInfo.projectName;
+        when (imageIndex) {
+            0 -> {
+                fileName = visitPrefix + "_picture_of_school_name.jpeg";
+            }
+
+            1 -> {
+                fileName = visitPrefix + "_selfie_with_school_name.jpeg";
+            }
+
+            2 -> {
+                fileName = visitPrefix + "_students_showing_filled_tracker.jpeg";
+            }
+
+            3 -> {
+                fileName = visitPrefix + "_teacher_handling_trackers.jpeg";
+            }
+
+            4 -> {
+                fileName = visitPrefix + "_acknowledgement_letter.jpeg";
+            }
+        }
+
+        return RequestModel(
+            project = userInfo.projectName,
+            uploadFor = "field_audit",
+            filename = fileName
+        )
+    }
+
+    fun submitForm(requestModel: RequestModel) {
+
+        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+            //setProgressDialog(requireContext(), "Loading Leads")
+            apiController.getApiResponse(
+                this,
+                requestModel,
+                ApiExtentions.ApiDef.VISIT_DATA.ordinal
+            )
+        } else {
+            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.VISIT_DATA.ordinal, this)
         }
 
     }
@@ -354,7 +461,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         val recyclerView = dialogView.findViewById<RecyclerView>(R.id.recyclerView);
         val dialogTitle = dialogView.findViewById<TextView>(R.id.dialogTitle);
 
-        dialogTitle.setText("Select State")
+        dialogTitle.text = "Select State"
 
         val adapter: StateAdapter =
             StateAdapter(stateList, object : ListDialogInterface {
@@ -380,7 +487,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         )
     }
 
-    fun getSchoolVisits(schoolId: Int) {
+    private fun getSchoolVisits(schoolId: Int) {
 
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
             //setProgressDialog(requireContext(), "Loading Leads")
@@ -399,7 +506,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     }
 
-    fun getDistrictList(callBack: ListDialogInterface) {
+    private fun getDistrictList(callBack: ListDialogInterface) {
 
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
             districtCallBack = callBack
@@ -418,7 +525,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     }
 
-    fun getStateList(callBack: ListDialogInterface) {
+    private fun getStateList(callBack: ListDialogInterface) {
 
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
             stateCallBack = callBack
@@ -450,7 +557,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         )
     }
 
-    fun addVisit(id: String, visitNumber: String) {
+    private fun addVisit(id: String, visitNumber: String) {
 
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
             //setProgressDialog(requireContext(), "Loading Leads")
@@ -476,12 +583,12 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         )
     }
 
-    fun formatDate(date: Date, format: String): String {
+    private fun formatDate(date: Date, format: String): String {
         val dateFormat = SimpleDateFormat(format, Locale.getDefault())
         return dateFormat.format(date)
     }
 
-    fun dayOfWeek(): String {
+    private fun dayOfWeek(): String {
         val calendar = Calendar.getInstance()
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
 
@@ -644,16 +751,16 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     override fun onResume() {
         super.onResume()
-
+        fetchVisitData()
         loadLocations()
 
         binding.schoolCode.setText("")
-        binding.txtProfileName.setText("Hi, " + userInfo.projectName)
+        binding.txtProfileName.text = "Hi, " + userInfo.projectName
 
-        showViewTemporarily(binding.llVisitSuccessToast, 2000)
+
     }
 
-    fun loadLocations() {
+    private fun loadLocations() {
 
 //        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
 //            setProgressDialog(requireContext(), "Loading Leads")
@@ -678,7 +785,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         )
     }
 
-    fun getAttendence() {
+    private fun getAttendence() {
 
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
             apiController.getApiResponse(
@@ -700,10 +807,11 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     override fun onApiSuccess(o: String?, objectType: Int) {
 
-        cancelProgressDialog()
+
         when (ApiExtentions.ApiDef.entries[objectType]) {
 
             ApiExtentions.ApiDef.ADD_NEW_SCHOOL -> {
+                cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     Toast.makeText(requireContext(), "School added successfully", Toast.LENGTH_LONG)
@@ -718,6 +826,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             }
 
             ApiExtentions.ApiDef.GET_STATES -> {
+                cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     val listType: Type = object : TypeToken<List<State?>?>() {}.type
@@ -730,6 +839,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             }
 
             ApiExtentions.ApiDef.GET_DISTRICTS -> {
+                cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     val listType: Type = object : TypeToken<List<District?>?>() {}.type
@@ -742,6 +852,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             }
 
             ApiExtentions.ApiDef.GET_ATTENDENCE -> {
+                cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     val listType: Type = object : TypeToken<List<Attendencemodel?>?>() {}.type
@@ -783,6 +894,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             }
 
             ApiExtentions.ApiDef.GET_PERFORMANCE -> {
+                cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     try {
@@ -806,6 +918,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             }
 
             ApiExtentions.ApiDef.SCHOOL_CODES -> {
+                cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     val listType: Type = object : TypeToken<List<SchoolCode?>?>() {}.type
@@ -837,6 +950,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             }
 
             ApiExtentions.ApiDef.ADD_VISIT -> {
+                cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     selectedSchoolCode?.id?.let { getSchoolVisits(it) }
@@ -846,6 +960,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             }
 
             ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE -> {
+                cancelProgressDialog()
                 val model = JSONObject(o.toString())
 
                 if (!model.getBoolean("error")) {
@@ -895,13 +1010,24 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             }
 
             ApiExtentions.ApiDef.VISIT_LIST_BY_STATUS -> {
+                cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     val listType: Type = object : TypeToken<List<ProjectInfo?>?>() {}.type
                     val visitListFromBE: ArrayList<ProjectInfo> =
                         Gson().fromJson(model.getJSONArray("data").toString(), listType);
 
-                    if (visitListFromBE.size > 0 || syncDataList!!.size > 0) {
+                    if (visitListFromBE.size > 0 || syncDataList!!.isNotEmpty()) {
+
+                        if(syncDataList!!.isNotEmpty())
+                        {
+                            binding.visitsLeft.text = syncDataList!!.size.toString() +" "+requireActivity().getString(R.string.todays_visit_left)
+                            for(data in syncDataList!!)
+                            {
+                                val projectInfo = ProjectInfo(visit_number = data.visitNumber.toString(), location_name = data.locationName, visit_status = "COMPLETED" )
+                                visitListFromBE.add(projectInfo)
+                            }
+                        }
 
                         val myVisitsAdapter =
                             MyVisitsAdapter(visitListFromBE, this, requireContext())
@@ -918,6 +1044,46 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
             }
 
+            ApiExtentions.ApiDef.UPLOAD_IMAGE -> {
+                val model = JSONObject(o.toString())
+                val uploadImageData = Gson().fromJson(
+                    model.getJSONObject("data").toString(),
+                    UploadImageData::class.java
+                )
+                if (uploadImageData != null && imageIndex == 0) {
+                    imageIndex += 1;
+                    requestModel!!.visitData!!.visit_image_1!!.value = uploadImageData.url
+                    uploadImage(requestModel!!.visitData!!.visit_image_2!!.value.toString().toUri())
+                } else if (uploadImageData != null && imageIndex == 1) {
+                    imageIndex += 1;
+                    requestModel!!.visitData!!.visit_image_2!!.value = uploadImageData.url
+                    uploadImage(requestModel!!.visitData!!.visit_image_3!!.value.toString().toUri())
+                } else if (uploadImageData != null && imageIndex == 2) {
+                    imageIndex += 1;
+                    requestModel!!.visitData!!.visit_image_3!!.value = uploadImageData.url
+                    uploadImage(requestModel!!.visitData!!.visit_image_4!!.value.toString().toUri())
+                } else if (uploadImageData != null && imageIndex == 3) {
+                    imageIndex += 1;
+                    requestModel!!.visitData!!.visit_image_1!!.value = uploadImageData.url
+                    submitForm(requestModel!!)
+                }
+            }
+
+            ApiExtentions.ApiDef.VISIT_DATA -> {
+                val model = JSONObject(o.toString())
+                if (!model.getBoolean("error")) {
+//                    userInfo.didUserSubmitNewVisit = true
+//                    val intent = Intent(activity, Dashboard::class.java)
+//                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+//                    startActivity(intent)
+//                    requireActivity().finish()
+                    visitDataViewModel.deleteById(visitDataTableUploading!!.id)
+                    fetchVisitData()
+                } else {
+                    redirectionAlertDialogue(requireContext(), model.getString("message"))
+                }
+            }
+
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
         }
     }
@@ -925,9 +1091,9 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     override fun onApiError(message: String?) {
         if (message?.equals(context?.getString(R.string.session_expire))!!) {
             userInfo.authToken = ""
-            redirectionAlertDialogue(requireContext(), message!!)
+            redirectionAlertDialogue(requireContext(), message)
         } else {
-            redirectionAlertDialogue(requireContext(), message!!)
+            redirectionAlertDialogue(requireContext(), message)
         }
     }
 
@@ -1105,7 +1271,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         return input.matches(regex)
     }
 
-    fun showViewTemporarily(view: View, duration: Long) {
+    private fun showViewTemporarily(view: View, duration: Long) {
         if (userInfo.didUserSubmitNewVisit) {
             view.visibility = View.VISIBLE
             handler.postDelayed({

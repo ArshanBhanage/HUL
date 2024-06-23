@@ -20,7 +20,7 @@ data class SchoolVisitData(
 )
 
 data class VisitDetails(
-    val value: Any?,
+    var value: Any?,
     val is_approved: Int? = null,
     val rejection_reason: String? = null
 )
