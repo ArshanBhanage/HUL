@@ -120,9 +120,17 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
         binding.proceed.setOnClickListener {
-            if (imageIndex == 0) {
-                setProgressDialog(requireContext(), "Uploading")
-                uploadImage(form3FillViewModel.imageUrl1.value?.toUri()!!)
+            if (form3FillViewModel.imageUrl1.value?.isEmpty() == true
+                || form3FillViewModel.imageUrl2.value?.isEmpty() == true
+                || form3FillViewModel.imageUrl3.value?.isEmpty() == true
+            ) {
+                Toast.makeText(requireContext(), "Please fill all data", Toast.LENGTH_LONG)
+                    .show()
+            } else {
+                if (imageIndex == 0) {
+                    setProgressDialog(requireContext(), "Uploading")
+                    uploadImage(form3FillViewModel.imageUrl1.value?.toUri()!!)
+                }
             }
         }
 

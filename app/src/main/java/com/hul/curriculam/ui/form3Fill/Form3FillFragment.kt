@@ -161,9 +161,18 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
         binding.proceed.setOnClickListener {
-            if (imageIndex == 0) {
-                setProgressDialog(requireContext(), "Uploading")
-                uploadImage(form3FillViewModel.imageUrl1.value?.toUri()!!)
+            if (form3FillViewModel.imageUrl1.value?.isEmpty() == true
+                || form3FillViewModel.imageUrl2.value?.isEmpty() == true
+                || form3FillViewModel.imageUrl3.value?.isEmpty() == true
+                || form3FillViewModel.imageUrl4.value?.isEmpty() == true
+            ) {
+                Toast.makeText(requireContext(), "Please fill all data", Toast.LENGTH_LONG)
+                    .show()
+            } else {
+                if (imageIndex == 0) {
+                    setProgressDialog(requireContext(), "Uploading")
+                    uploadImage(form3FillViewModel.imageUrl1.value?.toUri()!!)
+                }
             }
         }
 
@@ -668,16 +677,20 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
             if (form3FillViewModel.visitData.value?.visit_3?.revisit_applicable?.value == 1) true else false
 
         binding.form1.setText(
-            form3FillViewModel.visitData.value?.visit_3?.name_of_the_school_representative_who_collected_the_books?.value?.toString() ?: ""
+            form3FillViewModel.visitData.value?.visit_3?.name_of_the_school_representative_who_collected_the_books?.value?.toString()
+                ?: ""
         )
         binding.form2.setText(
-            form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_school_representative_who_collected_the_books?.value?.toString() ?: ""
+            form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_school_representative_who_collected_the_books?.value?.toString()
+                ?: ""
         )
         binding.form3.setText(
-            form3FillViewModel.visitData.value?.visit_3?.name_of_the_principal?.value?.toString() ?: ""
+            form3FillViewModel.visitData.value?.visit_3?.name_of_the_principal?.value?.toString()
+                ?: ""
         )
         binding.form4.setText(
-            form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_principal?.value?.toString() ?: ""
+            form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_principal?.value?.toString()
+                ?: ""
         )
         binding.form5.setText(
             form3FillViewModel.visitData.value?.visit_3?.remark?.value?.toString() ?: ""

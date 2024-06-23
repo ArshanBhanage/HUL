@@ -120,9 +120,17 @@ class AuditorForm2FillFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
         binding.proceed.setOnClickListener {
-            if (imageIndex == 0) {
-                setProgressDialog(requireContext(), "Uploading")
-                uploadImage(form2FillViewModel.imageUrl1.value?.toUri()!!)
+            if (form2FillViewModel.imageUrl1.value?.isEmpty() == true
+                || form2FillViewModel.imageUrl2.value?.isEmpty() == true
+                || form2FillViewModel.imageUrl3.value?.isEmpty() == true
+            ) {
+                Toast.makeText(requireContext(), "Please fill all data", Toast.LENGTH_LONG)
+                    .show()
+            } else {
+                if (imageIndex == 0) {
+                    setProgressDialog(requireContext(), "Uploading")
+                    uploadImage(form2FillViewModel.imageUrl1.value?.toUri()!!)
+                }
             }
         }
 
@@ -703,7 +711,7 @@ class AuditorForm2FillFragment : Fragment(), ApiHandler, RetryInterface {
             if (form2FillViewModel.visitData.value?.visit_2?.latitude == null) View.GONE else View.GONE
 
         binding.txtDirections.setOnClickListener {
-            if(currentLocation != null) {
+            if (currentLocation != null) {
                 form2FillViewModel.visitData.value?.visit_2?.longitude?.value?.let { it1 ->
                     form2FillViewModel.visitData.value?.visit_2?.latitude?.value?.let { it2 ->
                         openGoogleMapsForDirections(

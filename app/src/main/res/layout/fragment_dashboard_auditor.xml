@@ -24,36 +24,41 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#d7dcf2"
-                android:paddingHorizontal="@dimen/_16sdp"
-                android:paddingVertical="@dimen/_20sdp"
-                >
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="@dimen/_10sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
                     android:layout_width="@dimen/_120sdp"
                     android:layout_height="@dimen/_80sdp"
                     android:src="@drawable/ic_curriculum_logo"
-                    android:id="@+id/imgLogo"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
                     />
 
                 <RelativeLayout
                     android:id="@+id/rlProfile"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
+                    android:layout_width="@dimen/_45sdp"
+                    android:layout_height="@dimen/_45sdp"
                     android:layout_alignParentEnd="true"
                     android:layout_margin="3dp"
-                    android:background="@drawable/circle_shape"
-                    android:layout_centerVertical="true">
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/circle_shape">
 
                     <TextView
                         android:id="@+id/txtLatter"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:text=""
-                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="A"
                         android:textColor="@color/teal_200"
-                        android:textSize="20sp" />
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_centerInParent="true"/>
                 </RelativeLayout>
+
             </RelativeLayout>
 
             <LinearLayout

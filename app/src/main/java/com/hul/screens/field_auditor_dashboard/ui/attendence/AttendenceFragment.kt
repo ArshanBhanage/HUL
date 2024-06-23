@@ -32,13 +32,16 @@ import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
 import com.hul.camera.CameraActivity
 import com.hul.curriculam.Curriculam
+import com.hul.dashboard.Dashboard
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.databinding.FragmentAttendenceAuditorBinding
+import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboard
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
+import com.hul.utils.UserTypes
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectionAlertDialogue
@@ -239,7 +242,11 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
         binding.curriculumCapture.setOnClickListener {
-            redirectToCamera(1, attendenceViewModel.imageType2.value!!, "Selfie with curriculum")
+            redirectToCamera(
+                1,
+                attendenceViewModel.imageType2.value!!,
+                "Full image of mobiliser with curriculum material"
+            )
         }
 
         binding.stats.setOnClickListener {
@@ -388,7 +395,7 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
                 } else {
                     requireActivity().onBackPressed()
                 }*/
-                requireActivity().onBackPressed()
+                redirectToDashboard()
             }
 
             ApiExtentions.ApiDef.UPLOAD_IMAGE -> {
@@ -411,6 +418,28 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
         }
     }
 
+    private fun redirectToDashboard() {
+        when (userInfo.userType) {
+            UserTypes.MOBILISER -> {
+                val intent = Intent(activity, Dashboard::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                startActivity(intent)
+                requireActivity().finish()
+            }
+
+            UserTypes.FIELD_AUDITOR -> {
+                val intent = Intent(activity, FieldAuditorDashboard::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                startActivity(intent)
+                requireActivity().finish()
+            }
+
+            else -> {
+                // Handle other cases or default behavior
+            }
+        }
+    }
+
     override fun onApiError(message: String?) {
         redirectionAlertDialogue(requireContext(), message!!)
     }
@@ -429,7 +458,11 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
     private fun redirectToCamera(position: Int, imageType: String, heading: String) {
         val intent = Intent(activity, CameraActivity::class.java)
         intent.putExtra("position", position)
-        intent.putExtra("imageType", imageType)
+        if (position == 0) {
+            intent.putExtra("imageType", "Image Capture Front")
+        }else{
+            intent.putExtra("imageType", "Back")
+        }
         intent.putExtra("heading", heading)
         startImageCapture.launch(intent)
 

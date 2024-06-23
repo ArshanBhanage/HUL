@@ -25,7 +25,7 @@
                 android:layout_height="wrap_content"
                 android:background="#d7dcf2"
                 android:paddingHorizontal="16dp"
-                android:paddingVertical="@dimen/_20sdp"
+                android:paddingVertical="@dimen/_10sdp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -41,8 +41,8 @@
 
                 <RelativeLayout
                     android:id="@+id/rlProfile"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
+                    android:layout_width="@dimen/_45sdp"
+                    android:layout_height="@dimen/_45sdp"
                     android:layout_alignParentEnd="true"
                     android:layout_margin="3dp"
                     android:layout_centerVertical="true"
@@ -50,12 +50,13 @@
 
                     <TextView
                         android:id="@+id/txtLatter"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:text=""
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="A"
                         android:textColor="@color/teal_200"
                         android:textSize="20sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:layout_centerInParent="true"/>
                 </RelativeLayout>
 
             </RelativeLayout>
@@ -71,7 +72,7 @@
                     android:id="@+id/txtProfileName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="@dimen/_10sdp"
                     android:fontFamily="@font/public_sans_semi_bold"
                     android:text="Hi, "
                     android:textColor="#2F2B3D"
@@ -129,7 +130,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="24dp">
+                        android:padding="@dimen/_16sdp">
 
                         <LinearLayout
                             android:id="@+id/todaysAttendence"
@@ -148,24 +149,23 @@
                                     android:layout_height="40dp"
                                     android:src="@mipmap/attendence"
                                     app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toTopOf="parent" />
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent"/>
 
                                 <TextView
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginRight="10dp"
-                                    android:layout_toRightOf="@+id/cal"
                                     android:ellipsize="end"
-                                    android:fontFamily="@font/public_sans"
+                                    android:fontFamily="@font/public_sans_semi_bold"
                                     android:maxLines="1"
                                     android:text="@string/my_attendence"
-                                    android:textColor="#2F2B3D"
-                                    android:textFontWeight="700"
-                                    android:textSize="18sp"
+                                    android:textColor="@color/text_color_black"
+                                    android:textSize="@dimen/_13ssp"
                                     android:textStyle="bold"
                                     app:layout_constraintEnd_toStartOf="@+id/llButtons"
                                     app:layout_constraintStart_toEndOf="@+id/cal"
-                                    app:layout_constraintTop_toTopOf="parent" />
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintBottom_toBottomOf="parent"/>
 
                                 <LinearLayout
                                     android:id="@id/llButtons"
@@ -180,17 +180,16 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_gravity="right"
-                                        android:backgroundTint="#dde0f6"
-                                        android:fontFamily="@font/publicsans"
+                                        android:backgroundTint="@color/btn_bg_color"
+                                        android:fontFamily="@font/public_sans_regular"
                                         android:text="@string/punch_in"
                                         android:textAllCaps="false"
-                                        android:textColor="#2C41CA"
-                                        android:textFontWeight="700"
+                                        android:textColor="@color/btn_text_color"
                                         android:textSize="13sp"
                                         android:textStyle="bold"
-                                        app:cornerRadius="8dp"
+                                        app:cornerRadius="@dimen/_3sdp"
                                         app:icon="@mipmap/plus"
-                                        app:iconTint="#2C41CA" />
+                                        app:iconTint="@color/btn_text_color" />
 
                                     <com.google.android.material.button.MaterialButton
                                         android:id="@+id/punchInButtonDisabled"
@@ -225,8 +224,9 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Friday"
-                                    android:textColor="#6d6b77"
-                                    android:textSize="12sp"
+                                    android:fontFamily="@font/public_sans_regular"
+                                    android:textColor="@color/text_color_gray"
+                                    android:textSize="@dimen/_10ssp"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -234,11 +234,11 @@
                                     android:id="@+id/date"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
+                                    android:layout_marginTop="@dimen/_3sdp"
                                     android:text="27 May,2021"
-                                    android:textColor="#444050"
-                                    android:textSize="12sp"
-                                    android:textStyle="bold"
+                                    android:textColor="@color/text_color_black_light"
+                                    android:textSize="@dimen/_11ssp"
+                                    android:fontFamily="@font/public_sans_semi_bold"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toBottomOf="@+id/dayToday" />
 
@@ -247,10 +247,11 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/punch_time"
-                                    android:textColor="#6d6b77"
                                     android:textSize="12sp"
                                     app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintTop_toTopOf="parent" />
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    android:fontFamily="@font/public_sans_regular"
+                                    android:textColor="@color/text_color_gray"/>
 
                                 <TextView
                                     android:id="@+id/time"
@@ -258,11 +259,12 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="4dp"
                                     android:text="__ __"
-                                    android:textColor="#444050"
-                                    android:textSize="12sp"
                                     android:textStyle="bold"
                                     app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintTop_toBottomOf="@+id/punch_time" />
+                                    app:layout_constraintTop_toBottomOf="@+id/punch_time"
+                                    android:textColor="@color/text_color_black_light"
+                                    android:textSize="@dimen/_11ssp"
+                                    android:fontFamily="@font/public_sans_semi_bold"/>
                             </androidx.constraintlayout.widget.ConstraintLayout>
 
                             <LinearLayout

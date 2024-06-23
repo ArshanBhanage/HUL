@@ -33,15 +33,18 @@ import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
 import com.hul.camera.CameraActivity
 import com.hul.curriculam.Curriculam
+import com.hul.dashboard.Dashboard
 import com.hul.dashboard.DashboardComponent
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.data.UploadImageData
 import com.hul.databinding.FragmentAttendenceBinding
+import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboard
 import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDialogFragment
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
+import com.hul.utils.UserTypes
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectionAlertDialogue
@@ -244,7 +247,7 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
         binding.curriculumCapture.setOnClickListener {
-            redirectToCamera(1, attendenceViewModel.imageCaptureType2.value!!, "Selfie with curriculum")
+            redirectToCamera(1, attendenceViewModel.imageCaptureType2.value!!, "Full image of mobiliser with curriculum material")
         }
 
         binding.stats.setOnClickListener {
@@ -414,11 +417,12 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
 
             ApiExtentions.ApiDef.MARK_ATTENDENCE -> {
                 val model = JSONObject(o.toString())
-                if (attendenceViewModel.projectInfo.value!!.project_name != null) {
+                /*if (attendenceViewModel.projectInfo.value!!.project_name != null) {
                     redirectToCurriculam(attendenceViewModel.projectInfo.value!!)
                 } else {
                     requireActivity().onBackPressed()
-                }
+                }*/
+                redirectToDashboard()
             }
 
             ApiExtentions.ApiDef.UPLOAD_IMAGE -> {
@@ -439,6 +443,27 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
             }
 
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun redirectToDashboard() {
+        when (userInfo.userType) {
+            UserTypes.MOBILISER -> {
+                val intent = Intent(activity, Dashboard::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                startActivity(intent)
+                requireActivity().finish()
+            }
+            UserTypes.FIELD_AUDITOR -> {
+                val intent = Intent(activity, FieldAuditorDashboard::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                startActivity(intent)
+                requireActivity().finish()
+            }
+
+            else -> {
+                // Handle other cases or default behavior
+            }
         }
     }
 

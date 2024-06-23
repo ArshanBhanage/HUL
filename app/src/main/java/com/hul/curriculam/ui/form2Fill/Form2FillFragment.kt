@@ -154,9 +154,18 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
         binding.proceed.setOnClickListener {
-            if (imageIndex == 0) {
-                setProgressDialog(requireContext(), "Uploading")
-                uploadImage(form2FillViewModel.imageUrl1.value?.toUri()!!)
+            if (form2FillViewModel.imageUrl1.value?.isEmpty() == true
+                || form2FillViewModel.imageUrl2.value?.isEmpty() == true
+                || form2FillViewModel.imageUrl3.value?.isEmpty() == true
+                || form2FillViewModel.imageUrl4.value?.isEmpty() == true
+            ) {
+                Toast.makeText(requireContext(), "Please fill all data", Toast.LENGTH_LONG)
+                    .show()
+            } else {
+                if (imageIndex == 0) {
+                    setProgressDialog(requireContext(), "Uploading")
+                    uploadImage(form2FillViewModel.imageUrl1.value?.toUri()!!)
+                }
             }
         }
 
