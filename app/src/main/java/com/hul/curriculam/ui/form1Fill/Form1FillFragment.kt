@@ -150,9 +150,12 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
 
         binding.proceed.setOnClickListener {
             if (imageIndex == 0) {
-//                setProgressDialog(requireContext(), "Uploading")
-//                uploadImage(form1FillViewModel.imageUrl1.value?.toUri()!!)
-                val visitDataTable = VisitDataTable(jsonData= Gson().toJson(submitModel()), visitNumber = form1FillViewModel.projectInfo.value!!.visit_number!!.toInt(),locationName = form1FillViewModel.projectInfo.value!!.location_name!!, uDiceCode = form1FillViewModel.selectedSchoolCode.value!!.external_id1!!)
+                val visitDataTable = VisitDataTable(
+                    jsonData= Gson().toJson(submitModel()),
+                    visitNumber = form1FillViewModel.projectInfo.value!!.visit_number!!.toInt(),
+                    locationName = form1FillViewModel.projectInfo.value!!.location_name!!,
+                    uDiceCode = binding.disceCode.text.toString()
+                )
                 visitDataViewModel.insert(visitDataTable)
 
                 val intent = Intent(activity, Dashboard::class.java)
