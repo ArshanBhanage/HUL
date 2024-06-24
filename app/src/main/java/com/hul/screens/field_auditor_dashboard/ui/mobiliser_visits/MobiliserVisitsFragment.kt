@@ -12,7 +12,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,8 +34,6 @@ import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
-import com.hul.curriculam.ui.form1Fill.Form1FillFragment
-import com.hul.dashboard.ui.dashboard.MyVisitsAdapter
 import com.hul.data.MappedUser
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
@@ -441,12 +438,31 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
             val bundle = Bundle()
 
             bundle.putString("projectInfo", Gson().toJson(projectInfoForRedirect))
-            bundle.putString("visitList", Gson().toJson(visitsForSchoolId))
+
+            val firstVisit = visitsForSchoolId.filter { it.visit_number == "1" }
+            val secondVisit = visitsForSchoolId.filter { it.visit_number == "2" }
+            val thirdVisit = visitsForSchoolId.filter { it.visit_number == "3" }
+
+            val visibleVisits = ArrayList<ProjectInfo>()
+
+            visibleVisits.add(firstVisit[0])
+            if (firstVisit.isNotEmpty() && firstVisit[0].visit_status == FIELD_AUDITOR_APPROVED) {
+                if (secondVisit.isNotEmpty()) {
+                    visibleVisits.add(secondVisit[0])
+                }
+            }
+            if (secondVisit.isNotEmpty() && secondVisit[0].visit_status == FIELD_AUDITOR_APPROVED) {
+                if (thirdVisit.isNotEmpty()) {
+                    visibleVisits.add(thirdVisit[0])
+                }
+            }
+
+            bundle.putString("visitList", Gson().toJson(visibleVisits))
 
             findNavController().navigate(
                 R.id.action_visits_school_activity, bundle
             )
-        }else{
+        } else {
             projectInfoForRedirect = projectInfo
             projectInfo.location_id?.toInt()?.let { getSchoolVisits(it) }
         }
