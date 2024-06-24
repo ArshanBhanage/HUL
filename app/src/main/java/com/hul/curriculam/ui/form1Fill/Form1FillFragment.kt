@@ -151,7 +151,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.proceed.setOnClickListener {
             if (imageIndex == 0) {
                 val visitDataTable = VisitDataTable(
-                    jsonData= Gson().toJson(submitModel()),
+                    jsonData = Gson().toJson(submitModel()),
                     visitNumber = form1FillViewModel.projectInfo.value!!.visit_number!!.toInt(),
                     locationName = form1FillViewModel.projectInfo.value!!.location_name!!,
                     uDiceCode = binding.disceCode.text.toString()
@@ -682,29 +682,38 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.disceCode.setText(form1FillViewModel.uDiceCode.value)
         binding.schoolName.setText(form1FillViewModel.selectedSchoolCode.value?.location_name)
         binding.studentNo.setText(form1FillViewModel.selectedSchoolCode.value?.location_data_field1)
-        binding.switchSchoolClosed.isChecked = form1FillViewModel.visitData.value?.visit_1?.school_closed?.value == 1
+        binding.switchSchoolClosed.isChecked =
+            form1FillViewModel.visitData.value?.visit_1?.school_closed?.value == 1
         binding.noOfBooksHanded.setText(
-            form1FillViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value?.toString() ?: ""
+            form1FillViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value?.toString()
+                ?: ""
         )
         binding.noOfBooksHanded.setText(
-            form1FillViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value?.toString() ?: ""
+            form1FillViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value?.toString()
+                ?: ""
         )
         binding.teachersTrained.setText(
-            form1FillViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.value?.toString() ?: ""
+            form1FillViewModel.visitData.value?.visit_1?.no_of_teachers_trained?.value?.toString()
+                ?: ""
         )
         binding.form1.setText(
-            form1FillViewModel.visitData.value?.visit_1?.name_of_the_school_representative_who_collected_the_books?.value?.toString() ?: ""
+            form1FillViewModel.visitData.value?.visit_1?.name_of_the_school_representative_who_collected_the_books?.value?.toString()
+                ?: ""
         )
         binding.form2.setText(
-            form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_school_representative_who_collected_the_books?.value?.toString() ?: ""
+            form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_school_representative_who_collected_the_books?.value?.toString()
+                ?: ""
         )
         binding.form3.setText(
-            form1FillViewModel.visitData.value?.visit_1?.name_of_the_principal?.value?.toString() ?: ""
+            form1FillViewModel.visitData.value?.visit_1?.name_of_the_principal?.value?.toString()
+                ?: ""
         )
         binding.form4.setText(
-            form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_principal?.value?.toString() ?: ""
+            form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_principal?.value?.toString()
+                ?: ""
         )
-        binding.switchRevisit.isChecked = if (form1FillViewModel.visitData.value?.visit_1?.revisit_applicable?.value == 1) true else false
+        binding.switchRevisit.isChecked =
+            if (form1FillViewModel.visitData.value?.visit_1?.revisit_applicable?.value == 1) true else false
         binding.form5.setText(
             form1FillViewModel.visitData.value?.visit_1?.remark?.value?.toString() ?: ""
         )
@@ -790,5 +799,34 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
     override fun onDestroyView() {
         super.onDestroyView()
         handler.removeCallbacksAndMessages(null)
+    }
+
+    private fun checkValidation() {
+        if (form1FillViewModel.projectInfo.value == null) {
+            Toast.makeText(requireContext(), "Visit details not found", Toast.LENGTH_LONG).show()
+        } else if (binding.disceCode.text.toString().isBlank()) {
+            Toast.makeText(requireContext(), "Please enter U Dise Code", Toast.LENGTH_LONG).show()
+        } else if (binding.schoolName.text.toString().isBlank()) {
+            Toast.makeText(requireContext(), "Please enter school name", Toast.LENGTH_LONG).show()
+        } else if (binding.studentNo.text.toString().isBlank()) {
+            Toast.makeText(requireContext(), "Please enter no. of students", Toast.LENGTH_LONG).show()
+        } else if (form1FillViewModel.noOfBooksHandedOver.value?.isEmpty() == true) {
+            Toast.makeText(requireContext(), "Please enter no. of books handed over", Toast.LENGTH_LONG).show()
+        } else if (form1FillViewModel.teachersTrained.value?.isEmpty() == true) {
+            Toast.makeText(requireContext(), "Please enter no. of teachers trained", Toast.LENGTH_LONG).show()
+        } else if (form1FillViewModel.form1.value.toString().isEmpty()) {
+            Toast.makeText(requireContext(), "Please enter name of school representative", Toast.LENGTH_LONG).show()
+        } else if (form1FillViewModel.form2.value.toString().isEmpty()) {
+            Toast.makeText(requireContext(), "Please enter mobile number of school representative", Toast.LENGTH_LONG).show()
+        } else if (form1FillViewModel.form3.value.toString().isEmpty()) {
+            Toast.makeText(requireContext(), "Please enter name of principal", Toast.LENGTH_LONG).show()
+        } else if (form1FillViewModel.form4.value.toString().isEmpty()) {
+            Toast.makeText(requireContext(), "Please enter mobile number of principal", Toast.LENGTH_LONG).show()
+        } else if (currentLocation == null) {
+            Toast.makeText(requireContext(), "Location details not found", Toast.LENGTH_LONG).show()
+        } else if (form1FillViewModel.imageUrl1.value?.isEmpty() == true || form1FillViewModel.imageUrl2.value?.isEmpty() == true
+            || form1FillViewModel.imageUrl3.value?.isEmpty() == true || form1FillViewModel.imageUrl4.value?.isEmpty() == true) {
+            Toast.makeText(requireContext(), "Please add required images", Toast.LENGTH_LONG).show()
+        }
     }
 }

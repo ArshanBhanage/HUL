@@ -484,7 +484,11 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
     private fun redirectToCamera(position: Int, imageType: String, heading: String) {
         val intent = Intent(activity, CameraActivity::class.java)
         intent.putExtra("position", position)
-        intent.putExtra("imageType", imageType)
+        if (position == 0) {
+            intent.putExtra("imageType", "Image Capture Front")
+        }else{
+            intent.putExtra("imageType", "Back")
+        }
         intent.putExtra("heading", heading)
         startImageCapture.launch(intent)
     }
