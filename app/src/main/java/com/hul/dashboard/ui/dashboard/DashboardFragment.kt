@@ -275,9 +275,9 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         //visitDataViewModel.insert(VisitDataTable(jsonData = "Nitin", visitNumber = 1, project = "Test", uDiceCode = "retest"))
 
         binding.syncNow.setOnClickListener {
-            if (syncDataList!!.size > 0) {
+            if (syncDataList.isNotEmpty()) {
                 setProgressDialog(requireContext(), "Syncing Data")
-                startSync(syncDataList!!.get(syncDataList!!.size - 1))
+                startSync(syncDataList[syncDataList.size - 1])
             }
         }
 
@@ -1113,6 +1113,19 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     override fun redirectToAttendence(projectInfo: ProjectInfo) {
 
         if (dashboardViewModel.attendenceToday.value?.present == true) {
+
+            if (selectedSchoolCode == null
+                || visitList.isEmpty()
+            ) {
+                Toast.makeText(
+                    requireContext(),
+                    "Visit details is incomplete to view",
+                    Toast.LENGTH_LONG
+                )
+                    .show()
+                return;
+            }
+
             val bundle = Bundle()
             var uDiceCode = ""
             uDiceCode = if (selectedSchoolCode?.external_id1 != null) {
