@@ -15,7 +15,6 @@ import android.os.Looper
 import android.provider.Settings
 import android.text.InputFilter
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -24,6 +23,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.fragment.app.Fragment
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -39,7 +39,6 @@ import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
 import com.hul.camera.CameraActivity
 import com.hul.curriculam.CurriculamComponent
-import com.hul.curriculam.ui.form2Fill.Form2FillFragment
 import com.hul.dashboard.Dashboard
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
@@ -55,11 +54,9 @@ import com.hul.sync.VisitDataViewModel
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
 import com.hul.utils.RetryInterface
-import com.hul.utils.TimeUtils
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectionAlertDialogue
-import com.hul.utils.setProgressDialog
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -166,14 +163,23 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
         binding.proceed.setOnClickListener {
-            if (imageIndex == 0) {
-                val visitDataTable = VisitDataTable(jsonData= Gson().toJson(submitModel()), visitNumber = form3FillViewModel.projectInfo.value!!.visit_number!!.toInt(),locationName = form3FillViewModel.projectInfo.value!!.location_name!!, uDiceCode = form3FillViewModel.selectedSchoolCode.value!!.external_id1!!)
-                visitDataViewModel.insert(visitDataTable)
+            if (checkValidation()) {
+                if (imageIndex == 0) {
+                    val visitDataTable = VisitDataTable(
+                        jsonData = Gson().toJson(submitModel()),
+                        visitNumber = form3FillViewModel.projectInfo.value!!.visit_number!!.toInt(),
+                        locationName = form3FillViewModel.projectInfo.value!!.location_name!!,
+                        uDiceCode = binding.disceCode.text.toString()
+                    )
+                    visitDataViewModel.insert(visitDataTable)
 
-                val intent = Intent(activity, Dashboard::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                startActivity(intent)
-                requireActivity().finish()
+                    Toast.makeText(requireContext(), "Visit Data saved successfully", Toast.LENGTH_LONG).show()
+
+                    val intent = Intent(activity, Dashboard::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                    requireActivity().finish()
+                }
             }
         }
 
@@ -685,16 +691,20 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
             if (form3FillViewModel.visitData.value?.visit_3?.revisit_applicable?.value == 1) true else false
 
         binding.form1.setText(
-            form3FillViewModel.visitData.value?.visit_3?.name_of_the_school_representative_who_collected_the_books?.value?.toString() ?: ""
+            form3FillViewModel.visitData.value?.visit_3?.name_of_the_school_representative_who_collected_the_books?.value?.toString()
+                ?: ""
         )
         binding.form2.setText(
-            form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_school_representative_who_collected_the_books?.value?.toString() ?: ""
+            form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_school_representative_who_collected_the_books?.value?.toString()
+                ?: ""
         )
         binding.form3.setText(
-            form3FillViewModel.visitData.value?.visit_3?.name_of_the_principal?.value?.toString() ?: ""
+            form3FillViewModel.visitData.value?.visit_3?.name_of_the_principal?.value?.toString()
+                ?: ""
         )
         binding.form4.setText(
-            form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_principal?.value?.toString() ?: ""
+            form3FillViewModel.visitData.value?.visit_3?.mobile_number_of_the_principal?.value?.toString()
+                ?: ""
         )
         binding.form5.setText(
             form3FillViewModel.visitData.value?.visit_3?.remark?.value?.toString() ?: ""
@@ -748,5 +758,47 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
         val minutesLeft = millisUntilFinished / 1000 / 60
         val secondsLeft = (millisUntilFinished / 1000) % 60
         binding.txtClock.text = String.format("Submit in %d:%02d minutes", minutesLeft, secondsLeft)
+    }
+
+    private fun checkValidation(): Boolean {
+        if (binding.disceCode.text.toString().isBlank()) {
+            Toast.makeText(requireContext(), "Please enter U Dise Code", Toast.LENGTH_LONG).show()
+            return false;
+        } else if (binding.schoolName.text.toString().isBlank()) {
+            Toast.makeText(requireContext(), "Please enter school name", Toast.LENGTH_LONG).show()
+            return false;
+        } else if (binding.noOfBooksHanded.text.toString().isBlank()) {
+            Toast.makeText(
+                requireContext(),
+                "Please enter no. of books handed over",
+                Toast.LENGTH_LONG
+            ).show()
+            binding.noOfBooksHanded.isEnabled = true
+            return false;
+        } else if (form3FillViewModel.form1.value.toString().isEmpty()) {
+            Toast.makeText(
+                requireContext(),
+                "Please enter name of school representative",
+                Toast.LENGTH_LONG
+            ).show()
+            return false;
+        } else if (form3FillViewModel.form2.value.toString().isEmpty()) {
+            Toast.makeText(
+                requireContext(),
+                "Please enter mobile number of school representative",
+                Toast.LENGTH_LONG
+            ).show()
+            return false;
+        } else if (currentLocation == null) {
+            Toast.makeText(requireContext(), "Location details not found", Toast.LENGTH_LONG).show()
+            return false;
+        } else if (form3FillViewModel.imageUrl1.value?.isEmpty() == true || form3FillViewModel.imageUrl2.value?.isEmpty() == true
+            || form3FillViewModel.imageUrl3.value?.isEmpty() == true || form3FillViewModel.imageUrl4.value?.isEmpty() == true
+        ) {
+            Toast.makeText(requireContext(), "Please add required images", Toast.LENGTH_LONG).show()
+            return false;
+        } else {
+            return true;
+        }
     }
 }

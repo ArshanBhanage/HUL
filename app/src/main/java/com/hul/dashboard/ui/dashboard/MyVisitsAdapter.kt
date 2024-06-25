@@ -58,12 +58,13 @@ class MyVisitsAdapter(
                     )
                 )
                 binding.root.setOnClickListener {
-                    if (mList[position].visit_status.equals(ASSIGNED, ignoreCase = true)
+                    /*if (mList[position].visit_status.equals(ASSIGNED, ignoreCase = true)
                         || mList[position].visit_status.equals(INITIATED, ignoreCase = true)
                         || mList[position].visit_status.equals(PARTIALLY_SUBMITTED, ignoreCase = true)
                     ) {
                         dashboardInterface.redirectToAttendence(this)
-                    }
+                    }*/
+                    dashboardInterface.redirectToAttendence(this)
                 }
             }
         }

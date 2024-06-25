@@ -50,7 +50,6 @@ import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
 import com.hul.curriculam.Curriculam
 import com.hul.curriculam.ui.schoolCode.SchoolCodeAdapter
-import com.hul.dashboard.Dashboard
 import com.hul.dashboard.DashboardComponent
 import com.hul.data.Attendencemodel
 import com.hul.data.District
@@ -70,7 +69,6 @@ import com.hul.utils.ConnectionDetector
 import com.hul.utils.INITIATED
 import com.hul.utils.PARTIALLY_SUBMITTED
 import com.hul.utils.RetryInterface
-import com.hul.utils.TimeUtils.parseCoordinate
 import com.hul.utils.cancelProgressDialog
 import com.hul.utils.noInternetDialogue
 import com.hul.utils.redirectToLogin
@@ -133,7 +131,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     var stateCallBack: ListDialogInterface? = null;
 
-    private var syncDataList: List<VisitDataTable>? = null
+    private var syncDataList: List<VisitDataTable> = ArrayList()
 
     private var currentLocation: Location? = null
     private lateinit var locationCallback: LocationCallback
@@ -279,32 +277,31 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         binding.syncNow.setOnClickListener {
             if (syncDataList!!.size > 0) {
                 setProgressDialog(requireContext(), "Syncing Data")
-                startSync(syncDataList!!.get(syncDataList!!.size-1))
+                startSync(syncDataList!!.get(syncDataList!!.size - 1))
             }
         }
 
     }
 
-    private fun fetchVisitData(){
+    private fun fetchVisitData() {
         visitDataViewModel.allSyncData.observe(requireActivity()) { visitDataList ->
-            syncDataList = visitDataList
-            if(isSyncing)
-            {
-                if(syncDataList!!.isNotEmpty()) {
-                    startSync(syncDataList!!.get(syncDataList!!.size-1))
-                }
-                else{
-                    isSyncing = false
-                    showViewTemporarily(binding.llVisitSuccessToast, 2000)
-                    cancelProgressDialog()
-                    getTodaysVisit()
+            if (visitDataList.isNotEmpty()) {
+                syncDataList = visitDataList
+                if (isSyncing) {
+                    if (syncDataList.isNotEmpty()) {
+                        startSync(syncDataList[syncDataList.size - 1])
+                    } else {
+                        isSyncing = false
+                        showViewTemporarily(binding.llVisitSuccessToast, 2000)
+                        cancelProgressDialog()
+                        getTodaysVisit()
+                    }
                 }
             }
         }
     }
 
-    private fun startSync(visitDataTable: VisitDataTable)
-    {
+    private fun startSync(visitDataTable: VisitDataTable) {
         imageIndex = 0
         isSyncing = true
         visitDataTableUploading = visitDataTable
@@ -996,11 +993,12 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     val sortedList = visitList.sortedBy { it.visit_number }
 
                     val listToShowInAdapter: ArrayList<ProjectInfo> = ArrayList();
-                    if(sortedList.isNotEmpty()) {
+                    if (sortedList.isNotEmpty()) {
                         listToShowInAdapter.add(sortedList.last())
                     }
 
-                    val myVisitsAdapter = MyVisitsAdapter(listToShowInAdapter, this, requireContext())
+                    val myVisitsAdapter =
+                        MyVisitsAdapter(listToShowInAdapter, this, requireContext())
                     // Setting the Adapter with the recyclerview
                     binding.locationToVisit.adapter = myVisitsAdapter
                 } else {
@@ -1017,14 +1015,21 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     val visitListFromBE: ArrayList<ProjectInfo> =
                         Gson().fromJson(model.getJSONArray("data").toString(), listType);
 
-                    if (visitListFromBE.size > 0 || syncDataList!!.isNotEmpty()) {
+                    if (visitListFromBE.size > 0 || syncDataList.isNotEmpty()) {
 
-                        if(syncDataList!!.isNotEmpty())
-                        {
-                            binding.visitsLeft.text = syncDataList!!.size.toString() +" "+requireActivity().getString(R.string.todays_visit_left)
-                            for(data in syncDataList!!)
-                            {
-                                val projectInfo = ProjectInfo(visit_number = data.visitNumber.toString(), location_name = data.locationName, visit_status = "COMPLETED" )
+                        // Change visit total dynamically
+                        visitDataViewModel.allSyncData.observe(requireActivity()) { visitDataList ->
+                            binding.visitsLeft.text =
+                                visitDataList.size.toString() + " " + requireActivity().getString(R.string.todays_visit_left)
+                        }
+
+                        if (syncDataList.isNotEmpty()) {
+                            for (data in syncDataList) {
+                                val projectInfo = ProjectInfo(
+                                    visit_number = data.visitNumber.toString(),
+                                    location_name = data.locationName,
+                                    visit_status = "COMPLETED"
+                                )
                                 visitListFromBE.add(projectInfo)
                             }
                         }
@@ -1064,7 +1069,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     uploadImage(requestModel!!.visitData!!.visit_image_4!!.value.toString().toUri())
                 } else if (uploadImageData != null && imageIndex == 3) {
                     imageIndex += 1;
-                    requestModel!!.visitData!!.visit_image_1!!.value = uploadImageData.url
+                    requestModel!!.visitData!!.visit_image_4!!.value = uploadImageData.url
                     submitForm(requestModel!!)
                 }
             }
