@@ -158,7 +158,9 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                         Form1DetailsFragment.newInstance(
                             Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
                             Gson().toJson(visit),
-                            uDiceCode
+                            uDiceCode,
+                            requireArguments().getString("localData")
+
                         )
                     )
 
@@ -167,7 +169,8 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                         Form2DetailsFragment.newInstance(
                             Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
                             Gson().toJson(visit),
-                            uDiceCode
+                            uDiceCode,
+                            requireArguments().getString("localData")
                         )
                     )
 
@@ -176,7 +179,8 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                         Form3DetailsFragment.newInstance(
                             Gson().toJson(schoolFormViewModel.selectedSchoolCode.value),
                             Gson().toJson(visit),
-                            uDiceCode
+                            uDiceCode,
+                            requireArguments().getString("localData")
                         )
                     )
 

@@ -23,6 +23,8 @@ class Form1FillViewModel @Inject constructor(
 
     var position = MutableLiveData<Int>(0)
 
+    var numberOfStudentEditable = MutableLiveData(false)
+
     var longitude = MutableLiveData<String>()
     var lattitude = MutableLiveData<String>()
 

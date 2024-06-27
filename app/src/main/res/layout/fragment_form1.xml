@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text='@{viewModel.selectedSchoolCode.location_name}'
+                android:text='@{viewModel.visitData.visit_1.school_name.value.toString()}'
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"

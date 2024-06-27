@@ -10,5 +10,6 @@ data class VisitDataTable(
     val visitNumber: Int, // Only values 1, 2, or 3,
     val locationName: String,
     val uDiceCode : String,
+    val locationId : String,
 )
 

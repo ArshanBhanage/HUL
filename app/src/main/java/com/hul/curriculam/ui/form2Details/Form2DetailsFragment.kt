@@ -17,10 +17,12 @@ import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
 import com.hul.curriculam.CurriculamComponent
+import com.hul.curriculam.ui.form1Details.Form1DetailsFragment
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.data.SchoolCode
+import com.hul.data.VisitData
 import com.hul.databinding.FragmentForm2Binding
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
@@ -89,13 +91,15 @@ class Form2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
         private const val ARG_CONTENT1 = "content1"
         private const val ARG_CONTENT2 = "content2"
         private const val U_DICE_CODE = "uDiceCode"
+        private const val LOCAL_DATA = "localData"
 
-        fun newInstance(content1: String, content2: String, uDiceCode: String?) =
+        fun newInstance(content1: String, content2: String, uDiceCode: String?,localData: String?) =
             Form2DetailsFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_CONTENT1, content1)
                     putString(ARG_CONTENT2, content2)
                     putString(U_DICE_CODE, uDiceCode)
+                    putString(LOCAL_DATA, localData)
                 }
             }
     }
@@ -142,7 +146,14 @@ class Form2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
                     model.getJSONObject("data").toString(),
                     GetVisitDataResponseData::class.java
                 )
-
+                if(form2ViewModel.visitData.value!!.visit_2 ==null)
+                {
+                    val requestModel = Gson().fromJson(requireArguments().getString(
+                        LOCAL_DATA
+                    ), RequestModel::class.java)
+                    form2ViewModel.visitData.value!!.visit_2 = requestModel.visitData
+                }
+                form2ViewModel.uDiceCode.value = form2ViewModel.visitData.value?.visit_2?.u_dice_code!!.value.toString()
                 fillData()
 
                 if (form2ViewModel.visitData.value?.visit_2?.visit_image_1?.value != null) {
@@ -200,7 +211,7 @@ class Form2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
 
     private fun fillData() {
         binding.txtUdiceCode.text = form2ViewModel.uDiceCode.value
-        binding.txtSchoolName.text = form2ViewModel.selectedSchoolCode.value?.location_name
+        binding.txtSchoolName.text = form2ViewModel.visitData.value?.visit_2?.school_name!!.value.toString()
         binding.txtNoOfBooksGiven.text =
             form2ViewModel.projectInfo.value?.number_of_books_distributed.toString()
         binding.txtCurriculamOnTrack.text =

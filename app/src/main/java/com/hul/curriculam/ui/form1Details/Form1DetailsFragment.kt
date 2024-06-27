@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,7 @@ import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.data.SchoolCode
+import com.hul.data.VisitData
 import com.hul.databinding.FragmentForm1Binding
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
@@ -91,13 +93,15 @@ class Form1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
         private const val ARG_CONTENT1 = "content1"
         private const val ARG_CONTENT2 = "content2"
         private const val U_DICE_CODE = "uDiceCode"
+        private const val LOCAL_DATA = "localData"
 
-        fun newInstance(content1: String, content2: String, uDiceCode: String?) =
+        fun newInstance(content1: String, content2: String, uDiceCode: String?,localData: String?) =
             Form1DetailsFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_CONTENT1, content1)
                     putString(ARG_CONTENT2, content2)
                     putString(U_DICE_CODE, uDiceCode)
+                    putString(LOCAL_DATA, localData)
                 }
             }
     }
@@ -144,7 +148,13 @@ class Form1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
                     model.getJSONObject("data").toString(),
                     GetVisitDataResponseData::class.java
                 )
-
+                Log.d("Nitin", requireArguments().getString(LOCAL_DATA)!!)
+                if(form1ViewModel.visitData.value!!.visit_1 == null)
+                {
+                    val requestModel = Gson().fromJson(requireArguments().getString(LOCAL_DATA), RequestModel::class.java)
+                    form1ViewModel.visitData.value!!.visit_1 = requestModel.visitData
+                }
+                form1ViewModel.uDiceCode.value = form1ViewModel.visitData.value?.visit_1?.u_dice_code!!.value.toString()
                 if (form1ViewModel.visitData.value?.visit_1?.visit_image_1?.value != null) {
                     loadImage(
                         form1ViewModel.visitData.value?.visit_1?.visit_image_1!!.value.toString(),

@@ -163,7 +163,8 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
                         jsonData = Gson().toJson(submitModel()),
                         visitNumber = form2FillViewModel.projectInfo.value!!.visit_number!!.toInt(),
                         locationName = form2FillViewModel.projectInfo.value!!.location_name!!,
-                        uDiceCode = binding.disceCode.text.toString()
+                        uDiceCode = binding.disceCode.text.toString(),
+                        locationId = form2FillViewModel.projectInfo.value!!.location_id!!
                     )
                     visitDataViewModel.insert(visitDataTable)
 
@@ -588,7 +589,7 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
                     value = binding.form2.text.toString()
                 ),
 
-                curriculum_on_track = VisitDetails(value = if (binding.switchIsCurriculamOnTrack.isChecked) 1 else 0),
+                curriculum_on_track = VisitDetails(value = if (binding.switchIsCurriculamOnTrack.isChecked) true else false),
                 remark = VisitDetails(value = binding.form5.text.toString()),
                 visit_id = form2FillViewModel.projectInfo.value!!.visit_id.toString(),
                 latitude = VisitDetails(value = currentLocation?.latitude.toString()),

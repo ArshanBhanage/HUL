@@ -152,7 +152,8 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
                         jsonData = Gson().toJson(submitModel()),
                         visitNumber = form1FillViewModel.projectInfo.value!!.visit_number!!.toInt(),
                         locationName = form1FillViewModel.projectInfo.value!!.location_name!!,
-                        uDiceCode = binding.disceCode.text.toString()
+                        uDiceCode = binding.disceCode.text.toString(),
+                        locationId = form1FillViewModel.projectInfo.value!!.location_id!!
                     )
                     visitDataViewModel.insert(visitDataTable)
 
@@ -218,7 +219,15 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
 
         binding.form3.filters = arrayOf(allowOnlyLettersAndSpacesFilter)
 
-        binding.studentNo.setText(schoolCode.location_data_field1)
+        if(schoolCode.location_data_field1.isNullOrEmpty())
+        {
+            form1FillViewModel.numberOfStudentEditable.value = true
+        }
+        else{
+            form1FillViewModel.numberOfStudentEditable.value = false
+            binding.studentNo.setText(schoolCode.location_data_field1)
+        }
+
 
         binding.txtDirections.setOnClickListener {
             if (currentLocation != null) {
@@ -576,7 +585,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 u_dice_code = VisitDetails(value = binding.disceCode.text.toString()),
                 school_name = VisitDetails(value = binding.schoolName.text.toString()),
                 no_of_students_as_per_record = VisitDetails(value = binding.studentNo.text.toString()),
-                school_closed = VisitDetails(value = if (binding.switchSchoolClosed.isChecked) 1 else 0),
+                school_closed = VisitDetails(value = if (binding.switchSchoolClosed.isChecked) true else false),
                 number_of_books_distributed = VisitDetails(value = form1FillViewModel.noOfBooksHandedOver.value),
                 no_of_teachers_trained = VisitDetails(value = form1FillViewModel.teachersTrained.value),
 
@@ -591,7 +600,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 ),
                 name_of_the_principal = VisitDetails(value = form1FillViewModel.form3.value.toString()),
                 mobile_number_of_the_principal = VisitDetails(value = form1FillViewModel.form4.value.toString()),
-                revisit_applicable = VisitDetails(value = if (binding.switchRevisit.isChecked) 1 else 0),
+                revisit_applicable = VisitDetails(value = if (binding.switchRevisit.isChecked) true else  false),
                 remark = VisitDetails(value = form1FillViewModel.form5.value),
                 visit_id = form1FillViewModel.projectInfo.value!!.visit_id.toString(),
                 latitude = VisitDetails(value = currentLocation?.latitude.toString()),
@@ -764,7 +773,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
         isTimerStarted = true
         //binding.proceed.isEnabled = false
 
-        val totalTime = 1 * 60 * 1000L
+        val totalTime = 20 * 60 * 1000L
 
         // Set initial time before starting the timer
         updateTimerText(totalTime)

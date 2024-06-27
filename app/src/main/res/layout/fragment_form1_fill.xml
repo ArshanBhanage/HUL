@@ -216,10 +216,11 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:lineHeight="18dp"
+                            android:inputType="number"
                             android:textColor="@color/black"
                             android:textFontWeight="400"
                             android:textSize="16sp"
-                            android:enabled="false"
+                            android:enabled="@{viewModel.numberOfStudentEditable}"
                             />
 
 
@@ -352,7 +353,8 @@
                             android:layout_marginRight="10dp"
                             app:layout_constraintEnd_toStartOf="@+id/capture1"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="@id/actions1"/>
 
                         <LinearLayout
                             android:id="@+id/actions1"
@@ -415,7 +417,8 @@
                             android:layout_marginRight="10dp"
                             app:layout_constraintEnd_toStartOf="@+id/capture2"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="@id/actions2"/>
 
                         <LinearLayout
                             android:id="@+id/actions2"
@@ -478,7 +481,8 @@
                             android:layout_marginRight="10dp"
                             app:layout_constraintEnd_toStartOf="@+id/capture3"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="@id/actions3"/>
 
                         <LinearLayout
                             android:id="@+id/actions3"
@@ -541,7 +545,8 @@
                             android:layout_marginRight="10dp"
                             app:layout_constraintEnd_toStartOf="@+id/capture4"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="@id/actions4"/>
 
                         <LinearLayout
                             android:id="@+id/actions4"

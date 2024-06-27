@@ -7,9 +7,9 @@ data class GetVisitDataResponseModel(
 )
 
 data class GetVisitDataResponseData(
-    var visit_1: VisitData,
-    var visit_2: VisitData,
-    var visit_3: VisitData
+    var visit_1: VisitData? = null,
+    var visit_2: VisitData? = null,
+    var visit_3: VisitData? = null
 )
 
 data class Visit1(

@@ -169,7 +169,8 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                         jsonData = Gson().toJson(submitModel()),
                         visitNumber = form3FillViewModel.projectInfo.value!!.visit_number!!.toInt(),
                         locationName = form3FillViewModel.projectInfo.value!!.location_name!!,
-                        uDiceCode = binding.disceCode.text.toString()
+                        uDiceCode = binding.disceCode.text.toString(),
+                        locationId = form3FillViewModel.projectInfo.value!!.location_id!!
                     )
                     visitDataViewModel.insert(visitDataTable)
 
@@ -594,7 +595,7 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                 ),
                 name_of_the_principal = VisitDetails(value = binding.form3.text.toString()),
                 mobile_number_of_the_principal = VisitDetails(value = binding.form4.text.toString()),
-                revisit_applicable = VisitDetails(value = if (binding.switchRevisit.isChecked) 1 else 0),
+                revisit_applicable = VisitDetails(value = if (binding.switchRevisit.isChecked) true else false),
                 remark = VisitDetails(value = form3FillViewModel.form5.value),
                 visit_id = form3FillViewModel.projectInfo.value!!.visit_id.toString(),
                 latitude = VisitDetails(value = currentLocation?.latitude.toString()),

@@ -12,4 +12,5 @@ data class ProjectInfo(
     var lattitude: String? = null,
     var longitude: String? = null,
     var visit_number: String? = null,
+    var localString: String = "",
 )
