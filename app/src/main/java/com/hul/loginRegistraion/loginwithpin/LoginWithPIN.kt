@@ -171,6 +171,7 @@ class LoginWithPIN : Fragment(), ApiHandler, RetryInterface {
         )
     }
 
+
     fun redirectToOTP() {
         val bundle = Bundle()
         bundle.putString("loginId", loginWithPINViewModel.loginId.value)
@@ -214,13 +215,15 @@ class LoginWithPIN : Fragment(), ApiHandler, RetryInterface {
 
             ApiExtentions.ApiDef.SEND_OTP -> {
                 val model: ResponseModel = Gson().fromJson(o,ResponseModel::class.java)
+                Log.d("", "onApiSuccess: ${model}")
                 if (!model.error) {
 
 //                    userInfo.authToken = model.data!!.get("auth_token").toString() // for active session
 //                    userInfo.loginId = model.data!!.get("mobile_no").toString()
                     redirectToOTP()
                 } else {
-                    redirectionAlertDialogue(requireContext(), model.message!!)
+//                    redirectionAlertDialogue(requireContext(), model.message!!)
+//                    redirectionAlertDialogue(requireContext(), "User does not exist")
                 }
 
             }

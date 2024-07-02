@@ -1,8 +1,10 @@
 package com.hul.curriculam.ui.form3Details
 
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -157,6 +159,7 @@ class Form3DetailsFragment : Fragment(), ApiHandler, RetryInterface {
                 form3ViewModel.uDiceCode.value = form3ViewModel.visitData.value?.visit_3?.u_dice_code!!.value.toString()
                 fillData()
 
+                Log.d("form3ViewModel.visitData.value?.visit_3?.visit_image_1?.value", "onApiSuccess: ${form3ViewModel.visitData.value?.visit_3?.visit_image_1?.value}")
                 if (form3ViewModel.visitData.value?.visit_3?.visit_image_1?.value != null) {
                     loadImage(
                         form3ViewModel.visitData.value?.visit_3?.visit_image_1!!.value.toString(),
@@ -170,6 +173,7 @@ class Form3DetailsFragment : Fragment(), ApiHandler, RetryInterface {
                         binding.img2, binding.llImg2
                     )
                 }
+                Log.d("form3ViewModel.visitData", "onApiSuccess: ${form3ViewModel.visitData.value?.visit_3?.visit_image_3?.value}")
 
                 if (form3ViewModel.visitData.value?.visit_3?.visit_image_3?.value != null) {
                     loadImage(
@@ -225,9 +229,17 @@ class Form3DetailsFragment : Fragment(), ApiHandler, RetryInterface {
                     BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
                 }
 
-                Glide.with(imgId.context)
-                    .load(decodedByte)
-                    .into(imgId)
+                val imageUri = Uri.parse(base64)
+                Log.d("@@base64", "loadImage: ${base64}")
+                if(base64.startsWith("content://")){
+                    Glide.with(imgId.context)
+                        .load(imageUri)
+                        .into(imgId)
+                }else{
+                    Glide.with(imgId.context)
+                        .load(decodedByte)
+                        .into(imgId)
+                }
 
                 llId.visibility = View.VISIBLE
             } catch (e: Exception) {

@@ -25,7 +25,6 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="4dp"
             android:layout_marginVertical="16dp"
             android:background="@color/white"
             app:cardCornerRadius="8dp">
@@ -34,7 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="20dp">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -74,15 +73,6 @@
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/public_sans"
-                android:layout_marginTop="24dp"
-                android:text="@string/form1"
-                android:textColor="#6d6b77"
-                android:textFontWeight="400"
-                android:textSize="13sp" />
             <TextView
                 android:id="@+id/txtNameOfSchoolRepresentative"
                 android:layout_width="match_parent"
@@ -140,6 +130,17 @@
                 android:textColor="#6d6b77"
                 android:textFontWeight="400"
                 android:textSize="13sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="@font/public_sans"
+                android:text="@string/form1"
+                android:textColor="#6d6b77"
+                android:textFontWeight="400"
+                android:textSize="13sp" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -274,7 +275,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/public_sans"
-                            android:text="@string/visit_pic_4"
+                            android:text="@string/auditor_visit_1_pic_2"
                             android:textColor="#6d6b77"
                             android:textSize="@dimen/_8sdp"
                             android:layout_marginTop="@dimen/_5sdp"/>

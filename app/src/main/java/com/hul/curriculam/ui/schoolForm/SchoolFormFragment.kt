@@ -1,6 +1,7 @@
 package com.hul.curriculam.ui.schoolForm
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -113,10 +114,12 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
 
         // Add fragments dynamically
         for (visit in schoolFormViewModel.visitList.value!!) {
+            Log.d("visit", "onViewCreated: ${visit}")
             if ((visit.visit_status.equals(ASSIGNED, ignoreCase = true)
                 || visit.visit_status.equals(INITIATED, ignoreCase = true)
                 || visit.visit_status.equals(PARTIALLY_SUBMITTED, ignoreCase = true))
             ) {
+                Log.d("", "onViewCreated: true")
                 currentVisit = visit
                 visit.number_of_books_distributed = firstVisit?.number_of_books_distributed
                 when (visit.visit_number) {
@@ -150,8 +153,13 @@ class SchoolFormFragment : Fragment(), ApiHandler, RetryInterface {
                 }
 
             } else {
+                Log.d("", "onViewCreated: false")
+
                 completedVisit = visit
                 visit.number_of_books_distributed = firstVisit?.number_of_books_distributed
+                val visitNumberInt = visit.visit_number!!.toInt()
+//                val adjustedVisitNumber = (visitNumberInt - 1).toString()
+//                Log.d("", "onViewCreated: ${adjustedVisitNumber}")
                 when (visit.visit_number) {
                     "1" -> addNewTab(
                         requireContext().getString(R.string.visit) + visit.visit_number,

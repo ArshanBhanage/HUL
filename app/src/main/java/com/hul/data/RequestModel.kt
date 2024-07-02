@@ -52,4 +52,9 @@ data class RequestModel(
     val location_ward: String? = null,
     val location_district: String? = null,
     val location_state: String? = null,
+
+    val device_id: String? = null,
+    val make: String? = null,
+    val model: String? = null,
+    val os: String? = null,
 )

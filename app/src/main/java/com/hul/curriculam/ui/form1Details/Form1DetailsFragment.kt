@@ -2,6 +2,7 @@ package com.hul.curriculam.ui.form1Details
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -168,6 +169,7 @@ class Form1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
                         binding.img2, binding.llImg2
                     )
                 }
+                Log.d("form1ViewModel.visitData", "onApiSuccess: ${form1ViewModel.visitData.value?.visit_1?.visit_image_3?.value}")
 
                 if (form1ViewModel.visitData.value?.visit_1?.visit_image_3?.value != null) {
                     loadImage(
@@ -207,10 +209,22 @@ class Form1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
                     val decodedString = Base64.decode(base64, Base64.DEFAULT)
                     BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
                 }
+                val imageUri = Uri.parse(base64)
 
-                Glide.with(imgId.context)
-                    .load(decodedByte)
-                    .into(imgId)
+                if(base64.startsWith("content://")){
+                    Glide.with(imgId.context)
+                        .load(imageUri)
+                        .into(imgId)
+                }else{
+                    Glide.with(imgId.context)
+                        .load(decodedByte)
+                        .into(imgId)
+                }
+
+
+//                Glide.with(imgId.context)
+//                    .load(decodedByte)
+//                    .into(imgId)
 
                 llId.visibility = View.VISIBLE
             } catch (e: Exception) {

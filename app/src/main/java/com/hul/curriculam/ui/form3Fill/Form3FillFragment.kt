@@ -61,40 +61,23 @@ import org.json.JSONObject
 import javax.inject.Inject
 
 class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
-
     private var _binding: FragmentForm3FillBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
-
     private lateinit var curriculamComponent: CurriculamComponent
-
-//    private lateinit var disceCodeEditText: String
-
     @Inject
     lateinit var form3FillViewModel: Form3FillViewModel
-
     @Inject
     lateinit var userInfo: UserInfo
-
     @Inject
     lateinit var apiController: APIController
-
     @Inject
     lateinit var uploadFileController: UploadFileController
-
     @Inject
     lateinit var visitDataViewModel: VisitDataViewModel
-
     var imageIndex: Int = 0
-
     private lateinit var countDownTimer: CountDownTimer
-
     var isTimerStarted = false;
-
     private var currentLocation: Location? = null
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -172,6 +155,7 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                         uDiceCode = binding.disceCode.text.toString(),
                         locationId = form3FillViewModel.projectInfo.value!!.location_id!!
                     )
+                    Log.d("form3FillViewModel", "onCreateView: ${visitDataTable}")
                     visitDataViewModel.insert(visitDataTable)
 
                     Toast.makeText(requireContext(), "Visit Data saved successfully", Toast.LENGTH_LONG).show()
@@ -183,14 +167,6 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                 }
             }
         }
-
-//        binding.proceed.setOnClickListener {
-//            if (imageIndex == 0) {
-//                setProgressDialog(requireContext(), "Uploading")
-//                uploadImage(form3FillViewModel.imageUrl1.value?.toUri()!!)
-//            }
-//        }
-
         binding.view1.setOnClickListener {
             form3FillViewModel.imageUrl1.value?.let { it1 ->
                 showImagePreview(
@@ -420,10 +396,6 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
     // LocationCallback - Called when FusedLocationProviderClient has a new Location.
     private lateinit var locationCallback: LocationCallback
 
-    // Used only for local storage of the last known location. Usually, this would be saved to your
-// database, but because this is a simplified sample without a full database, we only need the
-// last location to create a Notification if the user navigates away from the app.
-
     private val requestPermission =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val granted = permissions.entries.all {
@@ -450,9 +422,6 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
             requestLocation()
         } else {
             requestLocationUpdates()
-            // Location services are enabled
-            //Toast.makeText(this, "Location services are enabled", Toast.LENGTH_SHORT).show()
-            // Proceed with location-related operations
         }
     }
 
@@ -467,30 +436,13 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
 
     @SuppressLint("MissingPermission")
     private fun requestLocationUpdates() {
-
-        // Initialize FusedLocationProviderClient
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireActivity())
 
 
         locationRequest = LocationRequest.create().apply {
-            // Sets the desired interval for active location updates. This interval is inexact. You
-            // may not receive updates at all if no location sources are available, or you may
-            // receive them less frequently than requested. You may also receive updates more
-            // frequently than requested if other applications are requesting location at a more
-            // frequent interval.
-            //
-            // IMPORTANT NOTE: Apps running on Android 8.0 and higher devices (regardless of
-            // targetSdkVersion) may receive updates less frequently than this interval when the app
-            // is no longer in the foreground.
             interval = 60
-
-            // Sets the fastest rate for active location updates. This interval is exact, and your
-            // application will never receive updates more frequently than this value.
             fastestInterval = 30
-
-            // Sets the maximum time when batched location updates are delivered. Updates may be
-            // delivered sooner than this interval.
             maxWaitTime = 10
 
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
@@ -499,14 +451,7 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 super.onLocationResult(locationResult)
-
-                // Normally, you want to save a new location to a database. We are simplifying
-                // things a bit and just saving it as a local variable, as we only need it again
-                // if a Notification is created (when the user navigates away from app).
                 currentLocation = locationResult.lastLocation
-
-                //attendenceViewModel.longitude.value = currentLocation!!.longitude.toString()
-                //attendenceViewModel.lattitude.value = currentLocation!!.latitude.toString()
                 fusedLocationProviderClient.removeLocationUpdates(locationCallback)
 
             }
@@ -518,43 +463,6 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
             Looper.getMainLooper()
         )
 
-//        locationCallback = object : LocationCallback() {
-//            //This callback is where we get "streaming" location updates. We can check things like accuracy to determine whether
-//            //this latest update should replace our previous estimate.
-//            override fun onLocationResult(locationResult: LocationResult) {
-//
-//                if (locationResult == null) {
-//                    Log.d(TAG, "locationResult null")
-//                    return
-//                }
-//                Log.d(TAG, "received " + locationResult.locations.size + " locations")
-//                for (loc in locationResult.locations) {
-//                    cameraPreviewViewModel.longitude.value = loc.longitude.toString()
-//                    cameraPreviewViewModel.lattitude.value = loc.latitude.toString()
-//                    if (cameraPreviewViewModel.uri.value != null) {
-//                        cancelProgressDialog()
-//                        redurectToImagePreview(cameraPreviewViewModel.uri.value!!)
-//                    }
-//                }
-//            }
-//
-//            override fun onLocationAvailability(locationAvailability: LocationAvailability) {
-//                Log.d(TAG, "locationAvailability is " + locationAvailability.isLocationAvailable)
-//                super.onLocationAvailability(locationAvailability)
-//            }
-//        }
-
-//        val locationRequest = LocationRequest.create().apply {
-//            interval = 100 // Update interval in milliseconds
-//            fastestInterval = 500 // Fastest update interval in milliseconds
-//            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-//        }
-//
-//        fusedLocationClient.requestLocationUpdates(
-//            locationRequest,
-//            locationCallback,
-//            null /* Looper */
-//        )
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
@@ -585,10 +493,10 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                 u_dice_code = VisitDetails(value = binding.disceCode.text.toString()),
                 school_name = VisitDetails(value = binding.schoolName.text.toString()),
                 number_of_books_distributed = VisitDetails(value = binding.noOfBooksHanded.text.toString()),
-                visit_image_1 = VisitDetails(value = form3FillViewModel.imageApiUrl1.value),
-                visit_image_2 = VisitDetails(value = form3FillViewModel.imageApiUrl2.value),
-                visit_image_3 = VisitDetails(value = form3FillViewModel.imageApiUrl3.value),
-                visit_image_4 = VisitDetails(value = form3FillViewModel.imageApiUrl4.value),
+                visit_image_1 = VisitDetails(value = form3FillViewModel.imageUrl1.value),
+                visit_image_2 = VisitDetails(value = form3FillViewModel.imageUrl2.value),
+                visit_image_3 = VisitDetails(value = form3FillViewModel.imageUrl3.value),
+                visit_image_4 = VisitDetails(value = form3FillViewModel.imageUrl4.value),
                 name_of_the_school_representative_who_collected_the_books = VisitDetails(value = binding.form1.text.toString()),
                 mobile_number_of_the_school_representative_who_collected_the_books = VisitDetails(
                     value = binding.form2.text.toString()
@@ -663,20 +571,7 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                     model.getJSONObject("data").toString(),
                     GetVisitDataResponseData::class.java
                 )
-
                 fillData()
-
-                // For render purpose only
-                /*if (form3FillViewModel.visitData.value?.visit_1 != null) {
-                    form3FillViewModel.visitDataToView.value =
-                        form3FillViewModel.visitData.value?.visit_1
-                } else if (form3FillViewModel.visitData.value?.visit_2 != null) {
-                    form3FillViewModel.visitDataToView.value =
-                        form3FillViewModel.visitData.value?.visit_2
-                } else if (form3FillViewModel.visitData.value?.visit_3 != null) {
-                    form3FillViewModel.visitDataToView.value =
-                        form3FillViewModel.visitData.value?.visit_3
-                }*/
             }
 
             else -> Toast.makeText(requireContext(), "Api Not Integrated", Toast.LENGTH_LONG).show()

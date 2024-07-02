@@ -42,6 +42,9 @@ class APIController @Inject constructor(private val mContext: Context) : Callbac
             ApiExtentions.ApiDef.LOGIN -> retrofit.create(ApiInterface::class.java)
                 .loginUser(requestModel).enqueue(this)
 
+            ApiExtentions.ApiDef.ADD_DEVICE_INFO -> retrofit.create(ApiInterface::class.java)
+                .deviceInfo(requestModel).enqueue(this)
+
             ApiExtentions.ApiDef.ADD_VISIT -> retrofit.create(ApiInterface::class.java)
                 .addVisit(requestModel).enqueue(this)
 

@@ -284,7 +284,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/public_sans"
-                            android:text="@string/visit_pic_5"
+                            android:text="@string/visit2_pic_detail_3"
                             android:textColor="#6d6b77"
                             android:textSize="@dimen/_8sdp"
                             android:layout_marginTop="@dimen/_5sdp"/>
@@ -312,7 +312,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/public_sans"
-                            android:text="@string/visit_pic_4"
+                            android:text="@string/auditor_visit_1_pic_2"
                             android:textColor="#6d6b77"
                             android:textSize="@dimen/_8sdp"
                             android:layout_marginTop="@dimen/_5sdp"/>

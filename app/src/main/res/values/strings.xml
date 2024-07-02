@@ -154,11 +154,13 @@
     <string name="logout">Logout</string>
     <string name="visit_1_header">Visit 1 School Activity</string>
 
-    <string name="visit_pic_1">Image of the school building</string>
+    <string name="visit_pic_1">Image of the school\nbuilding</string>
     <string name="visit_pic_2">Selfie with the school UDICE Code</string>
-    <string name="visit_pic_3">Image of teachers seeing training video with books placed on table</string>
+    <string name="visit_pic_3">Image of teachers seeing\ntraining video with books\nplaced on table</string>
+    <string name="visit2_pic_detail_3">Image of teachers\nteaching the curriculum in the class</string>
     <string name="visit_pic_6">Image of filled trackers on principal’s desk with the principal </string>
     <string name="visit_pic_4">Image of Acknowledgement</string>
+    <string name="visit_pic_detail_3">Image of school teachers with video &amp; books visible on desk </string>
     <string name="visit_pic_5">Image of students with Swasthya Curriculum books in their hands</string>
     <string name="add_school_code">Add school code</string>
     <string name="add_school">Add School</string>

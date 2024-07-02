@@ -166,6 +166,7 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
                         uDiceCode = binding.disceCode.text.toString(),
                         locationId = form2FillViewModel.projectInfo.value!!.location_id!!
                     )
+                    Log.d("visitDataTable", "onCreateView: ${visitDataTable}")
                     visitDataViewModel.insert(visitDataTable)
 
                     Toast.makeText(requireContext(), "Visit Data saved successfully", Toast.LENGTH_LONG).show()
@@ -178,12 +179,7 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
             }
         }
 
-//        binding.proceed.setOnClickListener {
-//            if (imageIndex == 0) {
-//                setProgressDialog(requireContext(), "Uploading")
-//                uploadImage(form2FillViewModel.imageUrl1.value?.toUri()!!)
-//            }
-//        }
+
 
         binding.view1.setOnClickListener {
             form2FillViewModel.imageUrl1.value?.let { it1 ->
@@ -338,9 +334,8 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
                 val data: Intent? = result.data
                 val position = data!!.getIntExtra("position", 0)
                 val imageUrl = result.data!!.getStringExtra("imageUrl")
-
                 startTimer()
-
+                Log.d("form2FillViewModel.imageUrl1.value", "${form2FillViewModel.imageUrl1.value}")
                 // Update the view model's imageUrl at the corresponding position
                 when (position) {
                     0 -> form2FillViewModel.imageUrl1.value = imageUrl
@@ -579,10 +574,10 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
                 school_name = VisitDetails(value = binding.schoolName.text.toString()),
                 number_of_books_distributed = VisitDetails(value = binding.noOfBooksHanded.text.toString()),
 
-                visit_image_1 = VisitDetails(value = form2FillViewModel.imageApiUrl1.value),
-                visit_image_2 = VisitDetails(value = form2FillViewModel.imageApiUrl2.value),
-                visit_image_3 = VisitDetails(value = form2FillViewModel.imageApiUrl3.value),
-                visit_image_4 = VisitDetails(value = form2FillViewModel.imageApiUrl4.value),
+                visit_image_1 = VisitDetails(value = form2FillViewModel.imageUrl1.value),
+                visit_image_2 = VisitDetails(value = form2FillViewModel.imageUrl2.value),
+                visit_image_3 = VisitDetails(value = form2FillViewModel.imageUrl3.value),
+                visit_image_4 = VisitDetails(value = form2FillViewModel.imageUrl4.value),
 
                 name_of_the_school_representative_who_collected_the_books = VisitDetails(value = binding.form1.text.toString()),
                 mobile_number_of_the_school_representative_who_collected_the_books = VisitDetails(
@@ -765,7 +760,7 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
         } else if (binding.schoolName.text.toString().isBlank()) {
             Toast.makeText(requireContext(), "Please enter school name", Toast.LENGTH_LONG).show()
             return false;
-        } else if (form2FillViewModel.noOfBooksHandedOver.value?.isEmpty() == true) {
+        } else if (form2FillViewModel.projectInfo.value?.number_of_books_distributed?.isEmpty() == true) {
             Toast.makeText(
                 requireContext(),
                 "Please enter no. of books handed over",

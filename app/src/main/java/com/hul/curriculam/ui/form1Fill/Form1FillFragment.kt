@@ -155,6 +155,8 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
                         uDiceCode = binding.disceCode.text.toString(),
                         locationId = form1FillViewModel.projectInfo.value!!.location_id!!
                     )
+                    Log.d("visitDataTableForm1", "onCreateView: ${visitDataTable}")
+
                     visitDataViewModel.insert(visitDataTable)
 
                     Toast.makeText(requireContext(), "Visit Data saved successfully", Toast.LENGTH_LONG).show()

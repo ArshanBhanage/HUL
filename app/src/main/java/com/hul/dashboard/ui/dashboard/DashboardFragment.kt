@@ -306,6 +306,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         isSyncing = true
         visitDataTableUploading = visitDataTable
         requestModel = Gson().fromJson(visitDataTable.jsonData, RequestModel::class.java)
+        Log.d("TAG", "startSync: ${requestModel}")
+        Log.d("TAG", "startSync: ${requestModel!!.visitData!!.visit_image_1!!.value.toString().toUri()}")
         uploadImage(requestModel!!.visitData!!.visit_image_1!!.value.toString().toUri())
     }
 
@@ -1163,6 +1165,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     override fun redirectToAttendence(projectInfo: ProjectInfo) {
 
+        Log.d("projectInfo", "redirectToAttendence: ${projectInfo}")
             if (dashboardViewModel.attendenceToday.value?.present == true) {
 
                 if (projectInfo.visit_status.equals("SUBMITTED", true)) {
