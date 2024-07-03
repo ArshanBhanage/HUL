@@ -51,6 +51,9 @@ class APIController @Inject constructor(private val mContext: Context) : Callbac
             ApiExtentions.ApiDef.GET_BANNER -> retrofit.create(ApiInterface::class.java)
                 .getBannerImage(requestModel!!.projectId!!).enqueue(this)
 
+            ApiExtentions.ApiDef.GET_VISIT_FORM -> retrofit.create(ApiInterface::class.java)
+                .getVisitFormFields(requestModel!!.projectId!!,requestModel!!.visit_number!!).enqueue(this)
+
             ApiExtentions.ApiDef.LOCATION_LIST -> retrofit.create(ApiInterface::class.java)
                 .getLocationList(requestModel!!.projectId).enqueue(this)
 

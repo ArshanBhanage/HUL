@@ -36,5 +36,6 @@ class ApiExtentions {
         GET_STATES,
         ADD_NEW_SCHOOL,
         VISIT_LIST_BY_STATUS,
+        GET_VISIT_FORM
     }
 }

@@ -9,6 +9,7 @@ import com.hul.curriculam.CurriculamComponent
 import com.hul.dashboard.DashboardComponent
 import com.hul.loginRegistraion.LoginRegisterComponent
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
+import com.hul.web_form.WebFormComponent
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -25,6 +26,8 @@ interface AppComponent {
     }
 
     fun loginRegisterComponent(): LoginRegisterComponent.Factory
+
+    fun webFormComponent(): WebFormComponent.Factory
 
     fun dashboardComponent(): DashboardComponent.Factory
 

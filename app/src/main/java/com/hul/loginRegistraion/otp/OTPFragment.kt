@@ -34,6 +34,7 @@ import com.hul.utils.noInternetDialogue
 import com.hul.utils.nonredirectionAlertDialogue
 import com.hul.utils.redirectionAlertDialogue
 import com.hul.utils.setProgressDialog
+import com.hul.web_form.WebForm
 import org.json.JSONArray
 import javax.inject.Inject
 
@@ -160,7 +161,7 @@ class OTPFragment : Fragment(), ApiHandler, RetryInterface {
     private fun redirectToDashboard() {
         when (userInfo.userType) {
             UserTypes.MOBILISER -> {
-                val intent = Intent(activity, Dashboard::class.java)
+                val intent = Intent(activity, WebForm::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 startActivity(intent)
                 requireActivity().finish()

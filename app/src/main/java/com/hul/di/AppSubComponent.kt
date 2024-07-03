@@ -6,7 +6,8 @@ package com.hul.di
 import com.hul.curriculam.CurriculamComponent
 import com.hul.dashboard.DashboardComponent
 import com.hul.loginRegistraion.LoginRegisterComponent
+import com.hul.web_form.WebFormComponent
 import dagger.Module
 
-@Module(subcomponents = [LoginRegisterComponent::class,DashboardComponent::class,CurriculamComponent::class])
+@Module(subcomponents = [LoginRegisterComponent::class,DashboardComponent::class,CurriculamComponent::class, WebFormComponent::class])
 class AppSubComponent

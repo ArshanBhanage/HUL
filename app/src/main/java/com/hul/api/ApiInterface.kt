@@ -54,6 +54,12 @@ interface ApiInterface {
         @Query("mobiliserId") mobiliserId: Int
     ): Call<ResponseBody?>
 
+    @GET("app/visits/v1/get_visit_form_fields/")
+    fun getVisitFormFields(
+        @Query("projectId") projectId: String?,
+        @Query("visitNumber") visitNumber: String
+    ): Call<ResponseBody?>
+
     @GET("app/visits/v1/get_list_of_visits/{id}")
     fun getListOfVisits(
         @Path("id") id: Int
