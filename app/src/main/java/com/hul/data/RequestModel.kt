@@ -4,6 +4,7 @@ package com.hul.data
  * Created by Nitin Chorge on 26-11-2020.
  */
 data class RequestModel(
+    var date_filter: String? = null,
     var projectId: String? = null,
     var mobile: String? = null,
     var type: String? = null,

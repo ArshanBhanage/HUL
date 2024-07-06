@@ -361,7 +361,8 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
 
     private fun uploadImageModel(): RequestModel {
         return RequestModel(
-            project = userInfo.projectName
+            project = userInfo.projectName,
+            uploadFor = "attendance",
         )
     }
 

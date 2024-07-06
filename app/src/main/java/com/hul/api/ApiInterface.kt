@@ -88,7 +88,7 @@ interface ApiInterface {
     fun getUserDetails(): Call<ResponseBody?>
 
     @GET("app/users/v1/performance")
-    fun getPerformance(): Call<ResponseBody?>
+    fun getPerformance(@Query("date_filter") date_filter: String?,): Call<ResponseBody?>
 
     @GET("app/visits/v1/visitData")
     fun getVisitData(
@@ -136,6 +136,8 @@ interface ApiInterface {
         @Query("projectName") projectName: String?,
         @Query("uploadFor") uploadFor: String?,
         @Query("filename") filename: String?,
+        @Query("visitId") visitId: String?,
+        @Query("clickDatetime") clickDatetime: String?,
     ): Call<ResponseBody?>
 
     @POST("app/visits/v1/addVisitData/")

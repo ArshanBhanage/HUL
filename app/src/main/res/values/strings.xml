@@ -22,6 +22,7 @@
     <string name="enter_school_Code">Enter School Code</string>
     <string name="enter_school_name">Enter School name</string>
     <string name="remarks">Remark</string>
+    <string name="captured_images">Captured Images</string>
     <string name="type_code">Type your 6 digit security code</string>
     <string name="username_placeholder">Enter here</string>
     <string name="enter_here">Enter here</string>
@@ -164,6 +165,7 @@
     <string name="visit_pic_5">Image of students with Swasthya Curriculum books in their hands</string>
     <string name="add_school_code">Add school code</string>
     <string name="add_school">Add School</string>
+    <string name="choose_option">Choose Option</string>
     <string name="ward_block">Ward/Block</string>
     <string name="state">State</string>
     <string name="btnAdd">Add</string>
@@ -187,4 +189,19 @@
     <string name="couldn_t_submit_visit_details">Couldn\'t submit visit details</string>
     <string name="school_closed_merged">School Closed/Merged</string>
     <string name="school_asked_to_revisit_for_more_tracker_collection">School asked to Revisit for more tracker collection</string>
+
+    <string name="yes_correct">Yes, This is correct</string>
+    <string name="incorrect">Incorrect</string>
+    <string name="yes_collected">Yes, Collected</string>
+    <string name="not_collected">Not Collected</string>
+
+    <string name="yes_distributed">Yes, Distributed</string>
+    <string name="not_distributed">Not Distributed</string>
+
+    <string name="yes_shared">Yes, Shared</string>
+    <string name="not_shared">Not Shared</string>
+
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
 </resources>

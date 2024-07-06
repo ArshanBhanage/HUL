@@ -264,35 +264,116 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         schoolActivityViewModel.projectInfo.value =
             Gson().fromJson(requireArguments().getString("projectInfo"), ProjectInfo::class.java)
 
-        binding.btnPositive.setOnClickListener {
-            binding.btnPositive.visibility = View.GONE
-            binding.btnNegative.visibility = View.GONE
-            binding.trueIconBooks.visibility = View.VISIBLE
-            schoolActivityViewModel.isBookDistributionApproved.value = 1;
+        schoolActivityViewModel.booksHandedOver.observe(viewLifecycleOwner) { index ->
+            // Update UI or perform any necessary actions
+            val indexSelected =
+                binding.radioGroup.indexOfChild(binding.radioGroup.findViewById(index))
+            if (indexSelected == 0) {
+//                binding.tickSuccess.visibility = View.VISIBLE
+//                binding.tickFailure.visibility = View.GONE
+                schoolActivityViewModel.isBookDistributionApproved.value = 1;
+                binding.txtNoOfBooksGiven.isEnabled = false
+                binding.txtNoOfBooksGiven.setText(schoolActivityViewModel.projectInfo.value?.number_of_books_distributed)
+            } else if (indexSelected == 1) {
+//                binding.tickSuccess.visibility = View.GONE
+//                binding.tickFailure.visibility = View.VISIBLE
+                schoolActivityViewModel.isBookDistributionApproved.value = 0;
+                binding.txtNoOfBooksGiven.isEnabled = true
+                binding.txtNoOfBooksGiven.setText(schoolActivityViewModel.projectInfo.value?.number_of_books_distributed)
+            }
         }
 
-        binding.btnNegative.setOnClickListener {
-            binding.btnPositive.visibility = View.GONE
-            binding.btnNegative.visibility = View.GONE
+        schoolActivityViewModel.booksDistributed.observe(viewLifecycleOwner) { index ->
+            // Update UI or perform any necessary actions
+            val indexSelected =
+                binding.radioGroup2.indexOfChild(binding.radioGroup2.findViewById(index))
+            schoolActivityViewModel.booksDistributedFlag.value =
+                if (indexSelected == 0) true else false
         }
 
-        binding.view1.setOnClickListener { schoolActivityViewModel.imageUrl1.value?.let { it1 ->
-            showImagePreview(
-                it1
-            )
-        } }
-        binding.view2.setOnClickListener { schoolActivityViewModel.imageUrl2.value?.let { it1 ->
-            showImagePreview(
-                it1
-            )
-        } }
-        binding.view3.setOnClickListener { schoolActivityViewModel.imageUrl3.value?.let { it1 ->
-            showImagePreview(
-                it1
-            )
-        } }
+        schoolActivityViewModel.videoShown.observe(viewLifecycleOwner) { index ->
+            // Update UI or perform any necessary actions
+            val indexSelected =
+                binding.radioGroup2.indexOfChild(binding.radioGroup3.findViewById(index))
+            schoolActivityViewModel.videoShownFlag.value = if (indexSelected == 0) true else false
+        }
+
+
+        binding.view1.setOnClickListener {
+            schoolActivityViewModel.imageUrl1.value?.let { it1 ->
+                showImagePreview(
+                    it1
+                )
+            }
+        }
+        binding.view2.setOnClickListener {
+            schoolActivityViewModel.imageUrl2.value?.let { it1 ->
+                showImagePreview(
+                    it1
+                )
+            }
+        }
+        binding.view3.setOnClickListener {
+            schoolActivityViewModel.imageUrl3.value?.let { it1 ->
+                showImagePreview(
+                    it1
+                )
+            }
+        }
 
         getVisitData();
+
+        binding.radioButton1.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if (checkedId) {
+                schoolActivityViewModel.isBookDistributionApproved.value = 1;
+                binding.edtNoOfBooksGiven.isEnabled = false
+                binding.txtNoOfBooksGiven.setText(schoolActivityViewModel.projectInfo.value?.number_of_books_distributed)
+            }
+        }
+
+        binding.radioButton2.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if (checkedId) {
+                schoolActivityViewModel.isBookDistributionApproved.value = 0;
+                binding.edtNoOfBooksGiven.isEnabled = true
+                binding.txtNoOfBooksGiven.setText(schoolActivityViewModel.projectInfo.value?.number_of_books_distributed)
+            }
+        }
+
+        binding.radioButton12.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if (checkedId) {
+                schoolActivityViewModel.booksDistributedFlag.value = true
+            }
+        }
+
+        binding.radioButton22.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if (checkedId) {
+                schoolActivityViewModel.booksDistributedFlag.value = false
+            }
+        }
+
+        binding.radioButton13.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if (checkedId) {
+                schoolActivityViewModel.videoShownFlag.value = true
+            }
+        }
+
+        binding.radioButton23.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if (checkedId) {
+                schoolActivityViewModel.videoShownFlag.value = false
+            }
+        }
 
         return root
     }
@@ -301,6 +382,8 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         return if (schoolActivityViewModel.imageUrl1.value?.isEmpty() == true
             || schoolActivityViewModel.imageUrl2.value?.isEmpty() == true
             || schoolActivityViewModel.imageUrl3.value?.isEmpty() == true
+            || schoolActivityViewModel.isBookDistributionApproved.value?.toString()!!
+                .isEmpty() || schoolActivityViewModel.booksDistributedFlag.value == null || schoolActivityViewModel.videoShownFlag.value == null
         ) {
             Toast.makeText(requireContext(), "Please add all images", Toast.LENGTH_LONG).show()
             false
@@ -441,7 +524,8 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         return RequestModel(
             project = schoolActivityViewModel.projectInfo.value?.project_name ?: "",
             uploadFor = "field_audit",
-            filename = fileName
+            filename = fileName,
+            visit_id = schoolActivityViewModel.projectInfo.value?.visit_id.toString() ?: "",
         )
     }
 

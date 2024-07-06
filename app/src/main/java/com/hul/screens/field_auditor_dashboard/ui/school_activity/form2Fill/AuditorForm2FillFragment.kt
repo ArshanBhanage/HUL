@@ -123,6 +123,8 @@ class AuditorForm2FillFragment : Fragment(), ApiHandler, RetryInterface {
             if (form2FillViewModel.imageUrl1.value?.isEmpty() == true
                 || form2FillViewModel.imageUrl2.value?.isEmpty() == true
                 || form2FillViewModel.imageUrl3.value?.isEmpty() == true
+                || form2FillViewModel.isBookDistributionApproved.value?.toString()!!.isEmpty() ||
+                form2FillViewModel.booksDistributedFlag.value == null
             ) {
                 Toast.makeText(requireContext(), "Please fill all data", Toast.LENGTH_LONG)
                     .show()
@@ -196,22 +198,59 @@ class AuditorForm2FillFragment : Fragment(), ApiHandler, RetryInterface {
 
         getVisitData()
 
-        binding.btnPositive.setOnClickListener {
-            binding.btnPositive.visibility = View.GONE
-            binding.btnNegative.visibility = View.GONE
-            binding.tickSuccess.visibility = View.VISIBLE
-            binding.tickFailure.visibility = View.GONE
-            form2FillViewModel.isBookDistributionApproved.value = 1;
-            binding.edtNoOfBooksGiven.isEnabled = false
-            binding.edtNoOfBooksGiven.setText(form2FillViewModel.projectInfo.value?.number_of_books_distributed)
+        binding.radioButton1.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if (checkedId) {
+                form2FillViewModel.isBookDistributionApproved.value = 1;
+                binding.edtNoOfBooksGiven.isEnabled = false
+                binding.edtNoOfBooksGiven.setText(form2FillViewModel.projectInfo.value?.number_of_books_distributed)
+            }
         }
 
-        binding.btnNegative.setOnClickListener {
-            binding.btnPositive.visibility = View.GONE
-            binding.btnNegative.visibility = View.GONE
-            binding.tickSuccess.visibility = View.GONE
-            binding.tickFailure.visibility = View.VISIBLE
+        binding.radioButton2.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if (checkedId) {
+                form2FillViewModel.isBookDistributionApproved.value = 0;
+                binding.edtNoOfBooksGiven.isEnabled = true
+                binding.edtNoOfBooksGiven.setText(form2FillViewModel.projectInfo.value?.number_of_books_distributed)
+            }
         }
+
+        binding.radioButton12.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if (checkedId) {
+                form2FillViewModel.booksDistributedFlag.value = true
+            }
+        }
+
+        binding.radioButton22.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if (checkedId) {
+                form2FillViewModel.booksDistributedFlag.value = false
+            }
+        }
+
+
+//        binding.btnPositive.setOnClickListener {
+//            binding.btnPositive.visibility = View.GONE
+//            binding.btnNegative.visibility = View.GONE
+//            binding.tickSuccess.visibility = View.VISIBLE
+//            binding.tickFailure.visibility = View.GONE
+//            form2FillViewModel.isBookDistributionApproved.value = 1;
+//            binding.edtNoOfBooksGiven.isEnabled = false
+//            binding.edtNoOfBooksGiven.setText(form2FillViewModel.projectInfo.value?.number_of_books_distributed)
+//        }
+//
+//        binding.btnNegative.setOnClickListener {
+//            binding.btnPositive.visibility = View.GONE
+//            binding.btnNegative.visibility = View.GONE
+//            binding.tickSuccess.visibility = View.GONE
+//            binding.tickFailure.visibility = View.VISIBLE
+//        }
 
         binding.nestedScrollView.setOnTouchListener { _, event ->
             when (event.action) {
@@ -295,7 +334,8 @@ class AuditorForm2FillFragment : Fragment(), ApiHandler, RetryInterface {
         return RequestModel(
             project = userInfo.projectName,
             uploadFor = "field_audit",
-            filename = fileName
+            filename = fileName,
+            visit_id = form2FillViewModel.projectInfo.value!!.visit_id.toString(),
         )
     }
 
@@ -568,7 +608,7 @@ class AuditorForm2FillFragment : Fragment(), ApiHandler, RetryInterface {
                 auditor_visit_image_2 = VisitDetails(value = form2FillViewModel.imageApiUrl2.value),
                 auditor_visit_image_3 = VisitDetails(value = form2FillViewModel.imageApiUrl3.value),
                 visit_id = form2FillViewModel.projectInfo.value!!.visit_id.toString(),
-                have_book_distribution_to_students_done = VisitDetails(value = binding.switchBookDistribution.isChecked),
+                have_book_distribution_to_students_done = VisitDetails(value = form2FillViewModel.booksDistributedFlag.value),
                 remark = VisitDetails(value = binding.form5.text.toString())
             )
         )

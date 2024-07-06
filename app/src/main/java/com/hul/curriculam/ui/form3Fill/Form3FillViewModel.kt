@@ -247,4 +247,20 @@ class Form3FillViewModel @Inject constructor(
     var visitData = MutableLiveData<GetVisitDataResponseData>(null)
     var visitDataToView = MutableLiveData<Visit1>(null)
 
+    val revisitApplicable = MutableLiveData<Int>()
+
+    val revisitApplicableFlag = MutableLiveData<Boolean>(null)
+
+    val booksHandedOver = MutableLiveData<Int>()
+
+    val booksDistributed = MutableLiveData<Int>()
+
+    val videoShown = MutableLiveData<Int>()
+
+    val booksDistributedFlag = MutableLiveData<Boolean>(null)
+
+    val trackerCollected = MutableLiveData<Boolean>(true)
+
+    val videoShownFlag = MutableLiveData<Boolean>(null)
+
 }

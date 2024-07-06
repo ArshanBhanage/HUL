@@ -189,12 +189,11 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/public_sans"
                     app:boxStrokeErrorColor="@color/red"
@@ -226,30 +225,49 @@
                     android:visibility="gone"
                     android:layout_marginHorizontal="@dimen/_5sdp"/>
 
-                <LinearLayout
-                    android:id="@+id/llButtons"
-                    android:layout_width="wrap_content"
+<!--                <LinearLayout-->
+<!--                    android:id="@+id/llButtons"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:layout_gravity="center_vertical"-->
+<!--                    android:layout_marginBottom="@dimen/_7sdp">-->
+
+<!--                    <ImageView-->
+<!--                        android:id="@+id/btnNegative"-->
+<!--                        android:layout_width="@dimen/_40sdp"-->
+<!--                        android:layout_height="@dimen/_40sdp"-->
+<!--                        android:src="@drawable/ic_negative"-->
+<!--                        android:layout_gravity="center_vertical"/>-->
+
+<!--                    <ImageView-->
+<!--                        android:id="@+id/btnPositive"-->
+<!--                        android:layout_width="@dimen/_40sdp"-->
+<!--                        android:layout_height="@dimen/_40sdp"-->
+<!--                        android:src="@drawable/ic_positive"-->
+<!--                        android:layout_gravity="center_vertical"/>-->
+
+<!--                </LinearLayout>-->
+                <RadioGroup
+                    android:id="@+id/radioGroup"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginBottom="@dimen/_7sdp">
-
-                    <ImageView
-                        android:id="@+id/btnNegative"
-                        android:layout_width="@dimen/_40sdp"
-                        android:layout_height="@dimen/_40sdp"
-                        android:src="@drawable/ic_negative"
-                        android:layout_gravity="center_vertical"/>
-
-                    <ImageView
-                        android:id="@+id/btnPositive"
-                        android:layout_width="@dimen/_40sdp"
-                        android:layout_height="@dimen/_40sdp"
-                        android:src="@drawable/ic_positive"
-                        android:layout_gravity="center_vertical"/>
-
-                </LinearLayout>
-
+                    android:checkedButton="@={viewModel.booksHandedOver}"
+                    >
+                    <RadioButton
+                        android:id="@+id/radio_button_1"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:text="@string/yes_correct"/>
+                    <RadioButton
+                        android:id="@+id/radio_button_2"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:text="@string/incorrect"/>
+                </RadioGroup>
                 <ImageView
                     android:layout_width="@dimen/_20sdp"
                     android:layout_height="@dimen/_20sdp"
@@ -560,17 +578,17 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <Switch
-                    android:id="@+id/switchBookDistribution"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+<!--                <Switch-->
+<!--                    android:id="@+id/switchBookDistribution"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_gravity="center_vertical"-->
+<!--                    tools:ignore="UseSwitchCompatOrMaterialXml" />-->
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:fontFamily="@font/public_sans"
@@ -579,25 +597,44 @@
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:layout_weight="1"
-                    android:layout_marginStart="@dimen/_10sdp"
                     />
+                <RadioGroup
+                    android:id="@+id/radioGroup2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:checkedButton="@={viewModel.booksDistributed}"
+                    >
+                    <RadioButton
+                        android:id="@+id/radio_button_12"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:text="@string/yes_distributed"/>
+                    <RadioButton
+                        android:id="@+id/radio_button_22"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:text="@string/not_distributed"/>
+                </RadioGroup>
             </LinearLayout>
 
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <Switch
-                    android:id="@+id/switchVideoShare"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+<!--                <Switch-->
+<!--                    android:id="@+id/switchVideoShare"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_gravity="center_vertical"-->
+<!--                    tools:ignore="UseSwitchCompatOrMaterialXml" />-->
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:fontFamily="@font/public_sans"
@@ -606,8 +643,27 @@
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:layout_weight="1"
-                    android:layout_marginStart="@dimen/_10sdp"
                     />
+                <RadioGroup
+                    android:id="@+id/radioGroup3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:checkedButton="@={viewModel.videoShown}"
+                    >
+                    <RadioButton
+                        android:id="@+id/radio_button_13"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:text="@string/yes_shared"/>
+                    <RadioButton
+                        android:id="@+id/radio_button_23"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:text="@string/not_shared"/>
+                </RadioGroup>
             </LinearLayout>
 
 

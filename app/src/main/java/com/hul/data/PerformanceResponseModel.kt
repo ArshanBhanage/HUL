@@ -7,11 +7,15 @@ data class Response(
 )
 
 data class PerformanceData(
-    val till_date: TillDate
+    val till_date: TillDate,
+    val today: TillDate,
+    val yesterday: TillDate,
+    val this_week: TillDate,
+    val this_month: TillDate,
 )
 
 data class TillDate(
     val total_visits: Int,
-    val attendance: Int,
-    val audit_approval: Int
+    val attendance: Double,
+    val audit_approval: Double
 )

@@ -245,4 +245,18 @@ class Form2FillViewModel @Inject constructor(
     var visitData = MutableLiveData<GetVisitDataResponseData>(null)
     var visitDataToView = MutableLiveData<Visit1>(null)
 
+    val booksHandedOver = MutableLiveData<Int>()
+
+    val booksDistributed = MutableLiveData<Int>()
+
+    val videoShown = MutableLiveData<Int>()
+
+    val booksDistributedFlag = MutableLiveData<Boolean>(null)
+
+    val videoShownFlag = MutableLiveData<Boolean>(null)
+
+    val curriculamOnTrack = MutableLiveData<Int>()
+
+    val curriculamOnTrackFlag = MutableLiveData<Boolean>(null)
+
 }

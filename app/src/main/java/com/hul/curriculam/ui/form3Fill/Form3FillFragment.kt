@@ -234,6 +234,24 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
             }
         }
 
+//        form3FillViewModel.revisitApplicable.observe(viewLifecycleOwner) { index ->
+//            // Update UI or perform any necessary actions
+//            val indexSelected = binding.radioGroup.indexOfChild(binding.radioGroup.findViewById(index))
+//            form3FillViewModel.revisitApplicableFlag.value = if(indexSelected==0) true else false
+//        }
+
+        binding.radioButton1.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            form3FillViewModel.revisitApplicableFlag.value = true
+        }
+
+        binding.radioButton2.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            form3FillViewModel.revisitApplicableFlag.value = false
+        }
+
         return root
     }
 
@@ -503,7 +521,7 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
                 ),
                 name_of_the_principal = VisitDetails(value = binding.form3.text.toString()),
                 mobile_number_of_the_principal = VisitDetails(value = binding.form4.text.toString()),
-                revisit_applicable = VisitDetails(value = if (binding.switchRevisit.isChecked) true else false),
+                revisit_applicable = VisitDetails(value = form3FillViewModel.revisitApplicableFlag.value),
                 remark = VisitDetails(value = form3FillViewModel.form5.value),
                 visit_id = form3FillViewModel.projectInfo.value!!.visit_id.toString(),
                 latitude = VisitDetails(value = currentLocation?.latitude.toString()),
@@ -582,9 +600,6 @@ class Form3FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.disceCode.setText(form3FillViewModel.uDiceCode.value)
         binding.schoolName.setText(form3FillViewModel.selectedSchoolCode.value?.location_name)
         binding.noOfBooksHanded.setText(form3FillViewModel.projectInfo.value?.number_of_books_distributed)
-
-        binding.switchRevisit.isChecked =
-            if (form3FillViewModel.visitData.value?.visit_3?.revisit_applicable?.value == 1) true else false
 
         binding.form1.setText(
             form3FillViewModel.visitData.value?.visit_3?.name_of_the_school_representative_who_collected_the_books?.value?.toString()

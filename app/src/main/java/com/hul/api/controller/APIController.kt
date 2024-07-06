@@ -108,7 +108,7 @@ class APIController @Inject constructor(private val mContext: Context) : Callbac
                 .getUserDetails().enqueue(this)
 
             ApiExtentions.ApiDef.GET_PERFORMANCE -> retrofit.create(ApiInterface::class.java)
-                .getPerformance().enqueue(this)
+                .getPerformance(requestModel!!.date_filter).enqueue(this)
 
             ApiExtentions.ApiDef.GET_VISIT_DATA -> if (requestModel != null) {
                 retrofit.create(ApiInterface::class.java)

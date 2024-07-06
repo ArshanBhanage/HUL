@@ -310,7 +310,10 @@ class ImagePreviewFragment : Fragment(), ApiHandler, RetryInterface {
                     destinationExif.setAttribute(attribute, value)
                 }
             }
-
+            val currentDate = Date()
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+            val formattedDate = dateFormat.format(currentDate)
+            destinationExif.setAttribute(ExifInterface.TAG_DATETIME, formattedDate)
             // Save the changes to the destination file
             destinationExif.saveAttributes()
         } catch (e: IOException) {

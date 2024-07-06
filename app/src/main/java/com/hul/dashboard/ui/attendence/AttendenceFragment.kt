@@ -387,8 +387,8 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
         }
         return RequestModel(
             project = userInfo.projectName,
-            uploadFor = "field_audit",
-            filename = fileName
+            uploadFor = "attendance",
+            filename = fileName,
         )
     }
 

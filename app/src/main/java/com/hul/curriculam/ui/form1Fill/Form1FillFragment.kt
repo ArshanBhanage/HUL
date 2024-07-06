@@ -259,6 +259,43 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
             false
         }
 
+        binding.radioButton1.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if(checkedId) {
+                form1FillViewModel.revisitApplicableFlag.value = true
+            }
+        }
+
+        binding.scmyes.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if(checkedId) {
+                form1FillViewModel.schoolMerged.value = false
+            }
+        }
+
+        binding.scmno.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if(checkedId) {
+                form1FillViewModel.schoolMerged.value = true
+            }
+        }
+
+        binding.radioButton2.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if(checkedId) {
+                form1FillViewModel.revisitApplicableFlag.value = false
+            }
+        }
+
+//        form1FillViewModel.revisitApplicable.observe(viewLifecycleOwner) { index ->
+//            // Update UI or perform any necessary actions
+//            val indexSelected = binding.radioGroup.indexOfChild(binding.radioGroup.findViewById(index))
+//            form1FillViewModel.revisitApplicableFlag.value = if(indexSelected==0) true else false
+//        }
         return root
     }
 
@@ -587,7 +624,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 u_dice_code = VisitDetails(value = binding.disceCode.text.toString()),
                 school_name = VisitDetails(value = binding.schoolName.text.toString()),
                 no_of_students_as_per_record = VisitDetails(value = binding.studentNo.text.toString()),
-                school_closed = VisitDetails(value = if (binding.switchSchoolClosed.isChecked) true else false),
+                school_closed = VisitDetails(value = form1FillViewModel.schoolMerged.value),
                 number_of_books_distributed = VisitDetails(value = form1FillViewModel.noOfBooksHandedOver.value),
                 no_of_teachers_trained = VisitDetails(value = form1FillViewModel.teachersTrained.value),
 
@@ -602,7 +639,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 ),
                 name_of_the_principal = VisitDetails(value = form1FillViewModel.form3.value.toString()),
                 mobile_number_of_the_principal = VisitDetails(value = form1FillViewModel.form4.value.toString()),
-                revisit_applicable = VisitDetails(value = if (binding.switchRevisit.isChecked) true else  false),
+                revisit_applicable = VisitDetails(value = form1FillViewModel.revisitApplicableFlag.value),
                 remark = VisitDetails(value = form1FillViewModel.form5.value),
                 visit_id = form1FillViewModel.projectInfo.value!!.visit_id.toString(),
                 latitude = VisitDetails(value = currentLocation?.latitude.toString()),
@@ -619,6 +656,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     // Set the adapter to the AutoCompleteTextView
+                    requireActivity().onBackPressed()
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -694,8 +732,8 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.disceCode.setText(form1FillViewModel.uDiceCode.value)
         binding.schoolName.setText(form1FillViewModel.selectedSchoolCode.value?.location_name)
         binding.studentNo.setText(form1FillViewModel.selectedSchoolCode.value?.location_data_field1)
-        binding.switchSchoolClosed.isChecked =
-            form1FillViewModel.visitData.value?.visit_1?.school_closed?.value == 1
+//        binding.scm.isChecked =
+//            form1FillViewModel.visitData.value?.visit_1?.school_closed?.value == 1
         binding.noOfBooksHanded.setText(
             form1FillViewModel.visitData.value?.visit_1?.number_of_books_distributed?.value?.toString()
                 ?: ""
@@ -724,8 +762,8 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
             form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_principal?.value?.toString()
                 ?: ""
         )
-        binding.switchRevisit.isChecked =
-            if (form1FillViewModel.visitData.value?.visit_1?.revisit_applicable?.value == 1) true else false
+//        binding.switchRevisit.isChecked =
+//            if (form1FillViewModel.visitData.value?.visit_1?.revisit_applicable?.value == 1) true else false
         binding.form5.setText(
             form1FillViewModel.visitData.value?.visit_1?.remark?.value?.toString() ?: ""
         )
@@ -775,7 +813,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
         isTimerStarted = true
         //binding.proceed.isEnabled = false
 
-        val totalTime = 20 * 60 * 1000L
+        val totalTime = 1 * 60 * 1000L
 
         // Set initial time before starting the timer
         updateTimerText(totalTime)
@@ -814,6 +852,7 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     private fun checkValidation(): Boolean {
+        Log.d("Nitin", form1FillViewModel.revisitApplicableFlag.value.toString())
         if (form1FillViewModel.projectInfo.value == null) {
             Toast.makeText(requireContext(), "Visit details not found", Toast.LENGTH_LONG).show()
             return false;
@@ -828,50 +867,58 @@ class Form1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 .show()
             binding.studentNo.isEnabled = true
             return false;
-        } else if (form1FillViewModel.noOfBooksHandedOver.value?.isEmpty() == true) {
+        } else if (form1FillViewModel.noOfBooksHandedOver.value?.isEmpty() == true && !form1FillViewModel.schoolMerged.value!!) {
             Toast.makeText(
                 requireContext(),
                 "Please enter no. of books handed over",
                 Toast.LENGTH_LONG
             ).show()
             return false;
-        } else if (form1FillViewModel.teachersTrained.value?.isEmpty() == true) {
+        } else if (form1FillViewModel.teachersTrained.value?.isEmpty() == true && !form1FillViewModel.schoolMerged.value!!) {
             Toast.makeText(
                 requireContext(),
                 "Please enter no. of teachers trained",
                 Toast.LENGTH_LONG
             ).show()
             return false;
-        } else if (form1FillViewModel.form1.value.toString().isEmpty()) {
+        } else if (form1FillViewModel.form1.value.toString().isEmpty() && !form1FillViewModel.schoolMerged.value!!) {
             Toast.makeText(
                 requireContext(),
                 "Please enter name of school representative",
                 Toast.LENGTH_LONG
             ).show()
             return false;
-        } else if (form1FillViewModel.form2.value.toString().isEmpty()) {
+        } else if (form1FillViewModel.form2.value.toString().isEmpty() && !form1FillViewModel.schoolMerged.value!!) {
             Toast.makeText(
                 requireContext(),
                 "Please enter mobile number of school representative",
                 Toast.LENGTH_LONG
             ).show()
             return false;
-        } else if (form1FillViewModel.form3.value.toString().isEmpty()) {
+        } else if (form1FillViewModel.form3.value.toString().isEmpty() && !form1FillViewModel.schoolMerged.value!!) {
             Toast.makeText(requireContext(), "Please enter name of principal", Toast.LENGTH_LONG)
                 .show()
             return false;
-        } else if (form1FillViewModel.form4.value.toString().isEmpty()) {
+        } else if (form1FillViewModel.form4.value.toString().isEmpty() && !form1FillViewModel.schoolMerged.value!!) {
             Toast.makeText(
                 requireContext(),
                 "Please enter mobile number of principal",
                 Toast.LENGTH_LONG
             ).show()
             return false;
-        } else if (currentLocation == null) {
+        }else if (form1FillViewModel.revisitApplicableFlag.value == null && !form1FillViewModel.schoolMerged.value!!) {
+            Toast.makeText(
+                requireContext(),
+                "Please enter mobile number of principal",
+                Toast.LENGTH_LONG
+            ).show()
+            return false;
+        }
+        else if (currentLocation == null) {
             Toast.makeText(requireContext(), "Location details not found", Toast.LENGTH_LONG).show()
             return false;
         } else if (form1FillViewModel.imageUrl1.value?.isEmpty() == true || form1FillViewModel.imageUrl2.value?.isEmpty() == true
-            || form1FillViewModel.imageUrl3.value?.isEmpty() == true || form1FillViewModel.imageUrl4.value?.isEmpty() == true
+            || (form1FillViewModel.imageUrl3.value?.isEmpty() == true && !form1FillViewModel.schoolMerged.value!!) || (form1FillViewModel.imageUrl4.value?.isEmpty() == true && !form1FillViewModel.schoolMerged.value!!)
         ) {
             Toast.makeText(requireContext(), "Please add required images", Toast.LENGTH_LONG).show()
             return false;

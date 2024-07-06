@@ -246,6 +246,20 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
             }
         }
 
+
+
+        binding.radioButton1.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            form2FillViewModel.curriculamOnTrackFlag.value = true
+        }
+
+        binding.radioButton2.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            form2FillViewModel.curriculamOnTrackFlag.value = false
+        }
+
         return root
     }
 
@@ -310,7 +324,8 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
         return RequestModel(
             project = userInfo.projectName,
             uploadFor = "field_audit",
-            filename = fileName
+            filename = fileName,
+            visit_id = ""
         )
     }
 
@@ -584,7 +599,7 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
                     value = binding.form2.text.toString()
                 ),
 
-                curriculum_on_track = VisitDetails(value = if (binding.switchIsCurriculamOnTrack.isChecked) true else false),
+                curriculum_on_track = VisitDetails(value = form2FillViewModel.curriculamOnTrackFlag.value),
                 remark = VisitDetails(value = binding.form5.text.toString()),
                 visit_id = form2FillViewModel.projectInfo.value!!.visit_id.toString(),
                 latitude = VisitDetails(value = currentLocation?.latitude.toString()),
@@ -714,8 +729,8 @@ class Form2FillFragment : Fragment(), ApiHandler, RetryInterface {
         binding.noOfBooksHanded.setText(form2FillViewModel.projectInfo.value?.number_of_books_distributed)
         binding.form1.setText(form2FillViewModel.visitData.value?.visit_2?.name_of_the_school_representative_who_collected_the_books?.value.toString())
         binding.form2.setText(form2FillViewModel.visitData.value?.visit_2?.mobile_number_of_the_school_representative_who_collected_the_books?.value.toString())
-        binding.switchIsCurriculamOnTrack.isChecked =
-            form2FillViewModel.visitData.value?.visit_2?.curriculum_on_track?.value == 1
+//        binding.switchIsCurriculamOnTrack.isChecked =
+//            form2FillViewModel.visitData.value?.visit_2?.curriculum_on_track?.value == 1
         binding.form5.setText(form2FillViewModel.visitData.value?.visit_2?.remark?.value.toString())
     }
 

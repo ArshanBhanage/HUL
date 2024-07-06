@@ -104,4 +104,14 @@ class SchoolActivityViewModel @Inject constructor(
         }
 
     }
+
+    val booksHandedOver = MutableLiveData<Int>()
+
+    val booksDistributed = MutableLiveData<Int>()
+
+    val videoShown = MutableLiveData<Int>()
+
+    val booksDistributedFlag = MutableLiveData<Boolean>()
+
+    val videoShownFlag = MutableLiveData<Boolean>()
 }

@@ -25,4 +25,10 @@ data class VisitDetails(
     val rejection_reason: String? = null
 )
 
+data class ImageWithObject(
+    val url: String?,
+    val dateTime : String?
+
+)
+
 

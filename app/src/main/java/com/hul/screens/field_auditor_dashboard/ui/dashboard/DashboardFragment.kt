@@ -7,6 +7,7 @@ import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.TextView
@@ -15,6 +16,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.hul.HULApplication
@@ -23,6 +25,8 @@ import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
 import com.hul.curriculam.Curriculam
+import com.hul.dashboard.ui.dashboard.MyPerfAdapter
+import com.hul.dashboard.ui.dashboard.PerfInterface
 import com.hul.data.Attendencemodel
 import com.hul.data.MappedUser
 import com.hul.data.PerformanceData
@@ -57,6 +61,10 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     private val binding get() = _binding!!
 
     private lateinit var dashboardComponent: FieldAuditorDashboardComponent
+
+    val perforManceList = arrayListOf("Till Date", "Today", "Yesterday", "This Week", "This Month")
+
+    var perfSelectedposition = 0
 
     @Inject
     lateinit var dashboardViewModel: DashboardViewModel
@@ -100,9 +108,11 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         binding.dayToday.text = getCurrentDayOfWeek()
         binding.date.text = formatDate(Date(), "dd MMM yyyy")
 
-        binding.tillDateButton.setOnClickListener {
-            showOptionsDialog()
-        }
+//        binding.tillDateButton.setOnClickListener {
+//            showOptionsDialog()
+//        }
+
+        binding.tillDateButton.setOnClickListener { showPerfDialog() }
 
         binding.rlProfile.setOnClickListener {
             showCustomDialog()
@@ -173,10 +183,10 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         )
     }
 
-    private fun getPerformance() {
+    private fun getPerformance(filter: String) {
         apiController.getApiResponse(
             this,
-            getPerformanceModel(),
+            getPerformanceModel(filter),
             ApiExtentions.ApiDef.GET_PERFORMANCE.ordinal
         )
     }
@@ -206,10 +216,58 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         )
     }
 
-    private fun getPerformanceModel(): RequestModel {
+    private fun getPerformanceModel(filter: String): RequestModel {
         return RequestModel(
-
+            date_filter = filter
         )
+    }
+
+    private fun showPerfDialog() {
+        val builder: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(context)
+        val inflater = getLayoutInflater()
+        val dialogView: View = inflater.inflate(R.layout.perf_dialog, null)
+        builder.setView(dialogView)
+        val alertDialog: android.app.AlertDialog = builder.create()
+
+        alertDialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+
+        val locationToVisit = dialogView.findViewById<RecyclerView>(R.id.locationToVisit);
+        locationToVisit.layoutManager = LinearLayoutManager(context)
+        val myVisitsAdapter =
+            MyPerfAdapter(perforManceList, perfSelectedposition, object : PerfInterface {
+                override fun onSelected(position: Int) {
+                    perfSelectedposition = position
+                    binding!!.tillDateButton.text = perforManceList[position]
+                    when (position) {
+                        0 -> {
+                            getPerformance("till_date")
+                        }
+
+                        1 -> {
+                            getPerformance("today")
+                        }
+
+                        2 -> {
+                            getPerformance("yesterday")
+                        }
+
+                        3 -> {
+                            getPerformance("this_week")
+                        }
+
+                        4 -> {
+                            getPerformance("this_month")
+                        }
+                    }
+                    alertDialog.cancel()
+                }
+
+            }, requireContext())
+        // Setting the Adapter with the recyclerview
+        locationToVisit.adapter = myVisitsAdapter
+
+
+        alertDialog.show()
     }
 
     override fun onApiSuccess(o: String?, objectType: Int) {
@@ -234,7 +292,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
                     binding.txtProfileName.setText("Hi, " + userDetails.user_fullname)
 
-                    getPerformance()
+                    getPerformance("till_date")
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -247,11 +305,52 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                         model.getJSONObject("data").toString(),
                         PerformanceData::class.java
                     )
-                    binding.txtVisits.text = performanceData.till_date.total_visits.toString()
-                    binding.txtAttendance.text =
-                        performanceData.till_date.attendance.toString() + "%"
-                    binding.txtTotalVisits.text =
-                        performanceData.till_date.audit_approval.toString() + "%"
+                    when (perfSelectedposition) {
+                        0 -> {
+                            binding.txtVisits.text =
+                                performanceData.till_date.total_visits.toString()
+                            binding.txtAttendance.text =
+                                performanceData.till_date.attendance.toString() + "%"
+                            binding.txtTotalVisits.text =
+                                performanceData.till_date.audit_approval.toString() + "%"
+                        }
+
+                        1 -> {
+                            binding.txtVisits.text =
+                                performanceData.today.total_visits.toString()
+                            binding.txtAttendance.text =
+                                performanceData.today.attendance.toString() + "%"
+                            binding.txtTotalVisits.text =
+                                performanceData.today.audit_approval.toString() + "%"
+                        }
+
+                        2 -> {
+                            binding.txtVisits.text =
+                                performanceData.yesterday.total_visits.toString()
+                            binding.txtAttendance.text =
+                                performanceData.yesterday.attendance.toString() + "%"
+                            binding.txtTotalVisits.text =
+                                performanceData.yesterday.audit_approval.toString() + "%"
+                        }
+
+                        3 -> {
+                            binding.txtVisits.text =
+                                performanceData.this_week.total_visits.toString()
+                            binding.txtAttendance.text =
+                                performanceData.this_week.attendance.toString() + "%"
+                            binding.txtTotalVisits.text =
+                                performanceData.this_week.audit_approval.toString() + "%"
+                        }
+
+                        4 -> {
+                            binding.txtVisits.text =
+                                performanceData.this_month.total_visits.toString()
+                            binding.txtAttendance.text =
+                                performanceData.this_month.attendance.toString() + "%"
+                            binding.txtTotalVisits.text =
+                                performanceData.this_month.audit_approval.toString() + "%"
+                        }
+                    }
 
                     getAttendance()
                 } else {
@@ -323,7 +422,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         if (message?.equals(context?.getString(R.string.session_expire))!!) {
             userInfo.authToken = ""
             redirectionAlertDialogue(requireContext(), message!!)
-        }else{
+        } else {
             redirectionAlertDialogue(requireContext(), message!!)
         }
     }

@@ -189,11 +189,20 @@
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
-
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/public_sans"
+                android:layout_marginTop="24dp"
+                android:text="@string/captured_images"
+                android:textColor="#6d6b77"
+                android:textFontWeight="400"
+                android:textSize="13sp" />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:layout_marginTop="24dp"
                 android:visibility="visible">
 
                 <LinearLayout

@@ -155,6 +155,7 @@ class Form1DetailsFragment : Fragment(), ApiHandler, RetryInterface {
                     val requestModel = Gson().fromJson(requireArguments().getString(LOCAL_DATA), RequestModel::class.java)
                     form1ViewModel.visitData.value!!.visit_1 = requestModel.visitData
                 }
+                form1ViewModel.visibiliyOfItems.value = if(form1ViewModel.visitData.value?.visit_1?.school_closed!!.value.toString().toBoolean()) View.GONE else View.VISIBLE
                 form1ViewModel.uDiceCode.value = form1ViewModel.visitData.value?.visit_1?.u_dice_code!!.value.toString()
                 if (form1ViewModel.visitData.value?.visit_1?.visit_image_1?.value != null) {
                     loadImage(

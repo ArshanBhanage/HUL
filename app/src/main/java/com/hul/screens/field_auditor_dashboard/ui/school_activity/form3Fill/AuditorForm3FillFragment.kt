@@ -194,22 +194,22 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
             ProjectInfo::class.java
         )
 
-        binding.btnPositive.setOnClickListener {
-            binding.btnPositive.visibility = View.GONE
-            binding.btnNegative.visibility = View.GONE
-            binding.tickSuccess.visibility = View.VISIBLE
-            binding.tickFailure.visibility = View.GONE
-            form3FillViewModel.isBookDistributionApproved.value = 1;
-            binding.edtNoOfBooksGiven.isEnabled = false
-            binding.edtNoOfBooksGiven.setText(form3FillViewModel.projectInfo.value?.number_of_books_distributed)
-        }
-
-        binding.btnNegative.setOnClickListener {
-            binding.btnPositive.visibility = View.GONE
-            binding.btnNegative.visibility = View.GONE
-            binding.tickSuccess.visibility = View.GONE
-            binding.tickFailure.visibility = View.VISIBLE
-        }
+//        binding.btnPositive.setOnClickListener {
+//            binding.btnPositive.visibility = View.GONE
+//            binding.btnNegative.visibility = View.GONE
+//            binding.tickSuccess.visibility = View.VISIBLE
+//            binding.tickFailure.visibility = View.GONE
+//            form3FillViewModel.isBookDistributionApproved.value = 1;
+//            binding.edtNoOfBooksGiven.isEnabled = false
+//            binding.edtNoOfBooksGiven.setText(form3FillViewModel.projectInfo.value?.number_of_books_distributed)
+//        }
+//
+//        binding.btnNegative.setOnClickListener {
+//            binding.btnPositive.visibility = View.GONE
+//            binding.btnNegative.visibility = View.GONE
+//            binding.tickSuccess.visibility = View.GONE
+//            binding.tickFailure.visibility = View.VISIBLE
+//        }
 
         binding.nestedScrollView.setOnTouchListener { _, event ->
             when (event.action) {
@@ -222,6 +222,43 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
                 }
             }
             false
+        }
+
+        binding.radioButton1.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if (checkedId) {
+                form3FillViewModel.isBookDistributionApproved.value = 1;
+                binding.edtNoOfBooksGiven.isEnabled = false
+                binding.edtNoOfBooksGiven.setText(form3FillViewModel.projectInfo.value?.number_of_books_distributed)
+            }
+        }
+
+        binding.radioButton2.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if (checkedId) {
+                form3FillViewModel.isBookDistributionApproved.value = 0;
+                binding.edtNoOfBooksGiven.isEnabled = true
+                binding.edtNoOfBooksGiven.setText(form3FillViewModel.projectInfo.value?.number_of_books_distributed)
+            }
+        }
+
+        binding.radioButton11.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if (checkedId) {
+                form3FillViewModel.trackerCollected.value = true;
+
+            }
+        }
+
+        binding.radioButton22.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if (checkedId) {
+                form3FillViewModel.trackerCollected.value = false;
+            }
         }
 
         return root
@@ -293,7 +330,8 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
         return RequestModel(
             project = userInfo.projectName,
             uploadFor = "field_audit",
-            filename = fileName
+            filename = fileName,
+            visit_id = form3FillViewModel.projectInfo.value!!.visit_id.toString(),
         )
     }
 
@@ -564,7 +602,7 @@ class AuditorForm3FillFragment : Fragment(), ApiHandler, RetryInterface {
                 auditor_visit_image_2 = VisitDetails(value = form3FillViewModel.imageApiUrl2.value),
                 auditor_visit_image_3 = VisitDetails(value = form3FillViewModel.imageApiUrl3.value),
                 visit_id = form3FillViewModel.projectInfo.value!!.visit_id.toString(),
-                were_file_trackers_collected = VisitDetails(value = binding.switchBookDistribution.isChecked),
+                were_file_trackers_collected = VisitDetails(value = form3FillViewModel.trackerCollected.value),
                 number_of_trackers_collected = VisitDetails(value = binding.edtFilledTrackers.text.toString()),
                 remark = VisitDetails(value = binding.form5.text.toString())
             )
