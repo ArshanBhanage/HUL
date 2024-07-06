@@ -4,6 +4,7 @@ package com.hul.data
  * Created by Nitin Chorge on 26-11-2020.
  */
 data class RequestModel(
+    var date_filter: String? = null,
     var projectId: String? = null,
     var mobile: String? = null,
     var type: String? = null,
@@ -52,4 +53,9 @@ data class RequestModel(
     val location_ward: String? = null,
     val location_district: String? = null,
     val location_state: String? = null,
+
+    val device_id: String? = null,
+    val make: String? = null,
+    val model: String? = null,
+    val os: String? = null,
 )

@@ -41,6 +41,7 @@ class Form1FillViewModel @Inject constructor(
     val loginEnabled = MediatorLiveData<Boolean>(true)
 
 
+
     val timerFinished = MediatorLiveData<Boolean>(false)
 
     var form1 = MutableLiveData<String>("")
@@ -61,6 +62,20 @@ class Form1FillViewModel @Inject constructor(
     val isBookDistributionApproved = MutableLiveData<Int>(0)
 
     var noOfBooksGivenToSchool = MutableLiveData(0)
+
+    var schoolMerged = MutableLiveData(false)
+
+    var noOfStudent = MutableLiveData("")
+
+    var noOfStudentEnabled : LiveData<Boolean> = noOfStudent.map {
+        if(it.length > 0)
+        {
+            true
+        }
+        else{
+            false
+        }
+    }
 
     init {
 
@@ -108,6 +123,16 @@ class Form1FillViewModel @Inject constructor(
             loginEnabled.value = it.length > 0 && imageUrl1.value!!.length > 0 && imageUrl2.value!!.length > 0 && imageUrl3.value!!.length > 0 && imageUrl4.value!!.length > 0 && noOfBooksHandedOver.value!!.length > 0 && teachersTrained.value!!.length > 0  && form2.value!!.length > 0 && form2.value!!.length > 0 && form3.value!!.length > 0
         }
 
+    }
+
+    var schoolMergedVisibiltiy : LiveData<Int> = schoolMerged.map {
+        if(it)
+        {
+            View.GONE
+        }
+        else{
+            View.VISIBLE
+        }
     }
 
     val capture1Visibility: LiveData<Int> = imageUrl1.map {
@@ -264,5 +289,19 @@ class Form1FillViewModel @Inject constructor(
 
     var visitData = MutableLiveData<GetVisitDataResponseData>(null)
     var visitDataToView = MutableLiveData<Visit1>(null)
+
+    val booksHandedOver = MutableLiveData<Int>()
+
+    val booksDistributed = MutableLiveData<Int>()
+
+    val videoShown = MutableLiveData<Int>()
+
+    val booksDistributedFlag = MutableLiveData<Boolean>(null)
+
+    val videoShownFlag = MutableLiveData<Boolean>(null)
+
+    val revisitApplicable = MutableLiveData<Int>()
+
+    val revisitApplicableFlag = MutableLiveData<Boolean>(null)
 
 }

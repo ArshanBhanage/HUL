@@ -1,8 +1,10 @@
 package com.hul.curriculam.ui.form2Details
 
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,12 +19,10 @@ import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
 import com.hul.curriculam.CurriculamComponent
-import com.hul.curriculam.ui.form1Details.Form1DetailsFragment
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.data.SchoolCode
-import com.hul.data.VisitData
 import com.hul.databinding.FragmentForm2Binding
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
@@ -36,6 +36,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import javax.inject.Inject
+
 
 class Form2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
 
@@ -238,10 +239,17 @@ class Form2DetailsFragment : Fragment(), ApiHandler, RetryInterface {
                     val decodedString = Base64.decode(base64, Base64.DEFAULT)
                     BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
                 }
+                val imageUri = Uri.parse(base64)
 
-                Glide.with(imgId.context)
-                    .load(decodedByte)
-                    .into(imgId)
+                if(base64.startsWith("content://")){
+                    Glide.with(imgId.context)
+                        .load(imageUri)
+                        .into(imgId)
+                }else{
+                    Glide.with(imgId.context)
+                        .load(decodedByte)
+                        .into(imgId)
+                }
 
                 llId.visibility = View.VISIBLE
             } catch (e: Exception) {

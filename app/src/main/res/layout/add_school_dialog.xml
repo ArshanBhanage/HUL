@@ -128,7 +128,8 @@
             android:layout_marginTop="@dimen/_10sdp"/>
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/public_sans"
@@ -139,13 +140,17 @@
             app:placeholderText="@string/enter_here"
             app:prefixTextColor="@color/black">
 
-            <com.google.android.material.textfield.TextInputEditText
+            <AutoCompleteTextView
                 android:id="@+id/edtState"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="none"
                 android:textColor="@color/black"
+                android:textFontWeight="400"
                 android:textSize="16sp"
-                android:text=''/>
+                />
+
+
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -159,7 +164,8 @@
             android:layout_marginTop="@dimen/_10sdp"/>
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/public_sans"
@@ -170,13 +176,17 @@
             app:placeholderText="@string/enter_here"
             app:prefixTextColor="@color/black">
 
-            <com.google.android.material.textfield.TextInputEditText
+            <AutoCompleteTextView
                 android:id="@+id/edtDistrict"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="none"
                 android:textColor="@color/black"
+                android:textFontWeight="400"
                 android:textSize="16sp"
-                android:text=''/>
+                />
+
+
         </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout

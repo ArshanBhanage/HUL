@@ -1,5 +1,6 @@
 package com.hul.curriculam.ui.form1Details
 
+import android.view.View
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.hul.data.GetVisitDataResponseData
@@ -19,4 +20,6 @@ class Form1ViewModel @Inject constructor(
     var visitData = MutableLiveData<GetVisitDataResponseData>(null)
 
     var uDiceCode = MutableLiveData<String>(null)
+
+    var visibiliyOfItems = MutableLiveData<Int>(View.VISIBLE)
 }

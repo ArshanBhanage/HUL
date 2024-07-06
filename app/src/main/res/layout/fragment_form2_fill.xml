@@ -26,7 +26,6 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="4dp"
                 android:layout_marginVertical="16dp"
                 android:background="@color/white"
                 app:cardCornerRadius="8dp">
@@ -35,7 +34,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="24dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="match_parent"
@@ -527,30 +526,30 @@
                         android:textStyle="bold"
                         app:layout_constraintTop_toTopOf="parent" />
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content">
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/switchIsCurriculamOnTrack"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="@={viewModel.form3}"
-                            android:layout_marginTop="10dp"
-                            android:theme="@style/SCBSwitch"
-                            android:layout_marginRight="10dp"
-                            />
-                        <TextView
-                            android:id="@+id/booleanText"
+                        <RadioGroup
+                            android:id="@+id/radioGroup"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/public_sans"
-                            android:lineHeight="28dp"
-                            android:text="@{viewModel.form3text}"
-                            android:textColor="#2F2B3D"
-                            android:textFontWeight="400"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:layout_gravity="center"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            android:orientation="horizontal"
+                            android:checkedButton="@={viewModel.curriculamOnTrack}"
+                            >
+                            <RadioButton
+                                android:id="@+id/radio_button_1"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:checked="true"
+                                android:layout_height="match_parent"
+                                android:text="@string/yes"/>
+                            <RadioButton
+                                android:id="@+id/radio_button_2"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:layout_height="match_parent"
+                                android:text="@string/no"/>
+                        </RadioGroup>
+
                     </LinearLayout>
                     <TextView
                         android:layout_width="match_parent"

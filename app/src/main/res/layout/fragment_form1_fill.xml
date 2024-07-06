@@ -65,7 +65,6 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="4dp"
                 android:layout_marginVertical="16dp"
                 android:background="@color/white"
                 app:cardCornerRadius="8dp">
@@ -74,7 +73,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="24dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="match_parent"
@@ -220,6 +219,7 @@
                             android:textColor="@color/black"
                             android:textFontWeight="400"
                             android:textSize="16sp"
+                            android:text="@={viewModel.noOfStudent}"
                             android:enabled="@{viewModel.numberOfStudentEditable}"
                             />
 
@@ -228,17 +228,11 @@
 
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginBottom="@dimen/_10sdp">
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/switchSchoolClosed"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:theme="@style/SCBSwitch"
-                            android:layout_marginRight="10dp"
-                            />
+                        android:layout_marginBottom="@dimen/_10sdp"
+                        android:orientation="vertical">
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -250,6 +244,26 @@
                             android:textStyle="bold"
                             android:layout_gravity="center"
                             app:layout_constraintTop_toTopOf="parent" />
+                        <RadioGroup
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            >
+                            <RadioButton
+                                android:id="@+id/scmyes"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:checked="false"
+                                android:layout_height="match_parent"
+                                android:text="@string/yes"/>
+                            <RadioButton
+                                android:id="@+id/scmno"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:checked="true"
+                                android:layout_height="match_parent"
+                                android:text="@string/no"/>
+                        </RadioGroup>
                     </LinearLayout>
 
 
@@ -263,7 +277,8 @@
                         android:textFontWeight="400"
                         android:textSize="15sp"
                         android:textStyle="bold"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}"/>
 
                     <com.google.android.material.textfield.TextInputLayout
 
@@ -278,7 +293,8 @@
                         app:errorTextColor="@color/red"
                         app:layout_constraintTop_toBottomOf="@+id/loginHeader"
                         app:placeholderText="@string/enter_here"
-                        app:prefixTextColor="@color/black">
+                        app:prefixTextColor="@color/black"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/noOfBooksHanded"
@@ -303,7 +319,8 @@
                         android:textFontWeight="400"
                         android:textSize="15sp"
                         android:textStyle="bold"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}"/>
 
                     <com.google.android.material.textfield.TextInputLayout
 
@@ -318,7 +335,9 @@
                         app:errorTextColor="@color/red"
                         app:layout_constraintTop_toBottomOf="@+id/loginHeader"
                         app:placeholderText="@string/enter_here"
-                        app:prefixTextColor="@color/black">
+                        app:prefixTextColor="@color/black"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}"
+                        >
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/teachersTrained"
@@ -465,7 +484,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="24dp"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}">
 
                         <TextView
                             android:layout_width="0dp"
@@ -529,7 +549,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="24dp"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}">
 
                         <TextView
                             android:layout_width="0dp"
@@ -601,6 +622,7 @@
                         android:textSize="15sp"
                         android:textStyle="bold"
                         android:layout_marginTop="24dp"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}"
                         app:layout_constraintTop_toTopOf="parent" />
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -614,7 +636,8 @@
                         app:errorTextColor="@color/red"
                         app:layout_constraintTop_toBottomOf="@+id/loginHeader"
                         app:placeholderText="@string/username_placeholder"
-                        app:prefixTextColor="@color/black">
+                        app:prefixTextColor="@color/black"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/form1"
@@ -640,6 +663,7 @@
                         android:textFontWeight="400"
                         android:textSize="15sp"
                         android:textStyle="bold"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}"
                         app:layout_constraintTop_toTopOf="parent" />
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -653,6 +677,7 @@
                         app:errorTextColor="@color/red"
                         app:layout_constraintTop_toBottomOf="@+id/loginHeader"
                         app:placeholderText="@string/username_placeholder"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}"
                         app:prefixTextColor="@color/black">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -680,6 +705,7 @@
                         android:textFontWeight="400"
                         android:textSize="15sp"
                         android:textStyle="bold"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}"
                         app:layout_constraintTop_toTopOf="parent" />
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -693,6 +719,7 @@
                         app:errorTextColor="@color/red"
                         app:layout_constraintTop_toBottomOf="@+id/loginHeader"
                         app:placeholderText="@string/username_placeholder"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}"
                         app:prefixTextColor="@color/black">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -719,6 +746,7 @@
                         android:textFontWeight="400"
                         android:textSize="15sp"
                         android:textStyle="bold"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}"
                         app:layout_constraintTop_toTopOf="parent" />
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -732,6 +760,7 @@
                         app:errorTextColor="@color/red"
                         app:layout_constraintTop_toBottomOf="@+id/loginHeader"
                         app:placeholderText="@string/username_placeholder"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}"
                         app:prefixTextColor="@color/black">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -750,16 +779,18 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
                     <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/switchRevisit"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
-                            android:theme="@style/SCBSwitch"
-                            android:layout_marginRight="10dp"
-                            />
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}">
+<!--                        -->
+<!--                            android:id="@+id/switchRevisit"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_marginTop="10dp"-->
+<!--                            android:theme="@style/SCBSwitch"-->
+<!--                            android:layout_marginRight="10dp"-->
+<!--                            />-->
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -772,6 +803,28 @@
                             android:textStyle="bold"
                             android:layout_gravity="center"
                             app:layout_constraintTop_toTopOf="parent" />
+                        <RadioGroup
+                            android:id="@+id/radioGroup"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:checkedButton="@={viewModel.revisitApplicable}"
+                            >
+                            <RadioButton
+                                android:id="@+id/radio_button_1"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:checked="false"
+                                android:layout_height="match_parent"
+                                android:text="@string/yes"/>
+                            <RadioButton
+                                android:id="@+id/radio_button_2"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:checked="false"
+                                android:layout_height="match_parent"
+                                android:text="@string/no"/>
+                        </RadioGroup>
                     </LinearLayout>
                     <TextView
                         android:layout_width="match_parent"
@@ -784,6 +837,7 @@
                         android:textFontWeight="400"
                         android:textSize="15sp"
                         android:textStyle="bold"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}"
                         app:layout_constraintTop_toTopOf="parent" />
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -796,6 +850,7 @@
                         app:errorTextColor="@color/red"
                         app:layout_constraintTop_toBottomOf="@+id/loginHeader"
                         app:placeholderText="@string/username_placeholder"
+                        android:visibility="@{viewModel.schoolMergedVisibiltiy}"
                         app:prefixTextColor="@color/black">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -822,7 +877,7 @@
                         android:textColor="@color/white"
                         android:textFontWeight="700"
                         android:textStyle="bold"
-                        android:enabled="@{viewModel.loginEnabled &amp;&amp; viewModel.timerFinished }"/>
+                        android:enabled="@{(viewModel.loginEnabled || viewModel.schoolMerged) &amp;&amp; viewModel.timerFinished &amp;&amp; viewModel.noOfStudentEnabled }"/>
 
 
                     <LinearLayout

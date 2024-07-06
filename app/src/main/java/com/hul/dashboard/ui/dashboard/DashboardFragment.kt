@@ -23,7 +23,10 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.LinearLayout
+import android.widget.RadioButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -115,6 +118,9 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     private var requestModel: RequestModel? = null
 
+    val perforManceList = arrayListOf("Till Date", "Today", "Yesterday", "This Week", "This Month")
+
+    var perfSelectedposition = 0
     @Inject
     lateinit var uploadFileController: UploadFileController
 
@@ -179,8 +185,6 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         binding!!.todaysVisit.layoutManager = LinearLayoutManager(context)
 
         binding!!.myArea.text = userInfo.myArea
-
-
 
         binding!!.punchInButton.setOnClickListener {
             redirectToAttendence(ProjectInfo(location_id = "1"))
@@ -270,6 +274,11 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
         binding!!.btnAddNewSchool.setOnClickListener { showAddSchoolDialog() }
 
+        binding!!.tillDateButton.setOnClickListener { showPerfDialog() }
+
+
+
+
         return root
     }
 
@@ -306,6 +315,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         isSyncing = true
         visitDataTableUploading = visitDataTable
         requestModel = Gson().fromJson(visitDataTable.jsonData, RequestModel::class.java)
+        Log.d("TAG", "startSync: ${requestModel}")
+        Log.d("TAG", "startSync: ${requestModel!!.visitData!!.visit_image_1!!.value.toString().toUri()}")
         uploadImage(requestModel!!.visitData!!.visit_image_1!!.value.toString().toUri())
     }
 
@@ -350,7 +361,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         return RequestModel(
             project = userInfo.projectName,
             uploadFor = "field_audit",
-            filename = fileName
+            filename = fileName,
+            visit_id = requestModel!!.visit_id
         )
     }
 
@@ -373,16 +385,16 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         ContextCompat.checkSelfPermission(requireContext(), it) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun getPerformanceModel(): RequestModel {
+    private fun getPerformanceModel(filter :String): RequestModel {
         return RequestModel(
-
+            date_filter = filter
         )
     }
 
-    private fun getPerformance() {
+    private fun getPerformance(filter :String) {
         apiController.getApiResponse(
             this,
-            getPerformanceModel(),
+            getPerformanceModel(filter),
             ApiExtentions.ApiDef.GET_PERFORMANCE.ordinal
         )
     }
@@ -522,10 +534,9 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     }
 
-    private fun getDistrictList(callBack: ListDialogInterface) {
+    private fun getDistrictList() {
 
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
-            districtCallBack = callBack
             apiController.getApiResponse(
                 this,
                 getDistricts(userInfo.projectId),
@@ -541,10 +552,9 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     }
 
-    private fun getStateList(callBack: ListDialogInterface) {
+    private fun getStateList() {
 
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
-            stateCallBack = callBack
             apiController.getApiResponse(
                 this,
                 getDistricts(userInfo.projectId),
@@ -656,6 +666,40 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         alertDialog.show()
     }
 
+    private fun showPerfDialog() {
+        val builder: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(context)
+        val inflater = getLayoutInflater()
+        val dialogView: View = inflater.inflate(R.layout.perf_dialog, null)
+        builder.setView(dialogView)
+        val alertDialog: android.app.AlertDialog = builder.create()
+
+        alertDialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+
+        val locationToVisit = dialogView.findViewById<RecyclerView>(R.id.locationToVisit);
+        locationToVisit.layoutManager = LinearLayoutManager(context)
+        val myVisitsAdapter =
+            MyPerfAdapter(perforManceList, perfSelectedposition,object : PerfInterface {
+                override fun onSelected(position: Int) {
+                    perfSelectedposition = position
+                    binding!!.tillDateButton.text = perforManceList[position]
+                    when(position){
+                        0->{getPerformance("till_date")}
+                        1->{getPerformance("today")}
+                        2->{getPerformance("yesterday")}
+                        3->{getPerformance("this_week")}
+                        4->{getPerformance("this_month")}
+                    }
+                    alertDialog.cancel()
+                }
+
+            } , requireContext())
+        // Setting the Adapter with the recyclerview
+        locationToVisit.adapter = myVisitsAdapter
+
+
+        alertDialog.show()
+    }
+
     private fun showAddSchoolDialog() {
         val builder: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(context)
         val inflater = getLayoutInflater()
@@ -671,41 +715,67 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         val edtSchoolCode = dialogView.findViewById<TextInputEditText>(R.id.edtSchoolCode);
         val edtSchoolName = dialogView.findViewById<TextInputEditText>(R.id.edtSchoolName);
         val edtWardBlock = dialogView.findViewById<TextInputEditText>(R.id.edtWardBlock);
-        val edtState = dialogView.findViewById<TextInputEditText>(R.id.edtState);
-        val edtDistrict = dialogView.findViewById<TextInputEditText>(R.id.edtDistrict);
+        val edtState = dialogView.findViewById<AutoCompleteTextView>(R.id.edtState);
+        val edtDistrict = dialogView.findViewById<AutoCompleteTextView>(R.id.edtDistrict);
 
         var districtToSubmit: District? = null
         var stateToSubmit: State? = null
+        var districtListString = arrayListOf<String>()
+        var stateListString = arrayListOf<String>()
 
-        edtDistrict.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                getDistrictList(object : ListDialogInterface {
-                    override fun onDistrictSelect(district: District) {
-                        edtDistrict.setText(district.area_name)
-                        districtToSubmit = district
-                    }
-
-                    override fun onStateSelect(state: State) {
-
-                    }
-                })
-            }
+        for (state in stateList)
+        {
+            stateListString.add(state.location_state)
         }
 
-        edtState.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                getStateList(object : ListDialogInterface {
-                    override fun onDistrictSelect(district: District) {
-
-                    }
-
-                    override fun onStateSelect(state: State) {
-                        edtState.setText(state.location_state)
-                        stateToSubmit = state
-                    }
-                })
-            }
+        for (district in districtList)
+        {
+            districtListString.add(district.area_name)
         }
+
+        val adapterDistrict = ArrayAdapter(requireContext(), R.layout.list_popup_window_item, districtListString)
+        edtDistrict.setAdapter(adapterDistrict)
+
+        val adapterState = ArrayAdapter(requireContext(), R.layout.list_popup_window_item, stateListString)
+        edtState.setAdapter(adapterState)
+
+        edtState.setOnItemClickListener { parent, view, position, id ->
+            stateToSubmit = stateList[position]
+        }
+
+        edtDistrict.setOnItemClickListener { parent, view, position, id ->
+            districtToSubmit = districtList[position]
+        }
+
+//        edtDistrict.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+//            if (hasFocus) {
+//                getDistrictList(object : ListDialogInterface {
+//                    override fun onDistrictSelect(district: District) {
+//                        edtDistrict.setText(district.area_name)
+//                        districtToSubmit = district
+//                    }
+//
+//                    override fun onStateSelect(state: State) {
+//
+//                    }
+//                })
+//            }
+//        }
+
+//        edtState.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+//            if (hasFocus) {
+//                getStateList(object : ListDialogInterface {
+//                    override fun onDistrictSelect(district: District) {
+//
+//                    }
+//
+//                    override fun onStateSelect(state: State) {
+//                        edtState.setText(state.location_state)
+//                        stateToSubmit = state
+//                    }
+//                })
+//            }
+//        }
 
         btnAdd.setOnClickListener {
 
@@ -856,7 +926,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     val listType: Type = object : TypeToken<List<State?>?>() {}.type
                     stateList =
                         Gson().fromJson(model.getJSONArray("data").toString(), listType);
-                    showStateDialog(stateList);
+                    getDistrictList()
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -869,7 +939,6 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                     val listType: Type = object : TypeToken<List<District?>?>() {}.type
                     districtList =
                         Gson().fromJson(model.getJSONArray("data").toString(), listType);
-                    showDistrictDialog(districtList);
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -909,7 +978,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                         binding!!.punchInButton.visibility = VISIBLE
                     }
 
-                    getPerformance()
+                    getPerformance("till_date")
 
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
@@ -921,19 +990,58 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                 cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
-                    try {
+
                         val performanceData = Gson().fromJson(
                             model.getJSONObject("data").toString(),
                             PerformanceData::class.java
                         )
-                        binding!!.txtVisits.text = performanceData.till_date.total_visits.toString()
-                        binding!!.txtAttendance.text =
-                            performanceData.till_date.attendance.toString() + "%"
-                        binding!!.txtTotalVisits.text =
-                            performanceData.till_date.audit_approval.toString() + "%"
-                    } catch (_: Exception) {
+                        when (perfSelectedposition) {
+                            0 -> {
+                                binding!!.txtVisits.text =
+                                    performanceData.till_date.total_visits.toString()
+                                binding!!.txtAttendance.text =
+                                    String.format("%.2f", performanceData.till_date.attendance)+ "%"
+                                binding!!.txtTotalVisits.text =
+                                    String.format("%.2f", performanceData.till_date.audit_approval) + "%"
+                            }
 
-                    }
+                            1 -> {
+                                binding!!.txtVisits.text =
+                                    performanceData.today.total_visits.toString()
+                                binding!!.txtAttendance.text =
+                                    performanceData.today.attendance.toString() + "%"
+                                binding!!.txtTotalVisits.text =
+                                    performanceData.today.audit_approval.toString() + "%"
+                            }
+
+                            2 -> {
+                                binding!!.txtVisits.text =
+                                    performanceData.yesterday.total_visits.toString()
+                                binding!!.txtAttendance.text =
+                                    performanceData.yesterday.attendance.toString() + "%"
+                                binding!!.txtTotalVisits.text =
+                                    performanceData.yesterday.audit_approval.toString() + "%"
+                            }
+
+                            3 -> {
+                                binding!!.txtVisits.text =
+                                    performanceData.this_week.total_visits.toString()
+                                binding!!.txtAttendance.text =
+                                    performanceData.this_week.attendance.toString() + "%"
+                                binding!!.txtTotalVisits.text =
+                                    performanceData.this_week.audit_approval.toString() + "%"
+                            }
+
+                            4 -> {
+                                binding!!.txtVisits.text =
+                                    performanceData.this_month.total_visits.toString()
+                                binding!!.txtAttendance.text =
+                                    performanceData.this_month.attendance.toString() + "%"
+                                binding!!.txtTotalVisits.text =
+                                    performanceData.this_month.audit_approval.toString() + "%"
+                            }
+                        }
+
 
                     getTodaysVisit()
                 } else {
@@ -1091,6 +1199,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                         binding!!.todaysVisitParent.visibility = View.GONE
                     }
 
+                    getStateList()
+
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -1163,6 +1273,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     override fun redirectToAttendence(projectInfo: ProjectInfo) {
 
+        Log.d("projectInfo", "redirectToAttendence: ${projectInfo}")
             if (dashboardViewModel.attendenceToday.value?.present == true) {
 
                 if (projectInfo.visit_status.equals("SUBMITTED", true)) {

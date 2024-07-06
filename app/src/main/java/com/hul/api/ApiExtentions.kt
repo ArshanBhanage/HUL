@@ -10,6 +10,7 @@ class ApiExtentions {
         GET_LOGO,
         GET_BANNER,
         LOGIN,
+        ADD_DEVICE_INFO,
         LOCATION_LIST,
         MARK_ATTENDENCE,
         ATTENDENCE_FORM,

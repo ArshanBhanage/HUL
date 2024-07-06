@@ -25,7 +25,6 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="4dp"
             android:layout_marginVertical="16dp"
             android:background="@color/white"
             app:cardCornerRadius="8dp">
@@ -34,7 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="20dp">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -74,6 +73,26 @@
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/public_sans"
+                android:layout_marginTop="24dp"
+                android:text="@string/school_closed_merged"
+                android:textColor="#6d6b77"
+                android:textFontWeight="400"
+                android:textSize="13sp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/public_sans"
+                android:lineHeight="28dp"
+                android:text="@{Boolean.valueOf(viewModel.visitData.visit_1.school_closed.value.toString()) ? `Yes` : `No`}"
+                android:textColor="#444050"
+                android:textFontWeight="700"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -81,6 +100,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:visibility="@{viewModel.visibiliyOfItems}"
                     android:orientation="vertical">
                     <TextView
                         android:layout_width="match_parent"
@@ -124,7 +144,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/public_sans"
                         android:lineHeight="28dp"
-                        android:text='@{viewModel.selectedSchoolCode.location_data_field1}'
+                        android:text='@{viewModel.visitData.visit_1.no_of_students_as_per_record.value.toString()}'
                         android:textColor="#444050"
                         android:textFontWeight="700"
                         android:textSize="15sp"
@@ -140,7 +160,8 @@
                 android:text="@string/books_no"
                 android:textColor="#6d6b77"
                 android:textFontWeight="400"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+                android:visibility="@{viewModel.visibiliyOfItems}"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -151,7 +172,8 @@
                 android:textFontWeight="700"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:gravity="bottom"/>
+                android:gravity="bottom"
+                android:visibility="@{viewModel.visibiliyOfItems}"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -161,6 +183,7 @@
                 android:text="@string/form1"
                 android:textColor="#6d6b77"
                 android:textFontWeight="400"
+                android:visibility="@{viewModel.visibiliyOfItems}"
                 android:textSize="13sp" />
             <TextView
                 android:layout_width="match_parent"
@@ -171,6 +194,7 @@
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
+                android:visibility="@{viewModel.visibiliyOfItems}"
                 android:textStyle="bold" />
             <TextView
                 android:layout_width="match_parent"
@@ -180,6 +204,7 @@
                 android:text="@string/form2"
                 android:textColor="#6d6b77"
                 android:textFontWeight="400"
+                android:visibility="@{viewModel.visibiliyOfItems}"
                 android:textSize="13sp" />
             <TextView
                 android:layout_width="match_parent"
@@ -190,6 +215,7 @@
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
+                android:visibility="@{viewModel.visibiliyOfItems}"
                 android:textStyle="bold" />
             <TextView
                 android:layout_width="match_parent"
@@ -199,6 +225,7 @@
                 android:text="@string/form3"
                 android:textColor="#6d6b77"
                 android:textFontWeight="400"
+                android:visibility="@{viewModel.visibiliyOfItems}"
                 android:textSize="13sp" />
             <TextView
                 android:layout_width="match_parent"
@@ -209,6 +236,7 @@
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
+                android:visibility="@{viewModel.visibiliyOfItems}"
                 android:textStyle="bold" />
             <TextView
                 android:layout_width="match_parent"
@@ -218,6 +246,7 @@
                 android:text="@string/form4"
                 android:textColor="#6d6b77"
                 android:textFontWeight="400"
+                android:visibility="@{viewModel.visibiliyOfItems}"
                 android:textSize="13sp" />
             <TextView
                 android:layout_width="match_parent"
@@ -228,6 +257,7 @@
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
+                android:visibility="@{viewModel.visibiliyOfItems}"
                 android:textStyle="bold" />
             <TextView
                 android:layout_width="match_parent"
@@ -237,16 +267,18 @@
                 android:text="@string/form5"
                 android:textColor="#6d6b77"
                 android:textFontWeight="400"
+                android:visibility="@{viewModel.visibiliyOfItems}"
                 android:textSize="13sp" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/public_sans"
                 android:lineHeight="28dp"
-                android:text="@{viewModel.visitData.visit_1.revisit_applicable.value.toString()}"
+                android:text="@{Boolean.valueOf(viewModel.visitData.visit_1.revisit_applicable.value.toString()) ? `Yes` : `No`}"
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
+                android:visibility="@{viewModel.visibiliyOfItems}"
                 android:textStyle="bold" />
             <TextView
                 android:layout_width="match_parent"
@@ -256,6 +288,7 @@
                 android:text="@string/remarks"
                 android:textColor="#6d6b77"
                 android:textFontWeight="400"
+                android:visibility="@{viewModel.visibiliyOfItems}"
                 android:textSize="13sp" />
             <TextView
                 android:layout_width="match_parent"
@@ -266,12 +299,24 @@
                 android:textColor="#444050"
                 android:textFontWeight="700"
                 android:textSize="15sp"
+                android:visibility="@{viewModel.visibiliyOfItems}"
                 android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/public_sans"
+                android:layout_marginTop="24dp"
+                android:text="@string/captured_images"
+                android:textColor="#6d6b77"
+                android:textFontWeight="400"
+                android:textSize="13sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:layout_marginTop="24dp"
                 android:visibility="visible">
 
                 <LinearLayout
@@ -341,13 +386,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="@dimen/_20sdp">
+                    android:layout_marginTop="@dimen/_20sdp"
+                    android:visibility="@{viewModel.visibiliyOfItems}">
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
+                        android:visibility="@{viewModel.visibiliyOfItems}"
                         android:layout_marginEnd="@dimen/_10sdp">
 
                         <ImageView
@@ -362,7 +409,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/public_sans"
-                            android:text="@string/visit_pic_3"
+                            android:text="@string/visit_pic_detail_3"
                             android:textColor="#6d6b77"
                             android:textSize="@dimen/_8sdp"
                             android:layout_marginTop="@dimen/_5sdp"/>
@@ -375,6 +422,7 @@
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
+                        android:visibility="@{viewModel.visibiliyOfItems}"
                         android:layout_marginStart="@dimen/_10sdp">
 
                         <ImageView
@@ -382,6 +430,7 @@
                             android:layout_height="@dimen/_50sdp"
                             android:src="@drawable/button_background_gray"
                             android:id="@+id/img4"
+                            android:visibility="@{viewModel.visibiliyOfItems}"
                             android:scaleType="centerCrop"
                             />
 
@@ -390,9 +439,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/public_sans"
-                            android:text="@string/visit_pic_4"
+                            android:text="@string/auditor_visit_1_pic_2"
                             android:textColor="#6d6b77"
                             android:textSize="@dimen/_8sdp"
+                            android:visibility="@{viewModel.visibiliyOfItems}"
                             android:layout_marginTop="@dimen/_5sdp"/>
 
                     </LinearLayout>

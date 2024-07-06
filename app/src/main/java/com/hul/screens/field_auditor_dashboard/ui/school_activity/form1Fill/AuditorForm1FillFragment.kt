@@ -95,14 +95,14 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
         _binding = FragmentForm1FillAuditorBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        binding.lifecycleOwner = viewLifecycleOwner
+
         curriculamComponent =
             (activity?.application as HULApplication).appComponent.curriculamComponent()
                 .create()
         curriculamComponent.inject(this)
 
         binding.viewModel = form1FillViewModel
-
+        binding.lifecycleOwner = viewLifecycleOwner
         binding.capture1.setOnClickListener {
             redirectToCamera(
                 0,
@@ -119,8 +119,9 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
         binding.proceed.setOnClickListener {
-            if (form1FillViewModel.imageUrl1.value?.isEmpty() == true
-                || form1FillViewModel.imageUrl2.value?.isEmpty() == true
+            if ((form1FillViewModel.imageUrl1.value?.isEmpty() == true
+                        || form1FillViewModel.imageUrl2.value?.isEmpty() == true) || form1FillViewModel.isBookDistributionApproved.value?.toString()!!
+                    .isEmpty() || form1FillViewModel.booksDistributedFlag.value == null || form1FillViewModel.videoShownFlag.value == null
             ) {
                 Toast.makeText(requireContext(), "Please fill all data", Toast.LENGTH_LONG)
                     .show()
@@ -185,22 +186,102 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
             ProjectInfo::class.java
         )
 
-        binding.btnPositive.setOnClickListener {
-            binding.btnPositive.visibility = View.GONE
-            binding.btnNegative.visibility = View.GONE
-            binding.tickSuccess.visibility = View.VISIBLE
-            binding.tickFailure.visibility = View.GONE
-            form1FillViewModel.isBookDistributionApproved.value = 1;
-            binding.edtNoOfBooksGiven.isEnabled = false
-            binding.edtNoOfBooksGiven.setText(form1FillViewModel.projectInfo.value?.number_of_books_distributed)
+
+
+        binding.radioButton1.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if (checkedId) {
+                form1FillViewModel.isBookDistributionApproved.value = 1;
+                binding.edtNoOfBooksGiven.isEnabled = false
+                binding.edtNoOfBooksGiven.setText(form1FillViewModel.projectInfo.value?.number_of_books_distributed)
+            }
         }
 
-        binding.btnNegative.setOnClickListener {
-            binding.btnPositive.visibility = View.GONE
-            binding.btnNegative.visibility = View.GONE
-            binding.tickSuccess.visibility = View.GONE
-            binding.tickFailure.visibility = View.VISIBLE
+        binding.radioButton2.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if (checkedId) {
+                binding.edtNoOfBooksGiven.setText("")
+                form1FillViewModel.isBookDistributionApproved.value = 0;
+                binding.edtNoOfBooksGiven.isEnabled = true
+            }
+
         }
+
+        binding.radioButton12.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if(checkedId) {
+                form1FillViewModel.booksDistributedFlag.value = true
+            }
+        }
+
+        binding.radioButton22.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if(checkedId) {
+                form1FillViewModel.booksDistributedFlag.value = false
+            }
+        }
+
+        binding.radioButton13.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if(checkedId) {
+                form1FillViewModel.videoShownFlag.value = true
+            }
+        }
+
+        binding.radioButton23.setOnCheckedChangeListener { group, checkedId ->
+
+            // on below line we are displaying a toast message.
+            if(checkedId) {
+                form1FillViewModel.videoShownFlag.value = false
+            }
+        }
+
+//        binding.radioGroup.setOnCheckedChangeListener{ group, checkedId ->
+//            // Find the index of the selected radio button
+//            val index = group.indexOfChild(group.findViewById(checkedId))
+//            // Update ViewModel with selected index
+//            form1FillViewModel.setBooksHandedOverIndex(index)
+//
+//            if(index==0)
+//            {
+//                binding.tickSuccess.visibility = View.VISIBLE
+//                binding.tickFailure.visibility = View.GONE
+//                form1FillViewModel.isBookDistributionApproved.value = 1;
+//                binding.edtNoOfBooksGiven.isEnabled = false
+//                binding.edtNoOfBooksGiven.setText(form1FillViewModel.projectInfo.value?.number_of_books_distributed)
+//            }
+//            else{
+//                binding.tickSuccess.visibility = View.GONE
+//                binding.tickFailure.visibility = View.VISIBLE
+//                form1FillViewModel.isBookDistributionApproved.value = 0;
+//                binding.edtNoOfBooksGiven.isEnabled = true
+//                binding.edtNoOfBooksGiven.setText(form1FillViewModel.projectInfo.value?.number_of_books_distributed)
+//            }
+//        }
+
+//        binding.btnPositive.setOnClickListener {
+//            binding.btnPositive.visibility = View.GONE
+//            binding.btnNegative.visibility = View.GONE
+//            binding.tickSuccess.visibility = View.VISIBLE
+//            binding.tickFailure.visibility = View.GONE
+//            form1FillViewModel.isBookDistributionApproved.value = 1;
+//            binding.edtNoOfBooksGiven.isEnabled = false
+//            binding.edtNoOfBooksGiven.setText(form1FillViewModel.projectInfo.value?.number_of_books_distributed)
+//
+//        }
+//
+//        binding.btnNegative.setOnClickListener {
+//            binding.btnPositive.visibility = View.GONE
+//            binding.btnNegative.visibility = View.GONE
+//            binding.tickSuccess.visibility = View.GONE
+//            binding.tickFailure.visibility = View.VISIBLE
+//
+//        }
 
         binding.nestedScrollView.setOnTouchListener { _, event ->
             when (event.action) {
@@ -284,7 +365,8 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
         return RequestModel(
             project = userInfo.projectName,
             uploadFor = "field_audit",
-            filename = fileName
+            filename = fileName,
+            visit_id = form1FillViewModel.projectInfo.value!!.visit_id.toString(),
         )
     }
 
@@ -556,8 +638,8 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 name_of_the_school_representative_who_mobiliser_met = VisitDetails(value = binding.form1.text.toString()),
                 number_of_the_school_representative_who_mobiliser_met = VisitDetails(value = binding.form2.text.toString()),
                 visit_id = form1FillViewModel.projectInfo.value!!.visit_id.toString(),
-                have_book_distribution_to_students_done = VisitDetails(value = binding.switchBookDistribution.isChecked),
-                was_video_shared_with_teachers = VisitDetails(value = binding.switchVideoShared.isChecked),
+                have_book_distribution_to_students_done = VisitDetails(value = form1FillViewModel.booksDistributedFlag.value),
+                was_video_shared_with_teachers = VisitDetails(value = form1FillViewModel.videoShownFlag.value),
                 remark = VisitDetails(value = binding.form5.text.toString()),
                 /*name_of_the_school_principal_auditor = VisitDetails(value = form1FillViewModel.visitData.value?.visit_1?.name_of_the_principal),
                 number_of_the_school_principal_auditor = VisitDetails(value = form1FillViewModel.visitData.value?.visit_1?.mobile_number_of_the_principal),*/
@@ -584,6 +666,7 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
                     // Set the adapter to the AutoCompleteTextView
+                    requireActivity().onBackPressed()
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
