@@ -3,6 +3,7 @@ package com.hul.camera.cameraPreview
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
+import android.app.AlertDialog
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -10,6 +11,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.hardware.SensorManager
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
@@ -23,6 +25,7 @@ import android.telecom.TelecomManager.EXTRA_LOCATION
 import android.util.Log
 import android.util.Size
 import android.view.LayoutInflater
+import android.view.OrientationEventListener
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -87,6 +90,8 @@ class CameraPreviewFragment : Fragment() {
     @Inject
     lateinit var apiController: APIController
 
+    var rotaion = -90f;
+
     private var imageCapture: ImageCapture? = null
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
@@ -96,7 +101,8 @@ class CameraPreviewFragment : Fragment() {
     private var isRunning = false
     private var elapsedTime: Long = 0
 
-
+    private lateinit var orientationEventListener: OrientationEventListener
+    var imageType = ""
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -119,18 +125,45 @@ class CameraPreviewFragment : Fragment() {
     private var currentLocation: Location? = null
 
 
-
     private val requestPermission =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val granted = permissions.entries.all {
                 it.value == true
             }
             if (granted) {
-                checkCameratype()
+                checkLocationSettings()
             } else {
-                requestPermission()
+                showInformationMessage()
             }
         }
+
+    private fun showInformationMessage() {
+        AlertDialog.Builder(requireActivity())
+            .setTitle("Permissions Needed")
+            .setMessage("You have denied the permissions. Please go to settings and allow the permissions manually.")
+            .setPositiveButton("Settings") { dialog, _ ->
+                requestPermissionSettings()
+                dialog.dismiss() // This dismisses the dialog
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun requestPermissionSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", requireActivity().packageName, null)
+        }
+        requestPermissionSetting.launch(intent)
+    }
+
+
+    private val requestPermissionSetting =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { permissions ->
+            if(!allPermissionsGranted()) {
+                showInformationMessage()
+            }
+        }
+
 
     private val requestLocation =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { permissions ->
@@ -156,8 +189,9 @@ class CameraPreviewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
+        if (requireArguments() != null) {
+            imageType = requireArguments().getString("imageType")!!
+        }
         if (allPermissionsGranted()) {
             checkCameratype()
         } else {
@@ -171,8 +205,57 @@ class CameraPreviewFragment : Fragment() {
         }
         outputDirectory = getOutputDirectory()
 
+        orientationEventListener =
+            object : OrientationEventListener(requireContext(), SensorManager.SENSOR_DELAY_NORMAL) {
+                override fun onOrientationChanged(orientation: Int) {
+                    if (orientation == ORIENTATION_UNKNOWN) return
+
+                    // Determine the current orientation
+                    rotaion = when {
+                        orientation in 45..134 -> 180f
+                        orientation in 135..224 -> if (imageType.contains("Front")) 90f else -90f
+                        orientation in 225..314 -> 0f
+                        else -> if (imageType.contains("Front")) -90f else 90f
+                    }
+
+                    when {
+                        orientation in 45..134 -> {
+                            binding.cameraHeader.visibility = View.VISIBLE
+                            binding.info.visibility = View.GONE
+                        }
+
+                        orientation in 135..224 -> {
+                            binding.cameraHeader.visibility = View.GONE
+                            binding.info.visibility = View.VISIBLE
+                        }
+
+                        orientation in 225..314 -> {
+                            binding.cameraHeader.visibility = View.VISIBLE
+                            binding.info.visibility = View.GONE
+                        }
+
+                        else -> {
+                            binding.cameraHeader.visibility = View.GONE
+                            binding.info.visibility = View.VISIBLE
+                        }
+                    }
+
+                    // Handle orientation change
+                    //handleOrientationChange(displayRotation)
+                }
+            }
+
+        // Enable the listener
+        if (orientationEventListener.canDetectOrientation()) {
+            orientationEventListener.enable()
+        }
+
 
     }
+
+//    private fun handleOrientationChange(displayRotation: String) {
+//        println("Orientation changed to: $displayRotation")
+//    }
 
     fun checkCameratype() {
         try {
@@ -188,7 +271,8 @@ class CameraPreviewFragment : Fragment() {
     private val REQUEST_CHECK_SETTINGS = 1002
 
     private fun checkLocationSettings() {
-        val locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationManager =
+            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         if (!isGpsEnabled) {
             //Toast.makeText(this, "GPS is not enabled", Toast.LENGTH_SHORT).show()
@@ -202,12 +286,12 @@ class CameraPreviewFragment : Fragment() {
     }
 
 
-
     @SuppressLint("MissingPermission")
     private fun requestLocationUpdates() {
 
         // Initialize FusedLocationProviderClient
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        fusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(requireActivity())
 
 
         locationRequest = LocationRequest.create().apply {
@@ -251,8 +335,13 @@ class CameraPreviewFragment : Fragment() {
             }
         }
 
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
 
+        fusedLocationProviderClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+        fetchLastKnownLocation()
 //        locationCallback = object : LocationCallback() {
 //            //This callback is where we get "streaming" location updates. We can check things like accuracy to determine whether
 //            //this latest update should replace our previous estimate.
@@ -292,6 +381,40 @@ class CameraPreviewFragment : Fragment() {
 //        )
     }
 
+    private fun fetchLastKnownLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                requireActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireActivity(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+        fusedLocationProviderClient.lastLocation
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful && task.result != null) {
+                    val location: Location? = task.result
+                    currentLocation = location
+                    cameraPreviewViewModel.longitude.value = location!!.longitude.toString()
+                    cameraPreviewViewModel.lattitude.value = location!!.latitude.toString()
+                    if (cameraPreviewViewModel.uri.value != null) {
+                        cancelProgressDialog()
+                        redurectToImagePreview(cameraPreviewViewModel.uri.value!!)
+                    }
+                } else {
+                    // Handle the case where no location is available
+                }
+            }
+    }
 
 
     fun requestPermission() {
@@ -302,7 +425,6 @@ class CameraPreviewFragment : Fragment() {
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         requestLocation.launch(intent)
     }
-
 
 
     private fun takePhoto() {
@@ -332,9 +454,17 @@ class CameraPreviewFragment : Fragment() {
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     cameraPreviewViewModel.uri.value = Uri.fromFile(photoFile)
+                    orientationEventListener.disable()
                     //startFetchingLastLocation()
-                    setProgressDialog(requireContext(), "Processing Image")
                     ensureLandscapeOrientation(photoFile)
+
+                    if (currentLocation != null) {
+                        redurectToImagePreview(cameraPreviewViewModel.uri.value!!)
+
+                    } else {
+                        setProgressDialog(requireContext(), "Processing Image")
+                    }
+
                     // set the saved uri to the image view
 //                    binding.ivCapture.visibility = View.VISIBLE
 //                    binding.ivCapture.setImageURI(savedUri)
@@ -349,20 +479,19 @@ class CameraPreviewFragment : Fragment() {
 
     private fun ensureLandscapeOrientation(photoFile: File) {
         val bitmap = BitmapFactory.decodeFile(photoFile.path)
-        val rotatedBitmap = if (bitmap.width < bitmap.height) {
-            // Rotate the image to landscape if it is in portrait
-            val matrix = Matrix()
-            matrix.postRotate(90f)
+
+        // Rotate the image to landscape if it is in portrait
+        val matrix = Matrix()
+        matrix.postRotate(rotaion)
+        val rotatedBitmap =
             Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-        } else {
-            // Image is already in landscape
-            bitmap
-        }
+
 
         // Save the rotated bitmap back to the file
         FileOutputStream(photoFile).use { out ->
             rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
         }
+
     }
 
 
@@ -374,8 +503,9 @@ class CameraPreviewFragment : Fragment() {
         bundle.putString("imageUri", uri.toString())
         bundle.putInt("position", requireArguments().getInt("position", 0))
         bundle.putString("heading", requireArguments().getString("heading"))
-        if(bundle.getString("visitData") != null) {
-            bundle.putString("visitData",bundle.getString("visitData"))
+        bundle.putString("tag", requireArguments().getString("tag"))
+        if (bundle.getString("visitData") != null) {
+            bundle.putString("visitData", bundle.getString("visitData"))
         }
         findNavController().navigate(
             R.id.action_cameraPreviewFragment_to_imagePreviewFragment,
@@ -387,13 +517,12 @@ class CameraPreviewFragment : Fragment() {
     private var recording: Recording? = null
 
 
-
     private fun startCamera() {
         binding.cameraHeader.visibility = View.VISIBLE
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         val cameraSelector: CameraSelector
         // Select back camera as a default
-        if (requireArguments().getString("imageType").equals("Image Capture Front")) {
+        if (requireArguments().getString("imageType")!!.contains("Front")) {
             cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
         } else {
             cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -448,15 +577,31 @@ class CameraPreviewFragment : Fragment() {
         private const val TAG = "CameraXGFG"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 20
-        private val REQUIRED_PERMISSIONS = arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
+        private val REQUIRED_PERMISSIONS =
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R){
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.RECORD_AUDIO,
+                )
+            }
+            else{
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                )
+
+            }
     }
 
     override fun onPause() {
         super.onPause()
+        orientationEventListener.disable()
         try {
             if (!requireArguments().getString("imageType").equals("Video")) {
                 val removeTask = fusedLocationProviderClient.removeLocationUpdates(locationCallback)
@@ -469,9 +614,7 @@ class CameraPreviewFragment : Fragment() {
                 }
             }
             cameraExecutor.shutdown()
-        }
-        catch (e:Exception)
-        {
+        } catch (e: Exception) {
 
         }
     }
@@ -479,12 +622,14 @@ class CameraPreviewFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         super.onResume()
+        orientationEventListener.enable()
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+
     }
 
 }

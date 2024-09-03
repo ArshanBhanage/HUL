@@ -11,8 +11,9 @@ import androidx.navigation.ui.setupWithNavController
 import com.hul.R
 import com.hul.databinding.ActivityDashboardBinding
 import android.util.DisplayMetrics
+import androidx.fragment.app.FragmentActivity
 
-class Dashboard : AppCompatActivity(),DashboardInterface {
+class Dashboard : FragmentActivity(),DashboardInterface {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityDashboardBinding
 

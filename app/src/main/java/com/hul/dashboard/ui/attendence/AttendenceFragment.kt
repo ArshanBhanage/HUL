@@ -3,6 +3,7 @@ package com.hul.dashboard.ui.attendence
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -39,6 +40,7 @@ import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.data.UploadImageData
 import com.hul.databinding.FragmentAttendenceBinding
+import com.hul.sb.mobiliser.SBMobiliserDashboard
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboard
 import com.hul.screens.field_auditor_dashboard.ui.image_preview.ImagePreviewDialogFragment
 import com.hul.user.UserInfo
@@ -101,9 +103,37 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
             if (granted) {
                 checkLocationSettings()
             } else {
-                requestPermission()
+                showInformationMessage()
             }
         }
+
+    private fun showInformationMessage() {
+        AlertDialog.Builder(requireActivity())
+            .setTitle("Permissions Needed")
+            .setMessage("You have denied the permissions. Please go to settings and allow the permissions manually.")
+            .setPositiveButton("Settings") { dialog, _ ->
+                requestPermissionSettings()
+                dialog.dismiss() // This dismisses the dialog
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun requestPermissionSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", requireActivity().packageName, null)
+        }
+        requestPermissionSetting.launch(intent)
+    }
+
+
+    private val requestPermissionSetting =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { permissions ->
+            if(!allPermissionsGranted()) {
+                showInformationMessage()
+            }
+        }
+
 
     private val requestLocation =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { permissions ->
@@ -246,8 +276,12 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
             redirectToCamera(0, attendenceViewModel.imageCaptureType1.value!!, "Selfie at first school")
         }
 
+        binding.selfieCapture3.setOnClickListener {
+            redirectToCamera(0, attendenceViewModel.imageType1.value!!, "Selfie at the location")
+        }
+
         binding.curriculumCapture.setOnClickListener {
-            redirectToCamera(1, attendenceViewModel.imageCaptureType2.value!!, "Full image of mobiliser with curriculum material")
+            redirectToCamera(1, attendenceViewModel.imageCaptureType2.value!!, "Full image of mobiliser with Curriculum material")
         }
 
         binding.stats.setOnClickListener {
@@ -270,6 +304,13 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
             }
         }
 
+        binding.markAttendence2.setOnClickListener {
+            if(attendenceViewModel.imageUrl1.value != null && attendenceViewModel.imageUrl1.value!!.length > 0) {
+                attendenceViewModel.position.value = 1
+                uploadImage(attendenceViewModel.imageUrl1.value?.toUri()!!)
+            }
+        }
+
         if (allPermissionsGranted()) {
             checkLocationSettings()
         } else {
@@ -284,13 +325,26 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
                 it1
             )
         } }
+        binding.view2.setOnClickListener { attendenceViewModel.imageUrl1.value?.let { it1 ->
+            showImagePreview(
+                it1
+            )
+        } }
         binding.view2.setOnClickListener { attendenceViewModel.imageUrl2.value?.let { it1 ->
             showImagePreview(
                 it1
             )
         } }
 
-        getAttendenceForm()
+        if(userInfo.projectId == "1") {
+            getAttendenceForm()
+            binding.card1.visibility = View.VISIBLE
+            binding.card2.visibility = View.GONE
+        }
+        else{
+            binding.card1.visibility = View.GONE
+            binding.card2.visibility = View.VISIBLE
+        }
 
         return root
     }
@@ -304,6 +358,33 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(requireContext(), it) == PackageManager.PERMISSION_GRANTED
     }
+
+    fun markAttendence2() {
+
+        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+            setProgressDialog(requireContext(), "Loading Leads")
+            apiController.getApiResponse(
+                this,
+                markAttendenceModel(),
+                ApiExtentions.ApiDef.MARK_ATTENDENCE.ordinal
+            )
+        } else {
+            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.MARK_ATTENDENCE.ordinal, this)
+        }
+
+    }
+
+    private fun markAttendenceModel2(): RequestModel {
+        return RequestModel(
+            project = userInfo.projectName,
+            location_id = attendenceViewModel.projectInfo.value!!.location_id,
+            lattitude = attendenceViewModel.lattitude.value,
+            longitude = attendenceViewModel.longitude.value,
+            photo_url1 = attendenceViewModel.imageUrl1API.value,
+            photo_url1_description = binding.image3Description.text.toString(),
+        )
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -381,15 +462,35 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
         var fileName: String = ""
         val visitPrefix = "project_" + userInfo.projectName;
         if (imageIndex == 0) {
-            fileName = visitPrefix + "_selfie_at_first_school.jpeg";
+            fileName = visitPrefix + "_"+getTag(binding.image1Description.text.toString())+".jpeg";
         }else if (imageIndex == 1) {
-            fileName = visitPrefix + "_full_image_fo_mobiliser_with_curriculam_material.jpeg";
+            fileName = visitPrefix + "_"+getTag(binding.image2Description.text.toString())+".jpeg";
         }
         return RequestModel(
             project = userInfo.projectName,
             uploadFor = "attendance",
             filename = fileName,
         )
+    }
+
+    private fun getTag(string : String) : String
+    {
+        return string.replace(" ", "_").lowercase()
+    }
+
+    private fun deleteImage(uri: Uri) {
+        try {
+            val resolver = requireActivity().contentResolver
+            val rowsDeleted = resolver.delete(uri, null, null)
+            if (rowsDeleted > 0) {
+                // File successfully deleted
+            } else {
+                // File not found or couldn't be deleted
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // Handle the error
+        }
     }
 
     override fun onApiSuccess(o: String?, objectType: Int) {
@@ -434,7 +535,15 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
                 if (uploadImageData != null && imageIndex == 0) {
                     imageIndex += 1;
                     attendenceViewModel.imageUrl1API.value = uploadImageData.url
-                    uploadImage(attendenceViewModel.imageUrl2.value?.toUri()!!)
+                    if(userInfo.projectId == "1") {
+                        uploadImage(attendenceViewModel.imageUrl2.value?.toUri()!!)
+                        deleteImage(attendenceViewModel.imageUrl1.value?.toUri()!!)
+                    }
+                    else{
+                        markAttendence2()
+                        deleteImage(attendenceViewModel.imageUrl2.value?.toUri()!!)
+                    }
+
                 } else if (uploadImageData != null && imageIndex == 1) {
                     imageIndex += 1;
                     attendenceViewModel.imageUrl2API.value = uploadImageData.url
@@ -447,22 +556,42 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     private fun redirectToDashboard() {
-        when (userInfo.userType) {
-            UserTypes.MOBILISER -> {
-                val intent = Intent(activity, Dashboard::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                startActivity(intent)
-                requireActivity().finish()
-            }
-            UserTypes.FIELD_AUDITOR -> {
-                val intent = Intent(activity, FieldAuditorDashboard::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                startActivity(intent)
-                requireActivity().finish()
-            }
+        if(userInfo.projectId == "1") {
+            when (userInfo.userType) {
+                UserTypes.MOBILISER -> {
+                    val intent = Intent(activity, Dashboard::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                }
 
-            else -> {
-                // Handle other cases or default behavior
+                UserTypes.FIELD_AUDITOR -> {
+                    val intent = Intent(activity, FieldAuditorDashboard::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                }
+
+                else -> {
+                    // Handle other cases or default behavior
+                }
+            }
+        }
+        else{
+            when (userInfo.userType) {
+                UserTypes.MOBILISER -> {
+                    val intent = Intent(activity, SBMobiliserDashboard::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                }
+
+                UserTypes.FIELD_AUDITOR -> {
+                    val intent = Intent(activity, FieldAuditorDashboard::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                }
+
+                else -> {
+                    // Handle other cases or default behavior
+                }
             }
         }
     }
@@ -518,11 +647,26 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
         private const val TAG = "CameraXGFG"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 20
-        private val REQUIRED_PERMISSIONS = arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
+        private val REQUIRED_PERMISSIONS =
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R){
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.RECORD_AUDIO,
+                )
+            }
+            else{
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                )
+
+            }
     }
 
 }

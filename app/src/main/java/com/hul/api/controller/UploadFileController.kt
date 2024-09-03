@@ -20,6 +20,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
 import javax.inject.Inject
 
 
@@ -47,9 +49,18 @@ class UploadFileController @Inject constructor(private val mContext: Context) :
         val file: File? = if (fileUri.toString().contains("content:") || fileUri.toString()
                 .contains("file:")
         ) getFile(mContext, fileUri) else File(fileUri.toString())
+        var date = ""
+        try {
+            val exif = ExifInterface(file!!.getPath())
+            date = exif.getAttribute(ExifInterface.TAG_DATETIME)!!
+        }
+        catch (e:Exception)
+        {
+            val dateString = Date(file!!.lastModified())
+            val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+            date = format.format(dateString)
+        }
 
-        val exif = ExifInterface(file!!.getPath())
-        val date = exif.getAttribute(ExifInterface.TAG_DATETIME)
         val requestFile = file!!.asRequestBody("multipart/form-data".toMediaTypeOrNull())
 
         // MultipartBody.Part is used to send also the actual file name

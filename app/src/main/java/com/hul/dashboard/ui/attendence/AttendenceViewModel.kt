@@ -45,7 +45,9 @@ class AttendenceViewModel @Inject constructor(
 
     val buttonEnabled = MediatorLiveData<Boolean>(false)
 
+    val button2Enabled = MediatorLiveData<Boolean>(false)
 
+    val projectId = if(userInfo.projectId.toInt() == 1) View.VISIBLE else View.GONE
 
     val capture1Visibility: LiveData<Int> = imageUrl1.map {
        if(it.length>0)
@@ -96,8 +98,8 @@ class AttendenceViewModel @Inject constructor(
             buttonEnabled.value = imageUrl1.value!!.isNotEmpty() && it.isNotEmpty()
         }
 
-//        buttonEnabled.addSource(remark) {
-//            buttonEnabled.value = imageUrl1.value!!.isNotEmpty() && imageUrl2.value!!.isNotEmpty() && it.isNotEmpty()
-//        }
+        button2Enabled.addSource(imageUrl1) {
+            button2Enabled.value = it.isNotEmpty()
+        }
     }
 }

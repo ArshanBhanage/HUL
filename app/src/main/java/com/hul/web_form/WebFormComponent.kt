@@ -1,8 +1,9 @@
 package com.hul.web_form
 
 import com.hul.di.ActivityScope
-import com.hul.loginRegistraion.loginwithpin.LoginWithPIN
-import com.hul.loginRegistraion.otp.OTPFragment
+import com.hul.web_form.dynamicFormDetails.DynamicFormDetailsFragment
+import com.hul.web_form.dynamicFormFill.DynamicFormFillFragment
+import com.hul.web_form.dynamic_forms.DynamicFormFragment
 import dagger.Subcomponent
 
 /**
@@ -19,5 +20,8 @@ interface WebFormComponent {
     }
 
     fun inject(activity: WebForm)
+    fun inject(fragment : DynamicFormFragment)
+    fun inject(fragment : DynamicFormFillFragment)
+    fun inject(fragment : DynamicFormDetailsFragment)
 
 }

@@ -8,6 +8,9 @@ import com.hul.camera.CameraComponent
 import com.hul.curriculam.CurriculamComponent
 import com.hul.dashboard.DashboardComponent
 import com.hul.loginRegistraion.LoginRegisterComponent
+import com.hul.salg.SalgDashboardComponent
+import com.hul.sb.SBDashboardComponent
+import com.hul.sb.SBSupervisorDashboardComponent
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
 import com.hul.web_form.WebFormComponent
 import dagger.BindsInstance
@@ -36,5 +39,11 @@ interface AppComponent {
     fun curriculamComponent(): CurriculamComponent.Factory
 
     fun fieldAuditorDashboardComponent(): FieldAuditorDashboardComponent.Factory
+
+    fun sbDashboardComponent(): SBDashboardComponent.Factory
+
+    fun sbSupervisorDashboardComponent(): SBSupervisorDashboardComponent.Factory
+
+    fun salgDashboardComponent(): SalgDashboardComponent.Factory
 
 }

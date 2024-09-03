@@ -3,6 +3,7 @@ package com.hul.screens.field_auditor_dashboard.ui.school_activity.form1Fill
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -127,7 +128,7 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
                     .show()
             } else {
                 if (imageIndex == 0) {
-                    setProgressDialog(requireContext(), "Uploading")
+                    //setProgressDialog(requireContext(), "Uploading")
                     uploadImage(form1FillViewModel.imageUrl1.value?.toUri()!!)
                 }
             }
@@ -372,6 +373,7 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
 
     private fun uploadImage(imageUri: Uri) {
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+            setProgressDialog(requireContext(), "uploading")
             uploadFileController.getApiResponse(
                 this,
                 imageUri,
@@ -406,11 +408,26 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
         private const val VISIT_LIST = "visitList"
         private const val PROJECT_INFO = "projectInfo"
 
-        private val REQUIRED_PERMISSIONS = arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
+        private val REQUIRED_PERMISSIONS =
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R){
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.RECORD_AUDIO,
+                )
+            }
+            else{
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                )
+
+            }
 
         fun newInstance(visitList: String, projectInfo: String) = AuditorForm1FillFragment().apply {
             arguments = Bundle().apply {
@@ -432,7 +449,7 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
 
     private fun getVisitData() {
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
-            //setProgressDialog(requireContext(), "Loading Visit data")
+            setProgressDialog(requireContext(), "loading")
             apiController.getApiResponse(
                 this,
                 visitsDataModel(),
@@ -471,9 +488,37 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
             if (granted) {
                 checkLocationSettings()
             } else {
-                requestPermission()
+                showInformationMessage()
             }
         }
+
+    private fun showInformationMessage() {
+        AlertDialog.Builder(requireActivity())
+            .setTitle("Permissions Needed")
+            .setMessage("You have denied the permissions. Please go to settings and allow the permissions manually.")
+            .setPositiveButton("Settings") { dialog, _ ->
+                requestPermissionSettings()
+                dialog.dismiss() // This dismisses the dialog
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun requestPermissionSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", requireActivity().packageName, null)
+        }
+        requestPermissionSetting.launch(intent)
+    }
+
+
+    private val requestPermissionSetting =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { permissions ->
+            if(!allPermissionsGranted()) {
+                showInformationMessage()
+            }
+        }
+
 
     private val requestLocation =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { permissions ->
@@ -603,7 +648,7 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
     fun submitForm() {
 
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
-            //setProgressDialog(requireContext(), "Loading Leads")
+            setProgressDialog(requireContext(), "loading")
             apiController.getApiResponse(
                 this,
                 submitModel(),
@@ -632,7 +677,7 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
                     value = binding.edtNoOfBooksHandedOver.text.toString(),
                     is_approved = form1FillViewModel.isBookDistributionApproved.value
                 ),
-                number_of_books_given_school = VisitDetails(value = binding.edtNoOfBooksHandedOver.text.toString()),
+                number_of_books_given_school = VisitDetails(value = binding.edtNoOfBooksGiven.text.toString()),
                 auditor_visit_image_1 = VisitDetails(value = form1FillViewModel.imageApiUrl1.value),
                 auditor_visit_image_2 = VisitDetails(value = form1FillViewModel.imageApiUrl2.value),
                 name_of_the_school_representative_who_mobiliser_met = VisitDetails(value = binding.form1.text.toString()),
@@ -648,6 +693,7 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     override fun onApiSuccess(o: String?, objectType: Int) {
+        cancelProgressDialog()
         when (ApiExtentions.ApiDef.entries[objectType]) {
 
             ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA -> {
@@ -656,6 +702,7 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
                 if (!model.getBoolean("error")) {
                     Toast.makeText(requireContext(), "Data saved successfully", Toast.LENGTH_LONG)
                         .show()
+                    requireActivity().onBackPressed()
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -688,6 +735,7 @@ class AuditorForm1FillFragment : Fragment(), ApiHandler, RetryInterface {
             }
 
             ApiExtentions.ApiDef.UPLOAD_IMAGE -> {
+                cancelProgressDialog()
                 val model = JSONObject(o.toString())
                 val uploadImageData = Gson().fromJson(
                     model.getJSONObject("data").toString(),

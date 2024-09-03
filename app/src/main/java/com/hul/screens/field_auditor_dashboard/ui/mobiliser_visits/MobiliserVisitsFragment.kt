@@ -2,6 +2,7 @@ package com.hul.screens.field_auditor_dashboard.ui.mobiliser_visits
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,6 +18,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -34,11 +36,13 @@ import com.hul.api.ApiExtentions
 import com.hul.api.ApiHandler
 import com.hul.api.controller.APIController
 import com.hul.api.controller.UploadFileController
+import com.hul.data.Attendencemodel
 import com.hul.data.MappedUser
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.databinding.FragmentVisitsBinding
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
+import com.hul.screens.field_auditor_dashboard.ui.dashboard.AttendenceAdapter
 import com.hul.user.UserInfo
 import com.hul.utils.ASSIGNED
 import com.hul.utils.ConnectionDetector
@@ -204,9 +208,37 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
             if (granted) {
                 checkLocationSettings()
             } else {
-                requestPermission()
+                showInformationMessage()
             }
         }
+
+    private fun showInformationMessage() {
+        AlertDialog.Builder(requireActivity())
+            .setTitle("Permissions Needed")
+            .setMessage("You have denied the permissions. Please go to settings and allow the permissions manually.")
+            .setPositiveButton("Settings") { dialog, _ ->
+                requestPermissionSettings()
+                dialog.dismiss() // This dismisses the dialog
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun requestPermissionSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", requireActivity().packageName, null)
+        }
+        requestPermissionSetting.launch(intent)
+    }
+
+
+    private val requestPermissionSetting =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { permissions ->
+            if(!allPermissionsGranted()) {
+                showInformationMessage()
+            }
+        }
+
 
     private val requestLocation =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { permissions ->
@@ -273,6 +305,8 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
             locationRequest, locationCallback, Looper.getMainLooper()
         )
 
+        fetchLastKnownLocation()
+
 //        locationCallback = object : LocationCallback() {
 //            //This callback is where we get "streaming" location updates. We can check things like accuracy to determine whether
 //            //this latest update should replace our previous estimate.
@@ -310,6 +344,36 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
 //            locationCallback,
 //            null /* Looper */
 //        )
+    }
+
+    private fun fetchLastKnownLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                requireActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireActivity(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+        fusedLocationProviderClient.lastLocation
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful && task.result != null) {
+                    val location: Location? = task.result
+                    currentLocation = location
+
+                } else {
+                    // Handle the case where no location is available
+                }
+            }
     }
 
 
@@ -412,6 +476,24 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
                     }
 
                     myVisitsAdapter.updateVisits(pendingVisits)
+                    getAttendance()
+                } else {
+                    redirectionAlertDialogue(requireContext(), model.getString("message"))
+                }
+
+
+            }
+
+            ApiExtentions.ApiDef.GET_ATTENDENCE -> {
+                val model = JSONObject(o.toString())
+                if (!model.getBoolean("error")) {
+                    val listType: Type = object : TypeToken<List<Attendencemodel?>?>() {}.type
+                    val items: ArrayList<Attendencemodel> =
+                        Gson().fromJson(model.getJSONArray("data").toString(), listType);
+                    val currentObject = items.get(items.size - 1)
+                    mobiliserVisitsViewModel.attendenceToday.value = currentObject
+                    items.removeAt(items.size - 1)
+
                 } else {
                     redirectionAlertDialogue(requireContext(), model.getString("message"))
                 }
@@ -430,41 +512,75 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
 
     }
 
+    private fun getAttendance() {
+
+        if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
+            apiController.getApiResponse(
+                this,
+                getAttendanceModel(),
+                ApiExtentions.ApiDef.GET_ATTENDENCE.ordinal
+            )
+        } else {
+            noInternetDialogue(requireContext(), ApiExtentions.ApiDef.GET_ATTENDENCE.ordinal, this)
+        }
+
+    }
+
+    private fun getAttendanceModel(): RequestModel {
+        return RequestModel(
+            projectId = userInfo.projectId
+        )
+    }
+
+    fun redirectToAttendence(projectInfo: ProjectInfo) {
+            val bundle = Bundle()
+            bundle.putString("projectInfo", Gson().toJson(projectInfo))
+            findNavController().navigate(
+                R.id.action_mobiliserVisitsFragment_to_attendenceFragment,
+                bundle
+            )
+
+    }
+
     override fun redirectToSchoolActivity(
         projectInfo: ProjectInfo,
         visitsForSchoolId: ArrayList<ProjectInfo>
     ) {
-        if (!visitsForSchoolId.isEmpty()) {
-            val bundle = Bundle()
-
-            bundle.putString("projectInfo", Gson().toJson(projectInfoForRedirect))
-
-            val firstVisit = visitsForSchoolId.filter { it.visit_number == "1" }
-            val secondVisit = visitsForSchoolId.filter { it.visit_number == "2" }
-            val thirdVisit = visitsForSchoolId.filter { it.visit_number == "3" }
-
-            val visibleVisits = ArrayList<ProjectInfo>()
-
-            visibleVisits.add(firstVisit[0])
-            if (firstVisit.isNotEmpty() && firstVisit[0].visit_status == FIELD_AUDITOR_APPROVED) {
-                if (secondVisit.isNotEmpty()) {
-                    visibleVisits.add(secondVisit[0])
-                }
-            }
-            if (secondVisit.isNotEmpty() && secondVisit[0].visit_status == FIELD_AUDITOR_APPROVED) {
-                if (thirdVisit.isNotEmpty()) {
-                    visibleVisits.add(thirdVisit[0])
-                }
-            }
-
-            bundle.putString("visitList", Gson().toJson(visibleVisits))
-
-            findNavController().navigate(
-                R.id.action_visits_school_activity, bundle
-            )
+        if (!mobiliserVisitsViewModel.attendenceToday.value!!.present!!) {
+            redirectToAttendence(projectInfo)
         } else {
-            projectInfoForRedirect = projectInfo
-            projectInfo.location_id?.toInt()?.let { getSchoolVisits(it) }
+            if (!visitsForSchoolId.isEmpty()) {
+                val bundle = Bundle()
+
+                bundle.putString("projectInfo", Gson().toJson(projectInfoForRedirect))
+
+                val firstVisit = visitsForSchoolId.filter { it.visit_number == "1" }
+                val secondVisit = visitsForSchoolId.filter { it.visit_number == "2" }
+                val thirdVisit = visitsForSchoolId.filter { it.visit_number == "3" }
+
+                val visibleVisits = ArrayList<ProjectInfo>()
+
+                visibleVisits.add(firstVisit[0])
+                if (firstVisit.isNotEmpty() && firstVisit[0].visit_status == FIELD_AUDITOR_APPROVED) {
+                    if (secondVisit.isNotEmpty()) {
+                        visibleVisits.add(secondVisit[0])
+                    }
+                }
+                if (secondVisit.isNotEmpty() && secondVisit[0].visit_status == FIELD_AUDITOR_APPROVED) {
+                    if (thirdVisit.isNotEmpty()) {
+                        visibleVisits.add(thirdVisit[0])
+                    }
+                }
+
+                bundle.putString("visitList", Gson().toJson(visibleVisits))
+
+                findNavController().navigate(
+                    R.id.action_visits_school_activity, bundle
+                )
+            } else {
+                projectInfoForRedirect = projectInfo
+                projectInfo.location_id?.toInt()?.let { getSchoolVisits(it) }
+            }
         }
     }
 
@@ -495,11 +611,26 @@ class MobiliserVisitsFragment : Fragment(), ApiHandler, RetryInterface,
     }
 
     companion object {
-        private val REQUIRED_PERMISSIONS = arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
+        private val REQUIRED_PERMISSIONS =
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R){
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.RECORD_AUDIO,
+                )
+            }
+            else{
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                )
+
+            }
     }
 
 }

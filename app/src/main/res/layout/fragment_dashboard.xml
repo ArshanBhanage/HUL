@@ -616,7 +616,7 @@
                         <!--                            android:layout_height="wrap_content"-->
                         <!--                            android:layout_marginTop="24dp"-->
                         <!--                            android:fontFamily="@font/public_sans"-->
-                        <!--                            android:lineHeight="28dp"-->
+                        <!--                            android:lineHeight="20dp"-->
                         <!--                            android:text="@string/or_select_location"-->
                         <!--                            android:textColor="#6d6b77"-->
                         <!--                            android:textFontWeight="400"-->
@@ -714,6 +714,7 @@
                                 <View
                                     android:layout_width="@dimen/_10sdp"
                                     android:layout_height="@dimen/_10sdp"
+                                    android:layout_marginTop="@dimen/_6sdp"
                                     android:background="@drawable/purple_cirlce" />
 
                                 <LinearLayout
@@ -733,7 +734,7 @@
                                         android:id="@+id/txtVisits"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text=""
+                                        android:text="0"
                                         android:textColor="#444050"
                                         android:textSize="@dimen/_18ssp"
                                         android:textStyle="bold" />
@@ -751,6 +752,7 @@
                                 <View
                                     android:layout_width="@dimen/_10sdp"
                                     android:layout_height="@dimen/_10sdp"
+                                    android:layout_marginTop="@dimen/_6sdp"
                                     android:background="@drawable/green_cirlce" />
 
                                 <LinearLayout
@@ -770,7 +772,7 @@
                                         android:id="@+id/txtAttendance"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text=""
+                                        android:text="0.0%"
                                         android:textColor="#444050"
                                         android:textSize="@dimen/_18ssp"
                                         android:textStyle="bold" />
@@ -789,6 +791,7 @@
                             <View
                                 android:layout_width="@dimen/_10sdp"
                                 android:layout_height="@dimen/_10sdp"
+                                android:layout_marginTop="@dimen/_6sdp"
                                 android:background="@drawable/orange_cirlce" />
 
                             <LinearLayout
@@ -808,7 +811,7 @@
                                     android:id="@+id/txtTotalVisits"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text=""
+                                    android:text="0.0%"
                                     android:textColor="#444050"
                                     android:textSize="@dimen/_18ssp"
                                     android:textStyle="bold" />

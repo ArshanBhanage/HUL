@@ -3,13 +3,14 @@ package com.hul.camera
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import com.hul.R
 import com.hul.databinding.ActivityCameraBinding
 
-class CameraActivity : AppCompatActivity() {
+class CameraActivity : FragmentActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityCameraBinding
@@ -24,6 +25,10 @@ class CameraActivity : AppCompatActivity() {
         bundle.putInt("position", intent.getIntExtra("position", 0))
         bundle.putString("imageType", intent.getStringExtra("imageType"))
         bundle.putString("heading", intent.getStringExtra("heading"))
+        if (intent.getStringExtra("tag") != null)
+            bundle.putString("tag", intent.getStringExtra("tag"))
+        else
+            bundle.putString("tag", "")
 
         findNavController(R.id.nav_host_fragment_camera).setGraph(R.navigation.camera_nav_graph)
         findNavController(R.id.nav_host_fragment_camera).navigate(
@@ -59,8 +64,22 @@ class CameraActivity : AppCompatActivity() {
 //        }
 //    }
 
+    override fun onBackPressed() {
+        val navController = findNavController(R.id.nav_host_fragment_camera)
+        if (navController.currentBackStackEntry?.destination?.id == R.id.cameraPreviewFragment) {
+            // If we are at the last fragment, finish the activity
+            finish() // Explicitly finish the activity
+        } else {
+            // Otherwise, let the NavController handle the back press
+            if (!navController.popBackStack()) {
+                super.onBackPressed()
+            }
+        }
+    }
 
 }
+
+
 
 
 //

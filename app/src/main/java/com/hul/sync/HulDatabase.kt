@@ -3,9 +3,11 @@ package com.hul.sync
 import androidx.room.Database
 import androidx.room.RoomDatabase
 
-@Database(entities = [VisitDataTable::class], version = 1, exportSchema = false)
+@Database(entities = [VisitDataTable::class,SocietyVisitDataTable::class], version = 2, exportSchema = false)
 abstract class HulDatabase : RoomDatabase() {
     abstract fun visitDataDao(): VisitDataDao
+
+    abstract fun societyVisitDataDao(): SocietyVisitDataDao
 
 //    companion object {
 //        @Volatile

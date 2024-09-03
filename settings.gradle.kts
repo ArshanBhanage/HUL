@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "HUL"
+rootProject.name = "GoodMetrics"
 include(":app")
  

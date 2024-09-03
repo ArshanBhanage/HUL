@@ -123,6 +123,10 @@ class ImagePreviewFragment : Fragment(), ApiHandler, RetryInterface {
                 "imageUrl",
                 imagePreviewViewModel.uri.value.toString()
             )
+            returnIntent.putExtra(
+                "tag",
+                requireArguments().getString("tag")
+            )
 
             requireActivity().setResult(Activity.RESULT_OK, returnIntent)
             requireActivity().finish()
@@ -140,7 +144,8 @@ class ImagePreviewFragment : Fragment(), ApiHandler, RetryInterface {
 
 
         binding.retake.setOnClickListener {
-            requireActivity().onBackPressed()
+
+            deleteImage(imagePreviewViewModel.uri.value.toString().toUri())
         }
 
         binding.date.text = SimpleDateFormat("dd MMM yyyy").format(Date())
@@ -359,6 +364,21 @@ class ImagePreviewFragment : Fragment(), ApiHandler, RetryInterface {
         }
 
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
+    private fun deleteImage(uri: Uri) {
+        try {
+            val resolver = requireActivity().contentResolver
+            val rowsDeleted = resolver.delete(uri, null, null)
+            if (rowsDeleted > 0) {
+                requireActivity().onBackPressed()
+            } else {
+                requireActivity().onBackPressed()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // Handle the error
+        }
     }
 
     fun uploadImage() {

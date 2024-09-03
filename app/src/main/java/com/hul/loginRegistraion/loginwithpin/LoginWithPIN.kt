@@ -25,6 +25,9 @@ import com.hul.data.ResponseModel
 import com.hul.databinding.FragmentLoginWithPinBinding
 import com.hul.loginRegistraion.LoginRegisterComponent
 import com.hul.loginRegistraion.LoginRegistrationInterface
+import com.hul.salg.SalgDashboard
+import com.hul.sb.mobiliser.SBMobiliserDashboard
+import com.hul.sb.supervisor.SBSupervisorDashboard
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboard
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
@@ -187,21 +190,48 @@ class LoginWithPIN : Fragment(), ApiHandler, RetryInterface {
 
     private fun checkUserLoginStatus() {
         if (!userInfo.authToken.isEmpty()) {
-            when (userInfo.userType) {
-                UserTypes.MOBILISER -> {
-                    val intent = Intent(activity, Dashboard::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    startActivity(intent)
-                }
-                UserTypes.FIELD_AUDITOR -> {
-                    val intent = Intent(activity, FieldAuditorDashboard::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    startActivity(intent)
-                }
+            if (userInfo.projectId == "1") {
+                when (userInfo.userType) {
+                    UserTypes.MOBILISER -> {
+                        val intent = Intent(activity, Dashboard::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        startActivity(intent)
+                    }
 
-                else -> {
-                    // Handle other cases or default behavior
+                    UserTypes.FIELD_AUDITOR -> {
+                        val intent = Intent(activity, FieldAuditorDashboard::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        startActivity(intent)
+                    }
+
+                    else -> {
+                        // Handle other cases or default behavior
+                    }
                 }
+            } else if (userInfo.projectId == "2") {
+                when (userInfo.userType) {
+                    UserTypes.MOBILISER -> {
+                        val intent = Intent(activity, SBMobiliserDashboard::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        startActivity(intent)
+                    }
+
+                    UserTypes.FIELD_AUDITOR -> {
+                        val intent = Intent(activity, SBSupervisorDashboard::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        startActivity(intent)
+                    }
+
+                    else -> {
+                        // Handle other cases or default behavior
+                    }
+                }
+            } else if (userInfo.projectId == "3") {
+
+                val intent = Intent(activity, SBMobiliserDashboard::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                startActivity(intent)
+
             }
         }
     }

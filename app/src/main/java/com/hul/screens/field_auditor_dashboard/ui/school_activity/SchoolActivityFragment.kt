@@ -3,6 +3,7 @@ package com.hul.screens.field_auditor_dashboard.ui.school_activity
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -108,9 +109,37 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
             if (granted) {
                 checkLocationSettings()
             } else {
-                requestPermission()
+                showInformationMessage()
             }
         }
+
+    private fun showInformationMessage() {
+        AlertDialog.Builder(requireActivity())
+            .setTitle("Permissions Needed")
+            .setMessage("You have denied the permissions. Please go to settings and allow the permissions manually.")
+            .setPositiveButton("Settings") { dialog, _ ->
+                requestPermissionSettings()
+                dialog.dismiss() // This dismisses the dialog
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun requestPermissionSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", requireActivity().packageName, null)
+        }
+        requestPermissionSetting.launch(intent)
+    }
+
+
+    private val requestPermissionSetting =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { permissions ->
+            if(!allPermissionsGranted()) {
+                showInformationMessage()
+            }
+        }
+
 
     private val requestLocation =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { permissions ->
@@ -622,7 +651,10 @@ class SchoolActivityFragment : Fragment(), ApiHandler, RetryInterface {
         val REQUIRED_PERMISSIONS = arrayOf(
             Manifest.permission.CAMERA,
             Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
         )
     }
 

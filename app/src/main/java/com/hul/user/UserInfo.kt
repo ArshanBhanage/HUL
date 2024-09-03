@@ -5,9 +5,11 @@ package com.hul.user
  */
 import com.hul.storage.Storage
 import com.hul.utils.AUTH_TOKEN
+import com.hul.utils.CODES_LIST
 import com.hul.utils.IS_NEW_VISIT_SUBMITTED
 import com.hul.utils.LOGIN_ID
 import com.hul.utils.MY_AREA
+import com.hul.utils.MY_AREA_ID
 import com.hul.utils.PENDING_LEAD_DETAIL
 import com.hul.utils.PROJECT_ID
 import com.hul.utils.PROJECT_Name
@@ -56,6 +58,11 @@ class UserInfo @Inject constructor(private val storage: Storage) {
     var myArea: String
         get() = storage.getString(MY_AREA)
         set(value) = storage.setString(MY_AREA, value)
+
+    var areaId: String
+        get() = storage.getString(MY_AREA_ID)
+        set(value) = storage.setString(MY_AREA_ID, value)
+
     var userType: String
         get() = storage.getString(USER_TYPE)
         set(value) = storage.setString(USER_TYPE, value)
@@ -63,4 +70,8 @@ class UserInfo @Inject constructor(private val storage: Storage) {
     var didUserSubmitNewVisit: Boolean
         get() = storage.getBoolean(IS_NEW_VISIT_SUBMITTED)
         set(value) = storage.setBoolean(IS_NEW_VISIT_SUBMITTED, value)
+
+    var codeList: String
+        get() = storage.getString(CODES_LIST)
+        set(value) = storage.setString(CODES_LIST, value)
 }

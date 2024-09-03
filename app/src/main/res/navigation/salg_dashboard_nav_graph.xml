@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/salg_dashboard_nav_graph"
+    app:startDestination="@id/salgDashboardFragment">
+
+    <fragment
+        android:id="@+id/salgDashboardFragment"
+        android:name="com.hul.salg.ui.dashboard.SalgDashboardFragment"
+        android:label="fragment_salg_dashboard"
+        tools:layout="@layout/fragment_salg_dashboard" >
+        <action
+            android:id="@+id/action_salgDashboardFragment_to_salgAttendenceFragment"
+            app:destination="@id/salgAttendenceFragment" />
+        <action
+            android:id="@+id/action_salgDashboardFragment_to_salgPreFormFragment"
+            app:destination="@id/salgPreFormFragment" />
+        <action
+            android:id="@+id/action_salgDashboardFragment_to_salgFormDetailFragment"
+            app:destination="@id/salgFormDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/salgAttendenceFragment"
+        android:name="com.hul.salg.ui.attendence.SalgAttendenceFragment"
+        android:label="SalgAttendenceFragment" />
+    <fragment
+        android:id="@+id/salgPreFormFragment"
+        android:name="com.hul.salg.ui.salgPreForm.SalgPreFormFragment"
+        android:label="SalgPreFormFragment" >
+        <action
+            android:id="@+id/action_salgPreFormFragment_to_salgFormFragment"
+            app:destination="@id/salgFormFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/salgFormFragment"
+        android:name="com.hul.salg.ui.salgForm.SalgFormFragment"
+        android:label="SalgFormFragment" />
+    <fragment
+        android:id="@+id/salgFormDetailFragment"
+        android:name="com.hul.salg.ui.formDetails.SalgFormDetailFragment"
+        android:label="SalgFormDetailFragment" />
+</navigation>

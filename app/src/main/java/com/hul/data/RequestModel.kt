@@ -1,5 +1,7 @@
 package com.hul.data
 
+import org.json.JSONObject
+
 /**
  * Created by Nitin Chorge on 26-11-2020.
  */
@@ -8,7 +10,9 @@ data class RequestModel(
     var projectId: String? = null,
     var mobile: String? = null,
     var type: String? = null,
+    var status: String? = null,
     var otp: String? = null,
+    var app_version: Int? = null,
     var password: String? = null,
     var leadId: String? = null,
     var regNo: String? = null,
@@ -24,6 +28,9 @@ data class RequestModel(
     var project: String? = null,
     var location_id: String? = null,
     var visit_number: String? = null,
+    var visit_identifier1: String? = null,
+    var visit_identifier2: String? = null,
+    var visit_status: String? = null,
     var lattitude: String? = null,
     var longitude: String? = null,
     var externalId: String? = null,
@@ -40,6 +47,7 @@ data class RequestModel(
     val collected_by: String = "MOBILISER",
     val schoolVisitData: SchoolVisitData? = null,
     val schoolId: Int? = null,
+    val areaId: String? = null,
 
 
     val location_name: String? = null,
@@ -58,4 +66,5 @@ data class RequestModel(
     val make: String? = null,
     val model: String? = null,
     val os: String? = null,
+    val form2Data: JSONObject? = null
 )

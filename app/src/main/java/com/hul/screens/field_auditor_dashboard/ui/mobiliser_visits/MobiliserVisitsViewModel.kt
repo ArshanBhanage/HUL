@@ -7,6 +7,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import com.hul.data.Attendencemodel
 import com.hul.data.GetVisitDataResponseData
 import com.hul.data.MappedUser
 import com.hul.data.ProjectInfo
@@ -24,7 +25,7 @@ class MobiliserVisitsViewModel @Inject constructor(
 
     var projectInfo = MutableLiveData<ProjectInfo>()
     var mobiliserUser = MutableLiveData<MappedUser>()
-
+    val attendenceToday = MutableLiveData<Attendencemodel>()
     var remark = MutableLiveData<String>("")
 
     var pendingSelected = MutableLiveData<Boolean>(true)

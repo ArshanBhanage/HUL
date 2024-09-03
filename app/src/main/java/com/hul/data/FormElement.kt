@@ -11,6 +11,7 @@ data class FormElement(
     val form_field_description: String,
     val form_field_conversion_type: String,
     val input_type: String,
+    val input_regex: String? = null,
     val input_allowed_values: String,
     val input_default: String,
     val input_description: String,

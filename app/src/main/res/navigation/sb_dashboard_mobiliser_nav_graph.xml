@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/sb_dashboard_mobiliser_nav_graph"
+    app:startDestination="@id/SBDashboardMobiliserFragment">
+
+    <fragment
+        android:id="@+id/SBDashboardMobiliserFragment"
+        android:name="com.hul.sb.mobiliser.ui.dashboard.SBDashboardMobiliserFragment"
+        android:label="SBDashboardMobiliserFragment" >
+        <action
+            android:id="@+id/action_SBDashboardMobiliserFragment_to_attendenceFragment42"
+            app:destination="@id/attendenceFragment4" />
+        <action
+            android:id="@+id/action_SBDashboardMobiliserFragment_to_SBPreFormFragment"
+            app:destination="@id/SBPreFormFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/attendenceFragment4"
+        android:name="com.hul.dashboard.ui.attendence.AttendenceFragment"
+        android:label="AttendenceFragment" />
+    <fragment
+        android:id="@+id/SBPreFormFragment"
+        android:name="com.hul.sb.mobiliser.ui.sbpreform.SBPreFormFragment"
+        android:label="SBPreFormFragment" />
+</navigation>

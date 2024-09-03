@@ -459,6 +459,7 @@
                                 <View
                                     android:layout_width="@dimen/_10sdp"
                                     android:layout_height="@dimen/_10sdp"
+                                    android:layout_marginTop="@dimen/_6sdp"
                                     android:background="@drawable/purple_cirlce" />
 
                                 <LinearLayout
@@ -496,6 +497,7 @@
                                 <View
                                     android:layout_width="@dimen/_10sdp"
                                     android:layout_height="@dimen/_10sdp"
+                                    android:layout_marginTop="@dimen/_6sdp"
                                     android:background="@drawable/green_cirlce" />
 
                                 <LinearLayout
@@ -534,6 +536,7 @@
                             <View
                                 android:layout_width="@dimen/_10sdp"
                                 android:layout_height="@dimen/_10sdp"
+                                android:layout_marginTop="@dimen/_6sdp"
                                 android:background="@drawable/orange_cirlce" />
 
                             <LinearLayout

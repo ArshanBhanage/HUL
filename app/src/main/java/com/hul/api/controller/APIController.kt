@@ -11,6 +11,8 @@ import com.hul.data.RequestModel
 import com.hul.storage.SharedPreferencesStorage
 import com.hul.storage.Storage
 import com.hul.user.UserInfo
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
 import org.json.JSONObject
 import retrofit2.Call
@@ -36,6 +38,15 @@ class APIController @Inject constructor(private val mContext: Context) : Callbac
         this.mHandler = handler!!
 
         when (ApiExtentions.ApiDef.entries[apiId]) {
+            ApiExtentions.ApiDef.SOCIETY_VISIT_LIST -> retrofit.create(ApiInterface::class.java)
+                .getSocietyList(requestModel).enqueue(this)
+
+            ApiExtentions.ApiDef.LIST_OF_CODES -> retrofit.create(ApiInterface::class.java)
+                .getCodeList(requestModel!!.areaId!!.toDouble().toInt(), true).enqueue(this)
+
+            ApiExtentions.ApiDef.ADD_VISIT_SOCIETY -> retrofit.create(ApiInterface::class.java)
+                .addVisit(requestModel).enqueue(this)
+
             ApiExtentions.ApiDef.SEND_OTP -> retrofit.create(ApiInterface::class.java)
                 .sendOTP(requestModel).enqueue(this)
 
@@ -55,7 +66,8 @@ class APIController @Inject constructor(private val mContext: Context) : Callbac
                 .getBannerImage(requestModel!!.projectId!!).enqueue(this)
 
             ApiExtentions.ApiDef.GET_VISIT_FORM -> retrofit.create(ApiInterface::class.java)
-                .getVisitFormFields(requestModel!!.projectId!!,requestModel!!.visit_number!!).enqueue(this)
+                .getVisitFormFields(requestModel!!.projectId!!, requestModel!!.visit_number!!)
+                .enqueue(this)
 
             ApiExtentions.ApiDef.LOCATION_LIST -> retrofit.create(ApiInterface::class.java)
                 .getLocationList(requestModel!!.projectId).enqueue(this)
@@ -77,7 +89,13 @@ class APIController @Inject constructor(private val mContext: Context) : Callbac
                 .getVisitList().enqueue(this)
 
             ApiExtentions.ApiDef.VISIT_LIST_BY_STATUS -> retrofit.create(ApiInterface::class.java)
-                .getVisitListByStatus("SUBMITTED").enqueue(this)
+                .getVisitListByStatus(requestModel!!.status).enqueue(this)
+
+            ApiExtentions.ApiDef.VISIT_LIST_BY_STATUS2 -> retrofit.create(ApiInterface::class.java)
+                .getVisitListByStatus2(
+                    requestModel!!.status,
+                     requestModel.userType
+                ).enqueue(this)
 
             ApiExtentions.ApiDef.VISIT_LIST_SINGLE -> retrofit.create(ApiInterface::class.java)
                 .getVisitListSingle(requestModel!!.location_id).enqueue(this)
@@ -91,6 +109,10 @@ class APIController @Inject constructor(private val mContext: Context) : Callbac
 
             ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE -> requestModel?.schoolId?.let {
                 retrofit.create(ApiInterface::class.java).getListOfVisits(it).enqueue(this)
+            }
+
+            ApiExtentions.ApiDef.VISIT_LIST_BY_ID -> requestModel?.visit_id?.let {
+                retrofit.create(ApiInterface::class.java).getListOfVisits(it.toInt()).enqueue(this)
             }
 
             ApiExtentions.ApiDef.VISIT_LIST_BY_SCHOOL_CODE_Completed -> requestModel?.schoolId?.let {
@@ -115,12 +137,39 @@ class APIController @Inject constructor(private val mContext: Context) : Callbac
 
             ApiExtentions.ApiDef.GET_VISIT_DATA -> if (requestModel != null) {
                 retrofit.create(ApiInterface::class.java)
-                    .getVisitData(requestModel.visitId!!, requestModel.project, requestModel.collected_by, requestModel.loadImages)
+                    .getVisitData(
+                        requestModel.visitId!!,
+                        requestModel.project,
+                        requestModel.collected_by,
+                        requestModel.loadImages
+                    )
+                    .enqueue(this)
+            }
+
+            ApiExtentions.ApiDef.GET_VISIT_DATA_IMAGE -> if (requestModel != null) {
+                retrofit.create(ApiInterface::class.java)
+                    .getVisitData(
+                        requestModel.visitId!!,
+                        requestModel.project,
+                        requestModel.collected_by,
+                        requestModel.loadImages
+                    )
                     .enqueue(this)
             }
 
             ApiExtentions.ApiDef.VISIT_DATA -> retrofit.create(ApiInterface::class.java)
                 .visitData(requestModel!!).enqueue(this)
+
+            ApiExtentions.ApiDef.SUBMIT_SCHOOL_FORM -> {
+                val json = requestModel!!.form2Data!!.toString()
+
+                // Create RequestBody from JSON string
+                val requestBody =
+                    json.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+                val map: Map<String, Any> = requestModel!!.form2Data!!.toMap()
+                retrofit.create(ApiInterface::class.java)
+                    .submitForm(requestBody).enqueue(this)
+            }
 
             ApiExtentions.ApiDef.SAVE_SCHOOL_ACTIVITY_DATA -> retrofit.create(ApiInterface::class.java)
                 .visitData(requestModel!!).enqueue(this)
@@ -160,7 +209,11 @@ class APIController @Inject constructor(private val mContext: Context) : Callbac
                 mHandler.onApiError(response.getJSONArray("error_details").get(0).toString())
             } catch (e: Exception) {
                 if (ApiExtentions.ApiDef.entries.toTypedArray()[apiId] != ApiExtentions.ApiDef.GET_LOGO && ApiExtentions.ApiDef.values()[apiId] != ApiExtentions.ApiDef.GET_BANNER) {
-                    mHandler.onApiError("Something went wrong")
+                    if (ApiExtentions.ApiDef.entries.toTypedArray()[apiId] == ApiExtentions.ApiDef.LOGIN) {
+                        mHandler.onApiError(response.getString("message"))
+                    } else {
+                        mHandler.onApiError("Something went wrong")
+                    }
                 }
             }
 
@@ -174,7 +227,7 @@ class APIController @Inject constructor(private val mContext: Context) : Callbac
         Log.i(APIController::class.qualifiedName, "Error : " + t.localizedMessage)
         t.localizedMessage?.let { Log.d("Errororo", it) }
         if (t.localizedMessage != null) {
-            if (t.localizedMessage.contains("13.126.28.53") || t.localizedMessage.contains("ws.mintwalk.com")) {
+            if (t.localizedMessage.contains("3.7.149.234") || t.localizedMessage.contains("api.goodmetrics.in")) {
                 mHandler.onApiError("Can not establish connection.\nCheck your Internet Connectivity.")
             } else {
                 mHandler.onApiError("Something went wrong")
@@ -184,5 +237,15 @@ class APIController @Inject constructor(private val mContext: Context) : Callbac
             mHandler.onApiError("Can not establish connection.\nCheck your Internet Connectivity.")
         }
         Toast.makeText(mContext, "Something went wrong", Toast.LENGTH_SHORT).show()
+    }
+
+    fun JSONObject.toMap(): Map<String, Any> {
+        val map = mutableMapOf<String, Any>()
+        val keys = this.keys()
+        while (keys.hasNext()) {
+            val key = keys.next()
+            map[key] = this.get(key)
+        }
+        return map
     }
 }

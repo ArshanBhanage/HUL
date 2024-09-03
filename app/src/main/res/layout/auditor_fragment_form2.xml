@@ -39,7 +39,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/public_sans"
-                        android:lineHeight="28dp"
+                        android:lineHeight="20dp"
                         android:text="@string/disce_code"
                         android:textColor="#6d6b77"
                         android:textFontWeight="400"
@@ -48,7 +48,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/public_sans"
-                        android:lineHeight="28dp"
+                        android:lineHeight="20dp"
                         android:text='@{viewModel.visitData.visit_2.u_dice_code.value.toString()}'
                         android:textColor="#444050"
                         android:textFontWeight="700"
@@ -67,7 +67,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/public_sans"
-                        android:lineHeight="28dp"
+                        android:lineHeight="20dp"
                         android:text='@{viewModel.visitData.visit_2.school_name.value.toString()}'
                         android:textColor="#444050"
                         android:textFontWeight="700"
@@ -88,7 +88,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:fontFamily="@font/public_sans"
-                        android:lineHeight="28dp"
+                        android:lineHeight="20dp"
                         android:text='@{viewModel.visitData.visit_2.number_of_books_distributed.value.toString()}'
                         android:textColor="#444050"
                         android:textFontWeight="700"
@@ -109,9 +109,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:fontFamily="@font/public_sans"
-                        android:lineHeight="28dp"
+                        android:lineHeight="20dp"
                         android:id="@+id/noOfBooksGiven"
-                        android:text='@{viewModel.visitData.visit_2.number_of_books_distributed.value.toString()}'
+                        android:text='@{viewModel.visitData.visit_2.number_of_books_given_school.value.toString()}'
                         android:textColor="#444050"
                         android:textFontWeight="700"
                         android:textSize="15sp"
@@ -132,7 +132,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/public_sans"
-                        android:lineHeight="28dp"
+                        android:lineHeight="20dp"
                         android:text='@{viewModel.visitData.visit_2.name_of_the_school_representative_who_mobiliser_met.value.toString()}'
                         android:textColor="#444050"
                         android:textFontWeight="700"
@@ -151,7 +151,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/public_sans"
-                        android:lineHeight="28dp"
+                        android:lineHeight="20dp"
                         android:text='@{viewModel.visitData.visit_2.number_of_the_school_representative_who_mobiliser_met.value.toString()}'
                         android:textColor="#444050"
                         android:textFontWeight="700"
@@ -171,7 +171,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/public_sans"
-                        android:lineHeight="28dp"
+                        android:lineHeight="20dp"
                         android:text='@{viewModel.visitData.visit_2.remark.value.toString()}'
                         android:textColor="#444050"
                         android:textFontWeight="700"

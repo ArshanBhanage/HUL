@@ -41,6 +41,7 @@ const val APP_LANGUAGE = "registered_user"
 const val PROFILE_ID = "profile_id"
 const val USER_PIC = "userPic"
 const val LOGIN_ID = "loginId"
+const val CODES_LIST = "codeList"
 const val ACTION_CONTINUE = "action_continue"
 const val CUSTOMER_ID = "customerID"
 const val ONBOARDING_PARTNER = "onboardingPartner"
@@ -114,6 +115,7 @@ val languages = arrayListOf("English", "हिंदी", "ಕನ್ನಡ", "�
 
 const val USER_TYPE = "userType"
 const val MY_AREA = "myArea"
+const val MY_AREA_ID = "myAreaId"
 const val IS_NEW_VISIT_SUBMITTED = "isNewVisitSubmitted"
 
 const val INITIATED = "INITIATED"

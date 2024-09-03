@@ -3,11 +3,13 @@ package com.hul.screens.field_auditor_dashboard.ui.attendence
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
@@ -36,6 +38,7 @@ import com.hul.dashboard.Dashboard
 import com.hul.data.ProjectInfo
 import com.hul.data.RequestModel
 import com.hul.databinding.FragmentAttendenceAuditorBinding
+import com.hul.sb.mobiliser.SBMobiliserDashboard
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboard
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboardComponent
 import com.hul.user.UserInfo
@@ -96,9 +99,37 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
             if (granted) {
                 checkLocationSettings()
             } else {
-                requestPermission()
+                showInformationMessage()
             }
         }
+
+    private fun showInformationMessage() {
+        AlertDialog.Builder(requireActivity())
+            .setTitle("Permissions Needed")
+            .setMessage("You have denied the permissions. Please go to settings and allow the permissions manually.")
+            .setPositiveButton("Settings") { dialog, _ ->
+                requestPermissionSettings()
+                dialog.dismiss() // This dismisses the dialog
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun requestPermissionSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", requireActivity().packageName, null)
+        }
+        requestPermissionSetting.launch(intent)
+    }
+
+
+    private val requestPermissionSetting =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { permissions ->
+            if(!allPermissionsGranted()) {
+                showInformationMessage()
+            }
+        }
+
 
     private val requestLocation =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { permissions ->
@@ -245,7 +276,7 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
             redirectToCamera(
                 1,
                 attendenceViewModel.imageType2.value!!,
-                "Full image of mobiliser with curriculum material"
+                "Full image of mobiliser with Curriculum material"
             )
         }
 
@@ -274,6 +305,7 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
 
         attendenceViewModel.projectInfo.value =
             Gson().fromJson(requireArguments().getString("projectInfo"), ProjectInfo::class.java)
+
 
         getAttendenceForm()
 
@@ -340,7 +372,7 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
 
     private fun getAttendenceFormModel(): RequestModel {
         return RequestModel(
-            projectId = userInfo.projectId,
+            projectId = "1",
         )
     }
 
@@ -406,11 +438,13 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
                     attendenceViewModel.imageUrl1API.value =
                         model.getJSONObject("data").getString("url")
                     attendenceViewModel.position.value = 2
+                    deleteImage(attendenceViewModel.imageUrl1.value?.toUri()!!)
                     uploadImage()
                 } else {
                     attendenceViewModel.imageUrl2API.value =
                         model.getJSONObject("data").getString("url")
                     markAttendence()
+                    deleteImage(attendenceViewModel.imageUrl2.value?.toUri()!!)
                 }
 
             }
@@ -419,24 +453,60 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
         }
     }
 
+    private fun deleteImage(uri: Uri) {
+        try {
+            val resolver = requireActivity().contentResolver
+            val rowsDeleted = resolver.delete(uri, null, null)
+            if (rowsDeleted > 0) {
+                // File successfully deleted
+            } else {
+                // File not found or couldn't be deleted
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // Handle the error
+        }
+    }
+
     private fun redirectToDashboard() {
-        when (userInfo.userType) {
-            UserTypes.MOBILISER -> {
-                val intent = Intent(activity, Dashboard::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                startActivity(intent)
-                requireActivity().finish()
-            }
+        if (!userInfo.authToken.isEmpty()) {
+            if(userInfo.projectId == "1") {
+                when (userInfo.userType) {
+                    UserTypes.MOBILISER -> {
+                        val intent = Intent(activity, Dashboard::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        startActivity(intent)
+                    }
 
-            UserTypes.FIELD_AUDITOR -> {
-                val intent = Intent(activity, FieldAuditorDashboard::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                startActivity(intent)
-                requireActivity().finish()
-            }
+                    UserTypes.FIELD_AUDITOR -> {
+                        val intent = Intent(activity, FieldAuditorDashboard::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        startActivity(intent)
+                    }
 
-            else -> {
-                // Handle other cases or default behavior
+                    else -> {
+                        // Handle other cases or default behavior
+                    }
+                }
+            }
+            else{
+                when (userInfo.userType) {
+                    UserTypes.MOBILISER -> {
+                        val intent = Intent(activity, SBMobiliserDashboard::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        startActivity(intent)
+                    }
+
+                    UserTypes.FIELD_AUDITOR -> {
+                        val intent = Intent(activity, FieldAuditorDashboard::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        startActivity(intent)
+                    }
+
+                    else -> {
+                        // Handle other cases or default behavior
+                    }
+                }
             }
         }
     }
@@ -494,11 +564,26 @@ class AttendenceFragment : Fragment(), ApiHandler, RetryInterface {
         private const val TAG = "CameraXGFG"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 20
-        private val REQUIRED_PERMISSIONS = arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
+        private val REQUIRED_PERMISSIONS =
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R){
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.RECORD_AUDIO,
+                )
+            }
+            else{
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                )
+
+            }
     }
 
 }

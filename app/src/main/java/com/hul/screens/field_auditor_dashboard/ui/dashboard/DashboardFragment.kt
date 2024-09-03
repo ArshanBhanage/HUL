@@ -492,11 +492,16 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     }
 
     override fun redirectToVisits(mobiliserData: MappedUser) {
-        val bundle = Bundle()
-        bundle.putString("mobiliserData", Gson().toJson(mobiliserData))
-        findNavController().navigate(
-            R.id.action_dashboard_to_visits,
-            bundle
-        )
+//        if (!dashboardViewModel.attendenceToday.value!!.present!!) {
+//            redirectToAttendence(ProjectInfo(location_id = "1"))
+//        } else {
+            val bundle = Bundle()
+            bundle.putString("mobiliserData", Gson().toJson(mobiliserData))
+            findNavController().navigate(
+                R.id.action_dashboard_to_visits,
+                bundle
+            )
+        //}
+
     }
 }

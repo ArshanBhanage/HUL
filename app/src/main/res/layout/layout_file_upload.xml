@@ -12,7 +12,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/public_sans"
-        android:lineHeight="28dp"
+        android:lineHeight="20dp"
         android:layout_weight="1"
         android:text="To identify house for next visit, an identifier sticker to be pasted on the door"
         android:textColor="#6d6b77"
@@ -20,6 +20,24 @@
         android:textSize="15sp"
         android:textStyle="bold"
         android:layout_marginRight="10dp"
+        app:layout_constraintEnd_toStartOf="@+id/capture"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/url"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/public_sans"
+        android:lineHeight="20dp"
+        android:layout_weight="1"
+        android:text="To identify house for next visit, an identifier sticker to be pasted on the door"
+        android:textColor="#6d6b77"
+        android:textFontWeight="400"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_marginRight="10dp"
+        android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@+id/capture"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

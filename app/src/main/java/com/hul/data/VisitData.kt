@@ -49,5 +49,42 @@ data class VisitData(
     var name_of_the_school_representative_who_mobiliser_met: VisitDetails? = null,
     var number_of_the_school_representative_who_mobiliser_met: VisitDetails? = null,
     var name_of_the_school_principal_auditor: VisitDetails? = null,
-    var number_of_the_school_principal_auditor: VisitDetails? = null
+    var number_of_the_school_principal_auditor: VisitDetails? = null,
+
+    var response: VisitDetails? = null,
+    var who_did_you_speak_with: VisitDetails? = null,
+    var did_you_take_consent_for_their_participation: VisitDetails? = null,
+    var are_you_and_your_family_aware_of_waste_segregation: VisitDetails? = null,
+    var if_yes_how_many_categories_should_it_be_segregated_in_for_proper_handling_and_processing: VisitDetails? = null,
+    var do_you_currently_segregate_your_waste_before_disposing: VisitDetails? = null,
+    var how_does_the_society_housekeeping_staff_collect_the_waste_from_your_house: VisitDetails? = null,
+    var does_this_household_have_a_champion: VisitDetails? = null,
+    var name: VisitDetails? = null,
+    var phone_number: VisitDetails? = null,
+    var would_you_like_to_support_our_initiative_by_spreading_the_awareness: VisitDetails? = null,
+    var share_your_experience: VisitDetails? = null,
+    var wing_number: VisitDetails? = null,
+    var floor: VisitDetails? = null,
+    var flatNumber: VisitDetails? = null,
+    var select_date_for_visit: VisitDetails? = null,
+    var select_time_for_visit: VisitDetails? = null,
+    var enter_another_apartment: VisitDetails? = null,
+
+    var house_code: VisitDetails? = null,
+    var customer_name: VisitDetails? = null,
+    var no_of_members_present_in_house: VisitDetails? = null,
+    var is_there_a_toilet_inside: VisitDetails? = null,
+    var is_there_a_washing_machine_in_the_house: VisitDetails? = null,
+    var has_the_customer_visited_suvidha_centre: VisitDetails? = null,
+    var enter_address: VisitDetails? = null,
+    var customer_mobile_number: VisitDetails? = null,
+    var lead_quality: VisitDetails? = null,
+    var visit_image_5: VisitDetails? = null,
+
+
+    var has_the_customer_created_a_pass_for_suvidha_center: VisitDetails? = null,
+    var add_coupon_serial_number: VisitDetails? = null,
+    var has_the_discount_coupon_for_suvidha_laundry_service_been_used_or_not: VisitDetails? = null,
+
+
 )

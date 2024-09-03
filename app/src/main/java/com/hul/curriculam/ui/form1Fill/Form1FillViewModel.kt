@@ -302,6 +302,6 @@ class Form1FillViewModel @Inject constructor(
 
     val revisitApplicable = MutableLiveData<Int>()
 
-    val revisitApplicableFlag = MutableLiveData<Boolean>(null)
+    val revisitApplicableFlag = MutableLiveData<Boolean>(false)
 
 }

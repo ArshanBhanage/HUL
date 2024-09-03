@@ -2,6 +2,7 @@ package com.hul.dashboard.ui.dashboard
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -121,6 +122,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     val perforManceList = arrayListOf("Till Date", "Today", "Yesterday", "This Week", "This Month")
 
     var perfSelectedposition = 0
+
     @Inject
     lateinit var uploadFileController: UploadFileController
 
@@ -160,7 +162,34 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
             if (granted) {
                 checkLocationSettings()
             } else {
-                requestPermission()
+                showInformationMessage()
+            }
+        }
+
+    private fun showInformationMessage() {
+        AlertDialog.Builder(requireActivity())
+            .setTitle("Permissions Needed")
+            .setMessage("You have denied the permissions. Please go to settings and allow the permissions manually.")
+            .setPositiveButton("Settings") { dialog, _ ->
+                requestPermissionSettings()
+                dialog.dismiss() // This dismisses the dialog
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun requestPermissionSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", requireActivity().packageName, null)
+        }
+        requestPermissionSetting.launch(intent)
+    }
+
+
+    private val requestPermissionSetting =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { permissions ->
+            if (!allPermissionsGranted()) {
+                showInformationMessage()
             }
         }
 
@@ -291,6 +320,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         binding!!.syncNow.setOnClickListener {
             if (syncDataList.isNotEmpty()) {
                 setProgressDialog(requireContext(), "Syncing Data")
+                binding!!.syncNow.isEnabled = false
+                binding!!.syncNow.isClickable = false
                 startSync(syncDataList[syncDataList.size - 1])
             }
         }
@@ -298,16 +329,19 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     }
 
     private fun fetchVisitData() {
-                if (isSyncing) {
-                    if (syncDataList.isNotEmpty()) {
-                        startSync(syncDataList[syncDataList.size - 1])
-                    } else {
-                        isSyncing = false
-                        cancelProgressDialog()
-                        showViewTemporarily(binding!!.llVisitSuccessToast, 2000)
-                        getTodaysVisit()
-                    }
-                }
+        if (isSyncing) {
+            if (syncDataList.isNotEmpty()) {
+                startSync(syncDataList[syncDataList.size - 1])
+            } else {
+                binding!!.syncNow.visibility = View.GONE
+                isSyncing = false
+                binding!!.syncNow.isEnabled = true
+                binding!!.syncNow.isClickable = true
+                cancelProgressDialog()
+                showViewTemporarily(binding!!.llVisitSuccessToast, 2000)
+                getTodaysVisit()
+            }
+        }
     }
 
     private fun startSync(visitDataTable: VisitDataTable) {
@@ -316,16 +350,22 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         visitDataTableUploading = visitDataTable
         requestModel = Gson().fromJson(visitDataTable.jsonData, RequestModel::class.java)
         Log.d("TAG", "startSync: ${requestModel}")
-        Log.d("TAG", "startSync: ${requestModel!!.visitData!!.visit_image_1!!.value.toString().toUri()}")
-        uploadImage(requestModel!!.visitData!!.visit_image_1!!.value.toString().toUri())
+        Log.d(
+            "TAG",
+            "startSync: ${requestModel!!.visitData!!.visit_image_1!!.value.toString().toUri()}"
+        )
+        uploadImage(
+            requestModel!!.visitData!!.visit_image_1!!.value.toString().toUri(),
+            requestModel!!.visit_number!!
+        )
     }
 
-    private fun uploadImage(imageUri: Uri) {
+    private fun uploadImage(imageUri: Uri, visitNumber: String) {
         if (ConnectionDetector(requireContext()).isConnectingToInternet()) {
             uploadFileController.getApiResponse(
                 this,
                 imageUri,
-                uploadImageModel(),
+                uploadImageModel(visitNumber),
                 ApiExtentions.ApiDef.UPLOAD_IMAGE.ordinal
             )
         } else {
@@ -333,28 +373,77 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         }
     }
 
-    private fun uploadImageModel(): RequestModel {
+    private fun uploadImageModel(visitNumber: String): RequestModel {
         var fileName: String = ""
         val visitPrefix = "project_" + userInfo.projectName;
-        when (imageIndex) {
-            0 -> {
-                fileName = visitPrefix + "_picture_of_school_name.jpeg";
-            }
+        if (visitNumber.toInt() == 1) {
+            when (imageIndex) {
+                0 -> {
+                    fileName = visitPrefix + "_image_of_school_building.jpeg";
+                }
 
-            1 -> {
-                fileName = visitPrefix + "_selfie_with_school_name.jpeg";
-            }
+                1 -> {
+                    fileName = visitPrefix + "_selfie_with_school_udise_code.jpeg";
+                }
 
-            2 -> {
-                fileName = visitPrefix + "_students_showing_filled_tracker.jpeg";
-            }
+                2 -> {
+                    fileName =
+                        visitPrefix + "_image_of_teachers_seeing_training_video_with_books_placed_on_table.jpeg";
+                }
 
-            3 -> {
-                fileName = visitPrefix + "_teacher_handling_trackers.jpeg";
-            }
+                3 -> {
+                    fileName = visitPrefix + "_image_of_acknowledgement_letter.jpeg";
+                }
 
-            4 -> {
-                fileName = visitPrefix + "_acknowledgement_letter.jpeg";
+                4 -> {
+                    fileName = visitPrefix + "_acknowledgement_letter.jpeg";
+                }
+            }
+        } else if (visitNumber.toInt() == 2) {
+            when (imageIndex) {
+                0 -> {
+                    fileName = visitPrefix + "_image_of_school_building.jpeg";
+                }
+
+                1 -> {
+                    fileName = visitPrefix + "_selfie_with_school_udise_code.jpeg";
+                }
+
+                2 -> {
+                    fileName =
+                        visitPrefix + "_image_of_students_with_swasthya_curriculum_books_in_their_hands.jpeg";
+                }
+
+                3 -> {
+                    fileName = visitPrefix + "_image_of_acknowledgement_letter.jpeg";
+                }
+
+                4 -> {
+                    fileName = visitPrefix + "_acknowledgement_letter.jpeg";
+                }
+            }
+        } else {
+            when (imageIndex) {
+                0 -> {
+                    fileName = visitPrefix + "_image_of_school_building.jpeg";
+                }
+
+                1 -> {
+                    fileName = visitPrefix + "_selfie_with_school_udise_code.jpeg";
+                }
+
+                2 -> {
+                    fileName =
+                        visitPrefix + "_image_of_filled_trackers_on_principal’s_desk_with_the_principal.jpeg";
+                }
+
+                3 -> {
+                    fileName = visitPrefix + "_image_of_acknowledgement_letter.jpeg";
+                }
+
+                4 -> {
+                    fileName = visitPrefix + "_acknowledgement_letter.jpeg";
+                }
             }
         }
 
@@ -385,13 +474,13 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         ContextCompat.checkSelfPermission(requireContext(), it) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun getPerformanceModel(filter :String): RequestModel {
+    private fun getPerformanceModel(filter: String): RequestModel {
         return RequestModel(
             date_filter = filter
         )
     }
 
-    private fun getPerformance(filter :String) {
+    private fun getPerformance(filter: String) {
         apiController.getApiResponse(
             this,
             getPerformanceModel(filter),
@@ -401,7 +490,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
     private fun getTodaysVisitModel(): RequestModel {
         return RequestModel(
-
+            status = "SUBMITTED"
         )
     }
 
@@ -678,21 +767,35 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         val locationToVisit = dialogView.findViewById<RecyclerView>(R.id.locationToVisit);
         locationToVisit.layoutManager = LinearLayoutManager(context)
         val myVisitsAdapter =
-            MyPerfAdapter(perforManceList, perfSelectedposition,object : PerfInterface {
+            MyPerfAdapter(perforManceList, perfSelectedposition, object : PerfInterface {
                 override fun onSelected(position: Int) {
                     perfSelectedposition = position
                     binding!!.tillDateButton.text = perforManceList[position]
-                    when(position){
-                        0->{getPerformance("till_date")}
-                        1->{getPerformance("today")}
-                        2->{getPerformance("yesterday")}
-                        3->{getPerformance("this_week")}
-                        4->{getPerformance("this_month")}
+                    when (position) {
+                        0 -> {
+                            getPerformance("till_date")
+                        }
+
+                        1 -> {
+                            getPerformance("today")
+                        }
+
+                        2 -> {
+                            getPerformance("yesterday")
+                        }
+
+                        3 -> {
+                            getPerformance("this_week")
+                        }
+
+                        4 -> {
+                            getPerformance("this_month")
+                        }
                     }
                     alertDialog.cancel()
                 }
 
-            } , requireContext())
+            }, requireContext())
         // Setting the Adapter with the recyclerview
         locationToVisit.adapter = myVisitsAdapter
 
@@ -723,20 +826,20 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         var districtListString = arrayListOf<String>()
         var stateListString = arrayListOf<String>()
 
-        for (state in stateList)
-        {
+        for (state in stateList) {
             stateListString.add(state.location_state)
         }
 
-        for (district in districtList)
-        {
+        for (district in districtList) {
             districtListString.add(district.area_name)
         }
 
-        val adapterDistrict = ArrayAdapter(requireContext(), R.layout.list_popup_window_item, districtListString)
+        val adapterDistrict =
+            ArrayAdapter(requireContext(), R.layout.list_popup_window_item, districtListString)
         edtDistrict.setAdapter(adapterDistrict)
 
-        val adapterState = ArrayAdapter(requireContext(), R.layout.list_popup_window_item, stateListString)
+        val adapterState =
+            ArrayAdapter(requireContext(), R.layout.list_popup_window_item, stateListString)
         edtState.setAdapter(adapterState)
 
         edtState.setOnItemClickListener { parent, view, position, id ->
@@ -834,8 +937,7 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         handler.removeCallbacksAndMessages(null)
     }
 
-    fun updateLocalList()
-    {
+    fun updateLocalList() {
         visitDataViewModel.allSyncData.observe(requireActivity()) { visitDataList ->
             syncDataList = ArrayList(visitDataList)
             binding!!.visitsLeft.text =
@@ -897,6 +999,21 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
         return RequestModel(
             projectId = userInfo.projectId
         )
+    }
+
+    private fun deleteImage(uri: Uri) {
+        try {
+            val resolver = requireActivity().contentResolver
+            val rowsDeleted = resolver.delete(uri, null, null)
+            if (rowsDeleted > 0) {
+                // File successfully deleted
+            } else {
+                // File not found or couldn't be deleted
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // Handle the error
+        }
     }
 
     override fun onApiSuccess(o: String?, objectType: Int) {
@@ -991,56 +1108,59 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                 val model = JSONObject(o.toString())
                 if (!model.getBoolean("error")) {
 
-                        val performanceData = Gson().fromJson(
-                            model.getJSONObject("data").toString(),
-                            PerformanceData::class.java
-                        )
-                        when (perfSelectedposition) {
-                            0 -> {
-                                binding!!.txtVisits.text =
-                                    performanceData.till_date.total_visits.toString()
-                                binding!!.txtAttendance.text =
-                                    String.format("%.2f", performanceData.till_date.attendance)+ "%"
-                                binding!!.txtTotalVisits.text =
-                                    String.format("%.2f", performanceData.till_date.audit_approval) + "%"
-                            }
-
-                            1 -> {
-                                binding!!.txtVisits.text =
-                                    performanceData.today.total_visits.toString()
-                                binding!!.txtAttendance.text =
-                                    performanceData.today.attendance.toString() + "%"
-                                binding!!.txtTotalVisits.text =
-                                    performanceData.today.audit_approval.toString() + "%"
-                            }
-
-                            2 -> {
-                                binding!!.txtVisits.text =
-                                    performanceData.yesterday.total_visits.toString()
-                                binding!!.txtAttendance.text =
-                                    performanceData.yesterday.attendance.toString() + "%"
-                                binding!!.txtTotalVisits.text =
-                                    performanceData.yesterday.audit_approval.toString() + "%"
-                            }
-
-                            3 -> {
-                                binding!!.txtVisits.text =
-                                    performanceData.this_week.total_visits.toString()
-                                binding!!.txtAttendance.text =
-                                    performanceData.this_week.attendance.toString() + "%"
-                                binding!!.txtTotalVisits.text =
-                                    performanceData.this_week.audit_approval.toString() + "%"
-                            }
-
-                            4 -> {
-                                binding!!.txtVisits.text =
-                                    performanceData.this_month.total_visits.toString()
-                                binding!!.txtAttendance.text =
-                                    performanceData.this_month.attendance.toString() + "%"
-                                binding!!.txtTotalVisits.text =
-                                    performanceData.this_month.audit_approval.toString() + "%"
-                            }
+                    val performanceData = Gson().fromJson(
+                        model.getJSONObject("data").toString(),
+                        PerformanceData::class.java
+                    )
+                    when (perfSelectedposition) {
+                        0 -> {
+                            binding!!.txtVisits.text =
+                                performanceData.till_date.total_visits.toString()
+                            binding!!.txtAttendance.text =
+                                String.format("%.2f", performanceData.till_date.attendance) + "%"
+                            binding!!.txtTotalVisits.text =
+                                String.format(
+                                    "%.2f",
+                                    performanceData.till_date.audit_approval
+                                ) + "%"
                         }
+
+                        1 -> {
+                            binding!!.txtVisits.text =
+                                performanceData.today.total_visits.toString()
+                            binding!!.txtAttendance.text =
+                                performanceData.today.attendance.toString() + "%"
+                            binding!!.txtTotalVisits.text =
+                                performanceData.today.audit_approval.toString() + "%"
+                        }
+
+                        2 -> {
+                            binding!!.txtVisits.text =
+                                performanceData.yesterday.total_visits.toString()
+                            binding!!.txtAttendance.text =
+                                performanceData.yesterday.attendance.toString() + "%"
+                            binding!!.txtTotalVisits.text =
+                                performanceData.yesterday.audit_approval.toString() + "%"
+                        }
+
+                        3 -> {
+                            binding!!.txtVisits.text =
+                                performanceData.this_week.total_visits.toString()
+                            binding!!.txtAttendance.text =
+                                performanceData.this_week.attendance.toString() + "%"
+                            binding!!.txtTotalVisits.text =
+                                performanceData.this_week.audit_approval.toString() + "%"
+                        }
+
+                        4 -> {
+                            binding!!.txtVisits.text =
+                                performanceData.this_month.total_visits.toString()
+                            binding!!.txtAttendance.text =
+                                performanceData.this_month.attendance.toString() + "%"
+                            binding!!.txtTotalVisits.text =
+                                performanceData.this_month.audit_approval.toString() + "%"
+                        }
+                    }
 
 
                     getTodaysVisit()
@@ -1151,8 +1271,14 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
                     visitList =
                         Gson().fromJson(model.getJSONArray("data").toString(), listType);
-                    visitList.forEachIndexed{index ,item ->
+                    visitList.forEachIndexed { index, item ->
+//                        if(!visitList[index].visit_status.equals(INITIATED) && !visitList[index].visit_status.equals(
+//                                ASSIGNED)) {
                         visitList[index].visit_status = "SUBMITTED"
+//                        }
+//                        else{
+//                            //visitList.removeAt(index)
+//                        }
                     }
                     redirectToCompleted(projectInfoCompleted)
 
@@ -1188,6 +1314,8 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                                 )
                                 visitListFromBE.add(projectInfo)
                             }
+                        } else {
+                            binding!!.syncNow.visibility = View.GONE
                         }
 
                         val myVisitsAdapter =
@@ -1216,19 +1344,36 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                 if (uploadImageData != null && imageIndex == 0) {
                     imageIndex += 1;
                     requestModel!!.visitData!!.visit_image_1!!.value = uploadImageData.url
-                    uploadImage(requestModel!!.visitData!!.visit_image_2!!.value.toString().toUri())
+                    uploadImage(
+                        requestModel!!.visitData!!.visit_image_2!!.value.toString().toUri(),
+                        requestModel!!.visit_number!!
+                    )
+
                 } else if (uploadImageData != null && imageIndex == 1) {
                     imageIndex += 1;
                     requestModel!!.visitData!!.visit_image_2!!.value = uploadImageData.url
-                    uploadImage(requestModel!!.visitData!!.visit_image_3!!.value.toString().toUri())
+                    if (requestModel!!.visitData!!.visit_image_3!!.value.toString().length > 0) {
+                        uploadImage(
+                            requestModel!!.visitData!!.visit_image_3!!.value.toString().toUri(),
+                            requestModel!!.visit_number!!
+                        )
+
+                    } else {
+                        submitForm(requestModel!!)
+                    }
                 } else if (uploadImageData != null && imageIndex == 2) {
                     imageIndex += 1;
                     requestModel!!.visitData!!.visit_image_3!!.value = uploadImageData.url
-                    uploadImage(requestModel!!.visitData!!.visit_image_4!!.value.toString().toUri())
+                    uploadImage(
+                        requestModel!!.visitData!!.visit_image_4!!.value.toString().toUri(),
+                        requestModel!!.visit_number!!
+                    )
+
                 } else if (uploadImageData != null && imageIndex == 3) {
                     imageIndex += 1;
                     requestModel!!.visitData!!.visit_image_4!!.value = uploadImageData.url
                     submitForm(requestModel!!)
+
                 }
             }
 
@@ -1240,6 +1385,16 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 //                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
 //                    startActivity(intent)
 //                    requireActivity().finish()
+                    deleteImage(requestModel!!.visitData!!.visit_image_1!!.value.toString().toUri())
+                    deleteImage(requestModel!!.visitData!!.visit_image_2!!.value.toString().toUri())
+                    if (requestModel!!.visitData!!.visit_image_3!!.value.toString().length > 0) {
+                        deleteImage(
+                            requestModel!!.visitData!!.visit_image_3!!.value.toString().toUri()
+                        )
+                        deleteImage(
+                            requestModel!!.visitData!!.visit_image_4!!.value.toString().toUri()
+                        )
+                    }
                     visitDataViewModel.deleteById(visitDataTableUploading!!.id)
                     syncDataList.removeIf { it.id == visitDataTableUploading!!.id }
                     fetchVisitData()
@@ -1274,51 +1429,13 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
     override fun redirectToAttendence(projectInfo: ProjectInfo) {
 
         Log.d("projectInfo", "redirectToAttendence: ${projectInfo}")
-            if (dashboardViewModel.attendenceToday.value?.present == true) {
+        if (dashboardViewModel.attendenceToday.value?.present == true) {
 
-                if (projectInfo.visit_status.equals("SUBMITTED", true)) {
-                    getSchoolVisitsCompleted(projectInfo.location_id!!.toInt())
-                    projectInfoCompleted = projectInfo
-                    return
-                }
-
-                val bundle = Bundle()
-                var uDiceCode = ""
-                uDiceCode = if (selectedSchoolCode?.external_id1 != null) {
-                    selectedSchoolCode?.external_id1!!
-                } else {
-                    selectedSchoolCode?.external_id2.toString()
-                }
-                bundle.putString(
-                    "uDiceCode",
-                    uDiceCode
-                )
-                bundle.putString(
-                    "schoolInformation",
-                    Gson().toJson(selectedSchoolCode)
-                )
-                bundle.putString(
-                    "visitList",
-                    Gson().toJson(visitList)
-                )
-                bundle.putString("localData", projectInfo.localString)
-                findNavController().navigate(
-                    R.id.action_schoolCodeFragment_to_schoolFormFragment,
-                    bundle
-                )
-            } else {
-                val bundle = Bundle()
-                bundle.putString("projectInfo", Gson().toJson(projectInfo))
-                findNavController().navigate(
-                    R.id.action_dashboardFragment_to_attendenceFragment,
-                    bundle
-                )
+            if (projectInfo.visit_status.equals("SUBMITTED", true)) {
+                getSchoolVisitsCompleted(projectInfo.location_id!!.toInt())
+                projectInfoCompleted = projectInfo
+                return
             }
-
-    }
-
-    fun redirectToCompleted(projectInfo: ProjectInfo) {
-
 
             val bundle = Bundle()
             var uDiceCode = ""
@@ -1344,11 +1461,48 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
                 R.id.action_schoolCodeFragment_to_schoolFormFragment,
                 bundle
             )
+        } else {
+            val bundle = Bundle()
+            bundle.putString("projectInfo", Gson().toJson(projectInfo))
+            findNavController().navigate(
+                R.id.action_dashboardFragment_to_attendenceFragment,
+                bundle
+            )
+        }
+
+    }
+
+    fun redirectToCompleted(projectInfo: ProjectInfo) {
+
+
+        val bundle = Bundle()
+        var uDiceCode = ""
+        uDiceCode = if (selectedSchoolCode?.external_id1 != null) {
+            selectedSchoolCode?.external_id1!!
+        } else {
+            selectedSchoolCode?.external_id2.toString()
+        }
+        bundle.putString(
+            "uDiceCode",
+            uDiceCode
+        )
+        bundle.putString(
+            "schoolInformation",
+            Gson().toJson(selectedSchoolCode)
+        )
+        bundle.putString(
+            "visitList",
+            Gson().toJson(visitList)
+        )
+        bundle.putString("localData", projectInfo.localString)
+        findNavController().navigate(
+            R.id.action_schoolCodeFragment_to_schoolFormFragment,
+            bundle
+        )
         visitList = ArrayList()
         projectInfoCompleted = ProjectInfo()
 
     }
-
 
 
     /*override fun redirectToAttendence(projectInfo: ProjectInfo) {
@@ -1466,11 +1620,25 @@ class DashboardFragment : Fragment(), ApiHandler, RetryInterface, DashboardFragm
 
 
     companion object {
-        private val REQUIRED_PERMISSIONS = arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
+        private val REQUIRED_PERMISSIONS =
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.RECORD_AUDIO,
+                )
+            } else {
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                )
+
+            }
 
     }
 

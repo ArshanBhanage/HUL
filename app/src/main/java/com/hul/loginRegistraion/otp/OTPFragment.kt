@@ -32,6 +32,9 @@ import com.hul.data.ResponseModel
 import com.hul.databinding.FragmentOTPBinding
 import com.hul.loginRegistraion.LoginRegisterComponent
 import com.hul.loginRegistraion.LoginRegistrationInterface
+import com.hul.salg.SalgDashboard
+import com.hul.sb.mobiliser.SBMobiliserDashboard
+import com.hul.sb.supervisor.SBSupervisorDashboard
 import com.hul.screens.field_auditor_dashboard.FieldAuditorDashboard
 import com.hul.user.UserInfo
 import com.hul.utils.ConnectionDetector
@@ -74,6 +77,7 @@ class OTPFragment : Fragment(), ApiHandler, RetryInterface {
         private val REQUEST_PHONE_STATE_PERMISSION = 101
 
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -105,9 +109,9 @@ class OTPFragment : Fragment(), ApiHandler, RetryInterface {
             )
 
         binding.loginButton.setOnClickListener {
-            if(checkPermission()){
+            if (checkPermission()) {
                 loginUser()
-            }else{
+            } else {
                 requestPermission()
             }
 
@@ -118,9 +122,9 @@ class OTPFragment : Fragment(), ApiHandler, RetryInterface {
                 // Handle Done or Send action key press
                 // Do something
                 if (otpViewModel.loginEnabled.value!! && !otpViewModel.termsAccepted.value!!) {
-                    if(checkPermission()){
+                    if (checkPermission()) {
                         loginUser()
-                    }else{
+                    } else {
                         requestPermission()
                     }
                 }
@@ -178,7 +182,8 @@ class OTPFragment : Fragment(), ApiHandler, RetryInterface {
     private fun loginModel(): RequestModel {
         return RequestModel(
             mobile = "+91" + otpViewModel.loginId.value,
-            otp = otpViewModel.otp.value
+            otp = otpViewModel.otp.value,
+            app_version = 6
         )
     }
 
@@ -207,24 +212,51 @@ class OTPFragment : Fragment(), ApiHandler, RetryInterface {
     }
 
     private fun redirectToDashboard() {
-        when (userInfo.userType) {
-            UserTypes.MOBILISER -> {
-                val intent = Intent(activity, WebForm::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                startActivity(intent)
-                requireActivity().finish()
-            }
-            UserTypes.FIELD_AUDITOR -> {
-                val intent = Intent(activity, FieldAuditorDashboard::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                startActivity(intent)
-                requireActivity().finish()
-            }
 
-            else -> {
-                // Handle other cases or default behavior
+        if (userInfo.projectId == "1") {
+            when (userInfo.userType) {
+                UserTypes.MOBILISER -> {
+                    val intent = Intent(activity, Dashboard::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                }
+
+                UserTypes.FIELD_AUDITOR -> {
+                    val intent = Intent(activity, FieldAuditorDashboard::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                }
+
+                else -> {
+                    // Handle other cases or default behavior
+                }
             }
+        } else if (userInfo.projectId == "2") {
+            when (userInfo.userType) {
+                UserTypes.MOBILISER -> {
+                    val intent = Intent(activity, SBMobiliserDashboard::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                }
+
+                UserTypes.FIELD_AUDITOR -> {
+                    val intent = Intent(activity, SBSupervisorDashboard::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                }
+
+                else -> {
+                    // Handle other cases or default behavior
+                }
+            }
+        } else if (userInfo.projectId == "3") {
+
+            val intent = Intent(activity, SBMobiliserDashboard::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            startActivity(intent)
+
         }
+
     }
 
 
@@ -256,10 +288,9 @@ class OTPFragment : Fragment(), ApiHandler, RetryInterface {
             requireContext().contentResolver,
             Secure.ANDROID_ID
         )
-        return  android_id
+        return android_id
 
     }
-
 
 
     private fun checkPermission(): Boolean {
@@ -275,7 +306,8 @@ class OTPFragment : Fragment(), ApiHandler, RetryInterface {
             REQUEST_PHONE_STATE_PERMISSION
         )
     }
-     override fun onRequestPermissionsResult(
+
+    override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
@@ -315,9 +347,18 @@ class OTPFragment : Fragment(), ApiHandler, RetryInterface {
                     val array = JSONArray(model.data!!.get("areas_mapped").toString())
                     if (array.length() > 0) {
                         userInfo.myArea = array.getJSONObject(0).getString("area_name")
+                        userInfo.areaId = array.getJSONObject(0).getString("area_id")
                     }
-                    if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.READ_PHONE_STATE), PERMISSION_REQUEST_CODE)
+                    if (ContextCompat.checkSelfPermission(
+                            requireContext(),
+                            Manifest.permission.READ_PHONE_STATE
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        ActivityCompat.requestPermissions(
+                            requireActivity(),
+                            arrayOf(Manifest.permission.READ_PHONE_STATE),
+                            PERMISSION_REQUEST_CODE
+                        )
                     } else {
                         deviceInfo()
                     }

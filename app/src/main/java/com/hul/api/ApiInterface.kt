@@ -5,6 +5,7 @@ import com.hul.data.RequestModel
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -19,6 +20,15 @@ import retrofit2.http.Query
  * Created by Nitin Chorge on 23-11-2020.
  */
 interface ApiInterface {
+
+    @POST("app/projects/v1/societies/")
+    fun getSocietyList(@Body param: RequestModel?): Call<ResponseBody?>
+
+    @GET("app/projects/v1/locations/")
+    fun getCodeList(
+        @Query("areaId") areaId: Int?,
+        @Query("sendAll") sendAll: Boolean?
+    ): Call<ResponseBody?>
 
     @GET("app/projects/v1/locations/")
     fun getLocationList(@Query("projectId") projectId: String?): Call<ResponseBody?>
@@ -41,6 +51,12 @@ interface ApiInterface {
     @GET("app/visits/v1/get_list_of_visits/")
     fun getVisitListByStatus(
         @Query("status ") status: String?,
+    ): Call<ResponseBody?>
+
+    @GET("app/visits/v1/get_list_of_visits/")
+    fun getVisitListByStatus2(
+        @Query("status") status: String?,
+        @Query("userType") userType: String?,
     ): Call<ResponseBody?>
 
     @GET("app/visits/v1/get_list_of_visits/")
@@ -149,6 +165,9 @@ interface ApiInterface {
     @POST("app/visits/v1/addVisitData/")
     fun visitData(@Body requestModel: RequestModel): Call<ResponseBody?>
 
+    @POST("app/visits/v1/addVisitData/")
+    fun submitForm(@Body requestModel: RequestBody): Call<ResponseBody?>
+
     @GET("app/projects/v1/areas")
     fun getDistricts(@Query("projectId") projectId: String): Call<ResponseBody?>
 
@@ -159,6 +178,7 @@ interface ApiInterface {
     fun addSchool(@Body requestModel: RequestModel): Call<ResponseBody?>
 
     companion object {
-        const val BASE_URL = "http://3.7.149.234:8000/"
+        const val BASE_URL = "http://3.7.149.234:8000/"//dev
+        //const val BASE_URL = "https://api.goodmetrics.in/"//prod
     }
 }

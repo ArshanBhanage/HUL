@@ -39,6 +39,9 @@
         <action
             android:id="@+id/action_visits_school_activity"
             app:destination="@id/schoolActivityFragment" />
+        <action
+            android:id="@+id/action_mobiliserVisitsFragment_to_attendenceFragment"
+            app:destination="@id/attendenceFragment" />
 
     </fragment>
 

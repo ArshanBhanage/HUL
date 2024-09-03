@@ -38,22 +38,24 @@
                 android:background="#d7dcf2">
                 <ImageView
                     android:id="@+id/logoimage"
-                    android:layout_width="@dimen/_120sdp"
-                    android:layout_height="@dimen/_80sdp"
+                    android:layout_width="@dimen/_70sdp"
+                    android:layout_height="@dimen/_45sdp"
                     android:src="@drawable/ic_curriculum_logo"
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold"
+                    android:layout_centerVertical="true"
 
                     />
                 <ImageView
-                    android:layout_width="@dimen/_120sdp"
-                    android:layout_height="@dimen/_80sdp"
+                    android:layout_width="@dimen/_90sdp"
+                    android:layout_height="@dimen/_30sdp"
                     android:src="@mipmap/hullogo"
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
                     />
             </RelativeLayout>
 
@@ -102,7 +104,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:fontFamily="@font/public_sans"
-                        android:lineHeight="28dp"
+                        android:lineHeight="20dp"
                         android:text="@string/otp_info"
                         android:textAlignment="center"
                         android:textColor="#6d6b77"
@@ -117,7 +119,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="24dp"
                         android:fontFamily="@font/public_sans"
-                        android:lineHeight="28dp"
+                        android:lineHeight="20dp"
                         android:text="@string/otp_sub_info1"
                         android:textColor="#6d6b77"
                         android:textFontWeight="400"
@@ -130,7 +132,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="24dp"
                         android:fontFamily="@font/public_sans"
-                        android:lineHeight="28dp"
+                        android:lineHeight="20dp"
                         android:text="@string/type_code"
                         android:textColor="#2F2B3D"
                         android:textFontWeight="400"
@@ -193,7 +195,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:fontFamily="@font/public_sans"
-            android:lineHeight="28dp"
+            android:lineHeight="20dp"
             android:text="@string/rights"
             android:textColor="#6d6b77"
             android:textFontWeight="400"
